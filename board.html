@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공지사항 · 자료실 — 한국관광교육연구원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest:#152a15;--deep:#1e3d1e;--hadon:#2d5a3d;
+    --path:#4a7c59;--moss:#6b9e78;--sage:#a8c5a0;
+    --gold:#c9a84c;--gold-lt:#e8d5a3;--cream:#f7f3ec;
+    --paper:#fdfbf7;--ink:#1a1a14;--ink-mid:#3d3d30;
+    --ink-soft:#6e6e5a;--border:rgba(45,90,61,0.15);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;overflow-x:hidden;}
+  ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--cream);}::-webkit-scrollbar-thumb{background:var(--moss);border-radius:3px;}
+
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(21,42,21,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:64px;}
+  .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .nav-logo-emblem{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .nav-logo-text{color:var(--gold-lt);font-size:15px;font-weight:500;}
+  .nav-logo-sub{color:var(--sage);font-size:10px;letter-spacing:0.06em;}
+  .nav-links{display:flex;gap:28px;}
+  .nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;font-size:13.5px;transition:color 0.2s;}
+  .nav-links a:hover,.nav-links a.active{color:var(--gold-lt);}
+  .nav-back{color:var(--sage);border:1px solid rgba(168,197,160,0.4);padding:7px 16px;border-radius:2px;font-size:12.5px;font-family:'Noto Sans KR',sans-serif;text-decoration:none;transition:all 0.2s;}
+  .nav-back:hover{color:var(--gold-lt);}
+  .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+  .nav-hamburger span{width:22px;height:1.5px;background:var(--gold-lt);display:block;}
+
+  .page-hero{background:var(--forest);padding:110px 5% 56px;position:relative;overflow:hidden;}
+  .page-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 50px,rgba(201,168,76,0.04) 50px,rgba(201,168,76,0.04) 51px);}
+  .page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .page-hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
+  .breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+  .breadcrumb a{color:rgba(255,255,255,0.45);font-size:12px;text-decoration:none;}
+  .breadcrumb a:hover{color:var(--sage);}
+  .breadcrumb-sep{color:rgba(255,255,255,0.2);font-size:11px;}
+  .breadcrumb-cur{color:var(--gold);font-size:12px;}
+  .page-hero h1{font-family:'Nanum Myeongjo',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;color:#fff;}
+  .page-hero h1 em{font-style:normal;color:var(--gold);}
+  .page-hero-desc{color:rgba(255,255,255,0.55);font-size:14px;margin-top:10px;}
+
+  .board-layout{max-width:1100px;margin:0 auto;padding:56px 5% 96px;display:grid;grid-template-columns:200px 1fr;gap:48px;align-items:start;}
+
+  .sidebar{position:sticky;top:88px;}
+  .sidebar-menu{background:#fff;border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .sidebar-group-title{background:var(--hadon);color:white;font-size:12px;font-weight:700;padding:12px 16px;letter-spacing:0.06em;}
+  .sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-size:13.5px;color:var(--ink-mid);text-decoration:none;cursor:pointer;border-bottom:1px solid rgba(45,90,61,0.07);transition:all 0.18s;}
+  .sidebar-item:last-child{border-bottom:none;}
+  .sidebar-item:hover{background:var(--cream);color:var(--hadon);}
+  .sidebar-item.active{background:var(--cream);color:var(--hadon);font-weight:700;border-left:3px solid var(--hadon);padding-left:13px;}
+  .sidebar-count{font-size:11px;color:var(--ink-soft);background:var(--cream);padding:1px 7px;border-radius:10px;}
+  .sidebar-item.active .sidebar-count{background:rgba(45,90,61,0.15);color:var(--hadon);}
+
+  .board-tabs{display:flex;border-bottom:2px solid var(--hadon);}
+  .board-tab{padding:12px 28px;font-size:14px;font-weight:500;color:var(--ink-soft);cursor:pointer;border:none;background:none;font-family:'Noto Sans KR',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.18s;}
+  .board-tab:hover{color:var(--hadon);}
+  .board-tab.active{color:var(--hadon);font-weight:700;border-bottom-color:var(--hadon);}
+
+  .board-panel{display:none;}
+  .board-panel.active{display:block;}
+
+  .board-toolbar{display:flex;justify-content:space-between;align-items:center;padding:16px 0;flex-wrap:wrap;gap:12px;}
+  .board-count{font-size:13px;color:var(--ink-soft);}
+  .board-count strong{color:var(--hadon);font-weight:700;}
+  .search-box{display:flex;align-items:center;border:1px solid rgba(45,90,61,0.25);border-radius:3px;overflow:hidden;background:#fff;}
+  .search-box input{border:none;outline:none;padding:8px 14px;font-size:13px;font-family:'Noto Sans KR',sans-serif;width:200px;background:transparent;color:var(--ink);}
+  .search-box button{background:var(--hadon);color:white;border:none;padding:8px 14px;cursor:pointer;font-size:13px;}
+  .search-box button:hover{background:var(--path);}
+
+  .notice-table{width:100%;border-collapse:collapse;}
+  .notice-table thead tr{background:var(--cream);border-bottom:2px solid var(--hadon);}
+  .notice-table th{padding:12px 14px;font-size:12.5px;font-weight:700;color:var(--hadon);text-align:left;letter-spacing:0.04em;}
+  .notice-table th.col-num{width:56px;text-align:center;}
+  .notice-table th.col-cat{width:90px;}
+  .notice-table th.col-date{width:100px;}
+  .notice-table th.col-views{width:60px;text-align:center;}
+  .notice-table tbody tr{border-bottom:1px solid rgba(45,90,61,0.1);transition:background 0.15s;cursor:pointer;}
+  .notice-table tbody tr:hover{background:var(--cream);}
+  .notice-table td{padding:14px 14px;font-size:13.5px;color:var(--ink-mid);vertical-align:middle;}
+  .notice-table td.col-num{text-align:center;font-size:12px;color:var(--ink-soft);}
+  .notice-table td.col-views{text-align:center;font-size:12px;color:var(--ink-soft);}
+  .notice-table td.col-date{font-size:12px;color:var(--ink-soft);}
+  .row-pinned td{background:rgba(45,90,61,0.04)!important;}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:2px;letter-spacing:0.04em;margin-right:6px;vertical-align:middle;}
+  .badge-notice{background:var(--hadon);color:white;}
+  .badge-prog{background:#e8f2e9;color:#1a4a28;border:1px solid rgba(45,90,61,0.2);}
+  .badge-edu{background:#E6F1FB;color:#0C447C;border:1px solid rgba(23,95,165,0.2);}
+  .badge-new{display:inline-block;font-size:9px;font-weight:700;color:#c0392b;margin-left:5px;vertical-align:middle;}
+  .pin-icon{color:var(--gold);font-size:13px;margin-right:2px;}
+
+  .file-grid{display:flex;flex-direction:column;}
+  .file-item{display:grid;grid-template-columns:52px 1fr auto;gap:0;border-bottom:1px solid rgba(45,90,61,0.1);padding:18px 0;align-items:center;transition:background 0.15s;}
+  .file-item:first-child{border-top:2px solid var(--hadon);}
+  .file-item:hover{background:var(--cream);padding-left:8px;padding-right:8px;margin:0 -8px;border-radius:3px;}
+  .file-icon-wrap{width:40px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:20px;flex-shrink:0;}
+  .fi-pdf{background:#fceaea;} .fi-doc{background:#e6eef8;} .fi-img{background:#e8f7ef;}
+  .file-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;line-height:1.4;}
+  .file-meta{font-size:12px;color:var(--ink-soft);display:flex;gap:14px;flex-wrap:wrap;}
+  .file-dl-btn{display:flex;align-items:center;gap:6px;background:var(--cream);border:1px solid rgba(45,90,61,0.2);color:var(--hadon);font-size:12px;font-weight:500;padding:7px 14px;border-radius:3px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.18s;white-space:nowrap;text-decoration:none;flex-shrink:0;margin-left:16px;}
+  .file-dl-btn:hover{background:var(--hadon);color:white;border-color:var(--hadon);}
+
+  .detail-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;padding:20px;}
+  .detail-overlay.open{display:flex;}
+  .detail-box{background:var(--paper);border-radius:6px;max-width:740px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.25);}
+  .detail-head{background:var(--hadon);padding:24px 28px;border-radius:6px 6px 0 0;position:sticky;top:0;z-index:2;}
+  .detail-head-cat{color:var(--sage);font-size:11.5px;letter-spacing:0.1em;margin-bottom:8px;}
+  .detail-head-title{color:#fff;font-family:'Nanum Myeongjo',serif;font-size:1.35rem;font-weight:800;line-height:1.4;}
+  .detail-head-meta{color:rgba(255,255,255,0.55);font-size:12px;margin-top:10px;}
+  .detail-close{position:absolute;top:18px;right:22px;background:none;border:none;color:rgba(255,255,255,0.6);font-size:22px;cursor:pointer;}
+  .detail-close:hover{color:white;}
+  .detail-body{padding:32px 28px;}
+  .detail-body p{font-size:14.5px;color:var(--ink-mid);line-height:2.05;margin-bottom:18px;}
+  .detail-body p:last-child{margin-bottom:0;}
+  .detail-body a{color:var(--hadon);font-weight:700;}
+  .detail-nav{border-top:1px solid var(--border);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;}
+  .detail-nav a{font-size:13px;color:var(--hadon);text-decoration:none;}
+  .detail-nav-list{font-size:13px;color:var(--ink-soft);background:var(--cream);padding:7px 16px;border-radius:2px;cursor:pointer;border:1px solid var(--border);font-family:'Noto Sans KR',sans-serif;}
+
+  .info-box{margin-top:20px;padding:16px 20px;background:var(--cream);border-radius:4px;border-left:3px solid var(--hadon);font-size:13.5px;color:var(--ink-mid);line-height:1.85;}
+  .info-box a{color:var(--hadon);font-weight:700;}
+
+  @media (max-width:900px){
+    .nav-links{display:none;}.nav-hamburger{display:flex;}
+    .board-layout{grid-template-columns:1fr;gap:24px;}.sidebar{position:static;}
+    .board-tabs{overflow-x:auto;}
+    .notice-table th.col-views,.notice-table td.col-views{display:none;}
+    .search-box input{width:140px;}
+    .file-item{grid-template-columns:44px 1fr;}.file-dl-btn{display:none;}
+  }
+  .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:99;background:rgba(21,42,21,0.98);flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+  .mobile-nav-overlay.open{display:flex;}
+  .mobile-nav-overlay a{color:rgba(255,255,255,0.85);text-decoration:none;font-size:18px;}
+  .mobile-nav-overlay a:hover{color:var(--gold);}
+  .mobile-nav-close{position:absolute;top:20px;right:5%;font-size:24px;color:var(--sage);cursor:pointer;background:none;border:none;}
+</style>
+</head>
+<body>
+
+<div class="mobile-nav-overlay" id="mobileNav">
+  <button class="mobile-nav-close" onclick="document.getElementById('mobileNav').classList.remove('open');document.body.style.overflow=''">✕</button>
+  <a href="index.html#greeting">원장 인사말</a>
+  <a href="index.html#about">연구원 소개</a>
+  <a href="index.html#course">백의종군로</a>
+  <a href="index.html#programs">프로그램</a>
+  <a href="board.html">공지·자료</a>
+  <a href="index.html#contact">문의·신청</a>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-emblem">⛵</div>
+    <div>
+      <div class="nav-logo-text">한국관광교육연구원</div>
+      <div class="nav-logo-sub">Korea Tourism Education Research Association</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#greeting">원장 인사말</a>
+    <a href="index.html#about">연구원 소개</a>
+    <a href="index.html#course">백의종군로</a>
+    <a href="index.html#programs">프로그램</a>
+    <a href="board.html" class="active">공지·자료</a>
+    <a href="index.html#contact">문의·신청</a>
+  </div>
+  <a href="index.html" class="nav-back">← 홈으로</a>
+  <div class="nav-hamburger" onclick="document.getElementById('mobileNav').classList.add('open');document.body.style.overflow='hidden'">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div class="breadcrumb">
+      <a href="index.html">홈</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-cur" id="heroBreadcrumb">공지사항</span>
+    </div>
+    <h1>공지사항 &amp; <em>자료실</em></h1>
+    <p class="page-hero-desc">연구원 공지사항, 탐방 일정·신청, 각종 서식 및 문의 안내입니다.</p>
+  </div>
+</div>
+
+<div class="board-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-menu">
+      <div class="sidebar-group-title">소식 · 자료</div>
+      <a class="sidebar-item active" onclick="switchTab('notice',this)">
+        공지사항 <span class="sidebar-count">2</span>
+      </a>
+      <a class="sidebar-item" onclick="switchTab('program',this)">
+        탐방 일정·신청 <span class="sidebar-count">2</span>
+      </a>
+      <a class="sidebar-item" onclick="switchTab('archive',this)">
+        자료실 <span class="sidebar-count">3</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div>
+
+    <div class="board-tabs">
+      <button class="board-tab active" onclick="switchTab('notice',null)" id="tab-notice">공지사항</button>
+      <button class="board-tab" onclick="switchTab('program',null)" id="tab-program">탐방 일정·신청</button>
+      <button class="board-tab" onclick="switchTab('archive',null)" id="tab-archive">자료실</button>
+    </div>
+
+    <!-- 공지사항 -->
+    <div class="board-panel active" id="panel-notice">
+      <div class="board-toolbar">
+        <span class="board-count">전체 <strong>2</strong>건</span>
+        <div class="search-box">
+          <input type="text" placeholder="제목 검색..." id="searchNotice" oninput="doSearch('notice','searchNotice')">
+          <button onclick="doSearch('notice','searchNotice')">🔍</button>
+        </div>
+      </div>
+      <table class="notice-table" id="tableNotice">
+        <thead>
+          <tr>
+            <th class="col-num">번호</th>
+            <th class="col-cat">분류</th>
+            <th>제목</th>
+            <th class="col-date">등록일</th>
+            <th class="col-views">조회</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-pinned" onclick="openDetail('n1')">
+            <td class="col-num"><span class="pin-icon">📌</span></td>
+            <td><span class="badge badge-notice">공지</span></td>
+            <td><strong>2025년 이충무공 백의종군로 탐방 프로그램 운영 안내</strong><span class="badge-new">NEW</span></td>
+            <td class="col-date">2025.03.10</td>
+            <td class="col-views">284</td>
+          </tr>
+          <tr onclick="openDetail('n2')">
+            <td class="col-num">1</td>
+            <td><span class="badge badge-prog">프로그램</span></td>
+            <td>2025 임진왜란 아카데미 참가 학교 모집 공고<span class="badge-new">NEW</span></td>
+            <td class="col-date">2025.01.15</td>
+            <td class="col-views">312</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 탐방 일정 -->
+    <div class="board-panel" id="panel-program">
+      <div class="board-toolbar">
+        <span class="board-count">전체 <strong>2</strong>건</span>
+        <div class="search-box">
+          <input type="text" placeholder="제목 검색..." id="searchProgram" oninput="doSearch('program','searchProgram')">
+          <button onclick="doSearch('program','searchProgram')">🔍</button>
+        </div>
+      </div>
+      <table class="notice-table" id="tableProgram">
+        <thead>
+          <tr>
+            <th class="col-num">번호</th>
+            <th class="col-cat">구분</th>
+            <th>탐방 일정 및 내용</th>
+            <th class="col-date">신청 마감</th>
+            <th class="col-views">정원</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="openDetail('pr1')">
+            <td class="col-num">2</td>
+            <td><span class="badge badge-edu">아카데미</span></td>
+            <td><strong>2025 임진왜란 아카데미 — 정기룡 장군 유숙지 체험</strong><span class="badge-new">모집중</span></td>
+            <td class="col-date">2025.07.10</td>
+            <td class="col-views">50명</td>
+          </tr>
+          <tr onclick="openDetail('pr2')">
+            <td class="col-num">1</td>
+            <td><span class="badge badge-prog">학교</span></td>
+            <td>2025 상반기 1구간 탐방 — 좌절의 길 (화개장터~하동읍성, 28km)</td>
+            <td class="col-date">2025.04.30</td>
+            <td class="col-views">60명</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="info-box">
+        탐방 신청은 홈페이지 <a href="index.html#contact">문의·신청 페이지</a> 또는
+        전화 <a href="tel:010-2786-7822">010-2786-7822</a>로 접수하실 수 있습니다.
+      </div>
+    </div>
+
+    <!-- 자료실 -->
+    <div class="board-panel" id="panel-archive">
+      <div class="board-toolbar">
+        <span class="board-count">전체 <strong>3</strong>건</span>
+      </div>
+      <div class="file-grid">
+
+        <div class="file-item">
+          <div class="file-icon-wrap fi-doc">📋</div>
+          <div class="file-info">
+            <div class="file-title">탐방 체험학습 신청 (학교·단체·개인)</div>
+            <div class="file-meta"><span>온라인 신청</span><span>2025년 최신</span></div>
+          </div>
+          <a class="file-dl-btn" href="index.html#contact">✏ 온라인 신청</a>
+        </div>
+
+        <div class="file-item">
+          <div class="file-icon-wrap fi-img">📞</div>
+          <div class="file-info">
+            <div class="file-title">전화 문의 — 팽현호 원장 직통</div>
+            <div class="file-meta"><span>평일 09:00 ~ 18:00</span></div>
+          </div>
+          <a class="file-dl-btn" href="tel:010-2786-7822">📞 전화하기</a>
+        </div>
+
+        <div class="file-item">
+          <div class="file-icon-wrap fi-pdf">✉</div>
+          <div class="file-info">
+            <div class="file-title">이메일 문의 — phyunhoo@naver.com</div>
+            <div class="file-meta"><span>프로그램·자료 요청</span></div>
+          </div>
+          <a class="file-dl-btn" href="mailto:phyunhoo@naver.com">✉ 메일 보내기</a>
+        </div>
+
+      </div>
+      <div class="info-box" style="margin-top:28px;">
+        📎 정관, 법인설립허가증, 고유번호증, 세부계획서 등 법인 서류 및 탐방 상세 자료는
+        이메일 <a href="mailto:phyunhoo@naver.com">phyunhoo@naver.com</a> 또는
+        전화 <a href="tel:010-2786-7822">010-2786-7822</a>로 요청하시면 신속히 안내해 드립니다.
+      </div>
+    </div>
+
+  </div><!-- /board-main -->
+</div><!-- /board-layout -->
+
+<!-- DETAIL OVERLAY -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-box">
+    <div class="detail-head" style="position:relative;">
+      <button class="detail-close" onclick="closeDetailBtn()">✕</button>
+      <div class="detail-head-cat" id="dCat"></div>
+      <div class="detail-head-title" id="dTitle"></div>
+      <div class="detail-head-meta" id="dMeta"></div>
+    </div>
+    <div class="detail-body" id="dBody"></div>
+    <div class="detail-nav">
+      <a href="#" onclick="closeDetailBtn();return false;">← 목록으로</a>
+      <button class="detail-nav-list" onclick="closeDetailBtn()">목록</button>
+    </div>
+  </div>
+</div>
+
+<footer style="background:var(--forest);padding:40px 5%;border-top:1px solid rgba(201,168,76,0.2);">
+  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div style="color:rgba(255,255,255,0.45);font-size:12.5px;line-height:2.1;">
+      <span style="color:var(--gold);font-family:'Nanum Myeongjo',serif;font-size:15px;font-weight:800;">사단법인 한국관광교육연구원</span><br>
+      경남 하동군 옥종면 옥종중앙길 132 (옥종관 1층)
+      &nbsp;|&nbsp; <a href="tel:010-2786-7822" style="color:rgba(255,255,255,0.6);text-decoration:none;">010-2786-7822</a>
+      &nbsp;|&nbsp; <a href="mailto:phyunhoo@naver.com" style="color:rgba(255,255,255,0.6);text-decoration:none;">phyunhoo@naver.com</a>
+    </div>
+    <a href="index.html" style="color:var(--sage);font-size:13px;text-decoration:none;border:1px solid rgba(168,197,160,0.3);padding:8px 18px;border-radius:2px;">← 메인으로</a>
+  </div>
+</footer>
+
+<script>
+const details = {
+  n1:{
+    cat:'공지사항', title:'2025년 이충무공 백의종군로 탐방 프로그램 운영 안내',
+    meta:'등록일 2025.03.10 · 조회 284 · 사무국',
+    body:`<p>안녕하십니까. 사단법인 한국관광교육연구원입니다.</p>
+<p>2025년도 이충무공 백의종군로 탐방 프로그램 운영 일정을 아래와 같이 안내드립니다. 경남 하동 화개장터에서 문암정까지 총 82km의 역사 탐방 코스를 3구간으로 나누어 운영하며, 학교 단체·일반 시민·기업 연수 등 다양한 형태로 신청하실 수 있습니다.</p>
+<p>■ 탐방 기간 : 2025년 4월 ~ 10월 (탄력 운영)<br>
+■ 탐방 코스 : 1구간 좌절의 길(28km) / 2구간 고난의 길(28km) / 3구간 고뇌의 길(26km) 중 선택<br>
+■ 대상 : 초·중·고등학생 단체, 일반 시민, 기업·공공기관<br>
+■ 신청 : <a href="index.html#contact">홈페이지 온라인 신청</a> 또는 전화 <a href="tel:010-2786-7822">010-2786-7822</a></p>
+<p>자세한 일정 및 비용은 사무국으로 문의해 주시기 바랍니다. 많은 관심과 참여 부탁드립니다.</p>`
+  },
+  n2:{
+    cat:'프로그램', title:'2025 임진왜란 아카데미 참가 학교 모집 공고',
+    meta:'등록일 2025.01.15 · 조회 312',
+    body:`<p>2025년 임진왜란 아카데미 참가 학교를 모집합니다.</p>
+<p>정기룡 장군 유숙지 현장 체험 및 하동군 역사문화 탐방을 병행하는 이번 프로그램은 중·고등학교를 대상으로 운영됩니다.</p>
+<p>■ 운영 일정 : 2025년 6 ~ 8월 중<br>
+■ 참가 대상 : 전국 중·고등학교 단체 (20명 이상)<br>
+■ 신청 기한 : 2025년 5월 31일까지<br>
+■ 문의 : <a href="tel:010-2786-7822">010-2786-7822</a> / <a href="mailto:phyunhoo@naver.com">phyunhoo@naver.com</a></p>`
+  },
+  pr1:{
+    cat:'탐방 일정', title:'2025 임진왜란 아카데미 — 정기룡 장군 유숙지 체험',
+    meta:'신청 마감 2025.07.10 · 정원 50명',
+    body:`<p>2025년 임진왜란 아카데미 참가자를 모집합니다.</p>
+<p>■ 탐방 일정 : 2025년 8월 예정<br>
+■ 주요 코스 : 정기룡 장군 유숙지 → 하동군 역사문화 체험<br>
+■ 정원 : 50명 (선착순 마감)<br>
+■ 대상 : 중·고등학교 단체</p>
+<p>신청 : <a href="index.html#contact">온라인 신청폼</a> 또는 <a href="tel:010-2786-7822">010-2786-7822</a></p>`
+  },
+  pr2:{
+    cat:'탐방 일정', title:'2025 상반기 1구간 탐방 — 좌절의 길 (화개장터~하동읍성)',
+    meta:'신청 마감 2025.04.30 · 정원 60명',
+    body:`<p>2025년 상반기 백의종군로 1구간 탐방 프로그램을 모집합니다.</p>
+<p>■ 탐방 구간 : 화개장터 → 하동읍성 (28km, 약 7시간)<br>
+■ 탐방 일정 : 2025년 5월 예정<br>
+■ 정원 : 60명 (선착순)<br>
+■ 포함 사항 : 안전 인솔 가이드, 스토리텔링 해설, 수료증 발급</p>
+<p>신청 : <a href="index.html#contact">온라인 신청폼</a> 또는 <a href="tel:010-2786-7822">010-2786-7822</a></p>`
+  }
+};
+
+function switchTab(id,el){
+  document.querySelectorAll('.board-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.board-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s=>s.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  else document.querySelectorAll('.sidebar-item').forEach(s=>{
+    if(s.getAttribute('onclick')&&s.getAttribute('onclick').includes("'"+id+"'"))s.classList.add('active');
+  });
+  const lb={notice:'공지사항',program:'탐방 일정·신청',archive:'자료실'};
+  document.getElementById('heroBreadcrumb').textContent=lb[id]||'소식·자료';
+}
+function openDetail(id){
+  const d=details[id]; if(!d)return;
+  document.getElementById('dCat').textContent=d.cat;
+  document.getElementById('dTitle').textContent=d.title;
+  document.getElementById('dMeta').textContent=d.meta;
+  document.getElementById('dBody').innerHTML=d.body;
+  document.getElementById('detailOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDetail(e){if(e.target===document.getElementById('detailOverlay'))closeDetailBtn();}
+function closeDetailBtn(){document.getElementById('detailOverlay').classList.remove('open');document.body.style.overflow='';}
+function doSearch(panelId,inputId){
+  const q=document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll('#panel-'+panelId+' tbody tr').forEach(tr=>{
+    tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+</script>
+</body>
+</html>
