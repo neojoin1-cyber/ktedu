@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{
   --forest:#152a15;--deep:#1e3d1e;--hadon:#2d5a3d;
@@ -26,8 +27,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(21,42,21,.97
 .nav-logo-emblem{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .nav-logo-text{color:var(--gold-lt);font-size:15px;font-weight:500;}
 .nav-logo-sub{color:var(--sage);font-size:10px;letter-spacing:.06em;}
-.nav-links{display:flex;gap:28px;}
-.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13.5px;transition:color .2s;}
+.nav-links{display:flex;gap:18px;}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:12.5px;transition:color .2s;white-space:nowrap;}
 .nav-links a:hover,.nav-links a.active{color:var(--gold-lt);}
 .nav-back{color:var(--sage);border:1px solid rgba(168,197,160,.4);padding:7px 16px;border-radius:2px;font-size:12.5px;text-decoration:none;}
 .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
@@ -186,9 +187,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(21,42,21,.97
 
 <!-- ★★★ Supabase 설정 — board.html과 동일한 값 입력 ★★★ -->
 <script>
-const SUPA_URL  = 'https://qinhvivdlbhmchjeiehn.supabase.co';
-const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';
+const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 const SITE_NAME = '한국관광교육연구원';
+
+// ★ EmailJS 설정 — emailjs.com 가입 후 아래 3가지 값 교체
+// 가입 방법은 아래 주석 참고
+const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';   // Account → General → Public Key
+const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';           // Email Services → Service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';          // Email Templates → Template ID
+const ADMIN_EMAIL         = 'kbe@daum.net';              // 수신할 관리자 이메일
 </script>
 
 <div class="mob-nav" id="mobNav">
@@ -555,6 +563,28 @@ async function doSignup() {
       else showToast('오류: ' + error.message, true);
       return;
     }
+
+    // 관리자에게 이메일 발송 (EmailJS)
+    if (EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
+      try {
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email   : ADMIN_EMAIL,
+          to_name    : '관리자',
+          from_name  : name,
+          from_email : email,
+          phone      : phone || '미입력',
+          org        : org   || '미입력',
+          site_name  : SITE_NAME,
+          approve_url: window.location.href,
+          message    : `${name}님(${email})이 회원가입을 신청했습니다.\n소속: ${org||'미입력'}\n연락처: ${phone||'미입력'}\n\n${window.location.href} 에서 승인해 주세요.`
+        });
+      } catch(mailErr) {
+        console.warn('이메일 발송 실패:', mailErr);
+        // 이메일 실패해도 가입 신청은 정상 처리
+      }
+    }
+
     // 자동 로그인
     const { data: rows } = await db.rpc('login_member', { p_email: email, p_pw_hash: pwHash });
     if (rows && rows.length) { curUser = rows[0]; saveSession(); showMemberArea(); }
@@ -591,10 +621,19 @@ async function doLogin() {
 /* ══════════════════════════════════
    SESSION (sessionStorage)
 ══════════════════════════════════ */
-function saveSession()   { sessionStorage.setItem('ktea_user', JSON.stringify(curUser)); }
-function clearSession()  { sessionStorage.removeItem('ktea_user'); }
-function loadSession()   {
-  try { const s = sessionStorage.getItem('ktea_user'); if(s) curUser = JSON.parse(s); } catch(e){}
+const SESSION_KEY = 'ktea_member_session';
+const SESSION_TTL = 24 * 60 * 60 * 1000;
+
+function saveSession()  { localStorage.setItem(SESSION_KEY, JSON.stringify({ user: curUser, ts: Date.now() })); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+function loadSession()  {
+  try {
+    const s = localStorage.getItem(SESSION_KEY);
+    if (!s) return;
+    const { user, ts } = JSON.parse(s);
+    if (Date.now() - ts < SESSION_TTL) { curUser = user; }
+    else localStorage.removeItem(SESSION_KEY);
+  } catch(e) {}
 }
 
 function doLogout() {
@@ -815,7 +854,7 @@ document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal('memoModal'); });
 
 /* ══════════════════════════════════
-   BOOT — 세션 복원
+   BOOT — 세션 복원 (24시간 유지)
 ══════════════════════════════════ */
 loadSession();
 if (curUser) showMemberArea();

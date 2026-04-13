@@ -33,8 +33,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 .nav-logo-emblem{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .nav-logo-text{color:var(--gold-lt);font-size:15px;font-weight:500;}
 .nav-logo-sub{color:var(--sage);font-size:10px;letter-spacing:.06em;}
-.nav-links{display:flex;gap:28px;}
-.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13.5px;transition:color .2s;}
+.nav-links{display:flex;gap:18px;}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:12.5px;transition:color .2s;white-space:nowrap;}
 .nav-links a:hover,.nav-links a.active{color:var(--gold-lt);}
 .nav-right{display:flex;align-items:center;gap:10px;}
 .nav-back{color:var(--sage);border:1px solid rgba(168,197,160,.4);padding:7px 16px;border-radius:2px;font-size:12.5px;text-decoration:none;transition:all .2s;font-family:'Noto Sans KR',sans-serif;}
@@ -267,7 +267,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 const ADMIN_ID = 'admin';
-const ADMIN_PW = 'ktea2025!';   // ← 변경 권장
+const ADMIN_PW = 'ktedu2604';
+const SESSION_KEY = 'ktea_admin_session';
+const SESSION_TTL = 24 * 60 * 60 * 1000; // 24시간
 const PER_PAGE = 10;
 </script>
 
@@ -452,7 +454,7 @@ const PER_PAGE = 10;
         <div class="form-error" id="lerr">아이디 또는 비밀번호가 올바르지 않습니다.</div>
       </div>
       <button class="btn-login" onclick="doLogin()">로그인</button>
-      <p class="login-hint">초기 계정 : <strong>admin</strong> / <strong>ktea2025!</strong><br>서버 배포 전 코드 내 비밀번호를 변경하세요.</p>
+      <p class="login-hint">관리자 ID : <strong>admin</strong> / 비밀번호 : <strong>ktedu2604</strong></p>
     </div>
   </div>
 </div>
@@ -551,8 +553,21 @@ const db = createClient(SUPA_URL, SUPA_KEY);
 let isAdmin      = false;
 let curTab       = 'notice';
 let curPage      = { notice:1, program:1, archive:1 };
-let pendingFiles = [];    // File objects — new uploads
-let existingFiles = [];   // { id, name, size, storage_path } — already saved, deletable
+let pendingFiles = [];
+let existingFiles = [];
+
+/* ── 관리자 세션 (localStorage, 24시간 유지) ── */
+function saveAdminSession()  { localStorage.setItem(SESSION_KEY, JSON.stringify({ ts: Date.now() })); }
+function clearAdminSession() { localStorage.removeItem(SESSION_KEY); }
+function loadAdminSession()  {
+  try {
+    const s = localStorage.getItem(SESSION_KEY);
+    if (!s) return false;
+    const { ts } = JSON.parse(s);
+    if (Date.now() - ts < SESSION_TTL) return true;
+    localStorage.removeItem(SESSION_KEY); return false;
+  } catch(e) { return false; }
+}
 
 /* ═══════════════════════════════════════
    BADGE MAP
@@ -778,21 +793,31 @@ function onAdminClick() {
   if (isAdmin) doLogout(); else openModal('loginModal');
 }
 function doLogin() {
-  const id = document.getElementById('lid').value.trim();
-  const pw = document.getElementById('lpw').value;
+  const id  = document.getElementById('lid').value.trim();
+  const pw  = document.getElementById('lpw').value;
   const err = document.getElementById('lerr');
-  if (id===ADMIN_ID && pw===ADMIN_PW) {
-    isAdmin=true; closeModal('loginModal');
-    document.getElementById('lid').value=''; document.getElementById('lpw').value='';
+  if (id === ADMIN_ID && pw === ADMIN_PW) {
+    isAdmin = true;
+    saveAdminSession();
+    closeModal('loginModal');
+    document.getElementById('lid').value = '';
+    document.getElementById('lpw').value = '';
     err.classList.remove('show');
-    updateAdminUI(); showToast('관리자로 로그인되었습니다.');
+    updateAdminUI();
+    showToast('관리자로 로그인되었습니다.');
   } else {
     err.classList.add('show');
     document.getElementById('lpw').classList.add('err');
-    document.getElementById('lpw').value=''; document.getElementById('lpw').focus();
+    document.getElementById('lpw').value = '';
+    document.getElementById('lpw').focus();
   }
 }
-function doLogout() { isAdmin=false; updateAdminUI(); showToast('로그아웃되었습니다.'); }
+function doLogout() {
+  isAdmin = false;
+  clearAdminSession();
+  updateAdminUI();
+  showToast('로그아웃되었습니다.');
+}
 
 function updateAdminUI() {
   const bar = document.getElementById('adminBar');
@@ -991,6 +1016,9 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','wri
 /* ═══════════════════════════════════════
    BOOT
 ═══════════════════════════════════════ */
+// 세션 복원 — 24시간 이내 로그인 기록 있으면 자동 관리자 모드
+if (loadAdminSession()) { isAdmin = true; updateAdminUI(); }
+
 loadBoard('notice');
 Promise.all(['notice','program','archive'].map(b=>
   db.from('posts').select('id',{count:'exact',head:true}).eq('board',b).then(({count})=>{
