@@ -266,6 +266,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 <script>
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
+
 const SESSION_KEY        = 'ktea_board_admin';     // board 전용 (admin ID/PW)
 const MEMBER_SESSION_KEY = 'ktea_member_session';  // mypage 공유
 const SESSION_TTL        = 24 * 60 * 60 * 1000;   // 24시간
@@ -317,6 +318,7 @@ const ADMIN_PW = 'ktedu2604';
   </div>
   <div class="admin-bar-right">
     <button class="btn-write" onclick="openWrite(null,null)">✏ 새 글 작성</button>
+    <button class="btn-logout" id="btnAdminPwChange" style="display:none" onclick="openAdminPwModal()">🔑 비번 변경</button>
     <button class="btn-logout" onclick="doLogout()">로그아웃</button>
   </div>
 </div>
@@ -446,33 +448,49 @@ const ADMIN_PW = 'ktedu2604';
       <p>관리자 또는 승인된 회원으로 로그인합니다.</p>
     </div>
     <div class="login-body">
-      <!-- 이메일 로그인 (Supabase 회원 — 관리자·일반회원 공용) -->
       <div class="form-group">
-        <label class="form-label">이메일</label>
-        <input class="form-input" type="email" id="lid" placeholder="이메일 주소" autocomplete="email">
+        <label class="form-label">이메일 또는 관리자 ID</label>
+        <input class="form-input" type="text" id="lid" placeholder="이메일 주소 또는 ID 입력" autocomplete="username">
       </div>
       <div class="form-group">
         <label class="form-label">비밀번호</label>
         <input class="form-input" type="password" id="lpw" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-        <div class="form-error" id="lerr">이메일·비밀번호 불일치 또는 승인 대기 중입니다.</div>
+        <div class="form-error" id="lerr">아이디·비밀번호가 올바르지 않거나 승인 대기 중입니다.</div>
       </div>
       <button class="btn-login" id="btnBoardLogin" onclick="doLogin()">로그인</button>
+    </div>
+  </div>
+</div>
 
-      <!-- 구분선 -->
-      <div style="display:flex;align-items:center;gap:10px;margin:18px 0 14px;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:11.5px;color:var(--ink-soft);">또는</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
+<!-- ════ ADMIN PASSWORD CHANGE ════ -->
+<div class="overlay" id="adminPwModal" onclick="if(event.target===this)closeModal('adminPwModal')">
+  <div class="modal" style="max-width:420px;">
+    <div class="login-head">
+      <button class="modal-close" onclick="closeModal('adminPwModal')">✕</button>
+      <h2>관리자 비밀번호 변경</h2>
+      <p>board.html 전용 admin 계정 비밀번호를 변경합니다.</p>
+    </div>
+    <div class="login-body">
+      <div class="form-group">
+        <label class="form-label">현재 비밀번호</label>
+        <input class="form-input" type="password" id="apwCurrent" placeholder="현재 비밀번호 입력">
+        <div class="form-error" id="apwCurrentErr">현재 비밀번호가 올바르지 않습니다.</div>
       </div>
-
-      <!-- 게시판 전용 관리자 (admin / ktedu2604) -->
-      <div style="background:var(--cream);border-radius:3px;padding:12px 14px;font-size:12px;color:var(--ink-soft);line-height:1.9;">
-        <strong style="color:var(--hadon);">관리자 로그인 안내</strong><br>
-        • <strong style="color:var(--ink);">kbe@daum.net</strong> — 이메일로 로그인<br>
-        • <strong style="color:var(--ink);">phyunhoo@naver.com</strong> — 이메일로 로그인<br>
-        • 게시판 전용 ID : <strong style="color:var(--ink);">admin</strong> / <strong style="color:var(--ink);">ktedu2604</strong><br>
-        <span style="font-size:11px;color:var(--ink-soft);">mypage.html에서 로그인하면 이 페이지에서 자동 유지됩니다.</span>
+      <div class="form-group">
+        <label class="form-label">새 비밀번호 (6자 이상)</label>
+        <input class="form-input" type="password" id="apwNew" placeholder="새 비밀번호">
+        <div class="form-error" id="apwNewErr">6자 이상 입력해 주세요.</div>
       </div>
+      <div class="form-group">
+        <label class="form-label">새 비밀번호 확인</label>
+        <input class="form-input" type="password" id="apwNew2" placeholder="새 비밀번호 재입력" onkeydown="if(event.key==='Enter')changeAdminPw()">
+        <div class="form-error" id="apwNew2Err">비밀번호가 일치하지 않습니다.</div>
+      </div>
+      <button class="btn-login" onclick="changeAdminPw()">비밀번호 변경</button>
+      <p style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:14px;line-height:1.8;">
+        ⚠ 변경 후 board.html 파일을 GitHub에 다시 업로드해야 적용됩니다.<br>
+        변경된 비밀번호를 안전한 곳에 메모해 두세요.
+      </p>
     </div>
   </div>
 </div>
@@ -948,7 +966,45 @@ function updateAdminUI() {
     const th = document.getElementById('th-a-'+b);
     if (th) th.style.display = canW ? '' : 'none';
   });
+  // admin 전용 비번 변경 버튼 — board 전용 admin 계정으로 로그인 시만 표시
+  const pwBtn = document.getElementById('btnAdminPwChange');
+  if (pwBtn) pwBtn.style.display = isAdmin ? 'inline-block' : 'none';
+
   loadBoard(curTab);
+}
+
+/* ═══════════════════════════════════════
+   ADMIN 비밀번호 변경 (board.html 전용)
+═══════════════════════════════════════ */
+function openAdminPwModal() {
+  document.getElementById('apwCurrent').value = '';
+  document.getElementById('apwNew').value     = '';
+  document.getElementById('apwNew2').value    = '';
+  ['apwCurrentErr','apwNewErr','apwNew2Err'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
+  openModal('adminPwModal');
+}
+
+function changeAdminPw() {
+  const cur  = document.getElementById('apwCurrent').value;
+  const nw   = document.getElementById('apwNew').value;
+  const nw2  = document.getElementById('apwNew2').value;
+
+  const setE = (id, show) => document.getElementById(id).classList.toggle('show', show);
+  setE('apwCurrentErr', cur !== ADMIN_PW);
+  setE('apwNewErr',     nw.length < 6);
+  setE('apwNew2Err',    nw !== nw2);
+  if (cur !== ADMIN_PW || nw.length < 6 || nw !== nw2) return;
+
+  // board.html 파일 내 ADMIN_PW 값을 런타임에 업데이트
+  // (실제 파일 저장은 불가 — 안내 후 클립보드 복사 제공)
+  window.__newAdminPw = nw;
+  closeModal('adminPwModal');
+
+  const msg = `새 비밀번호: ${nw}\n\n이 비밀번호를 적용하려면:\n1. board.html 파일을 메모장으로 열기\n2. Ctrl+F → ktedu2604 검색\n3. ${nw} 으로 교체\n4. 저장 후 GitHub 재업로드\n\n지금 클립보드에 복사하시겠습니까?`;
+  if (confirm(msg)) {
+    navigator.clipboard.writeText(nw).then(() => showToast('새 비밀번호가 클립보드에 복사되었습니다.'));
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -1141,7 +1197,7 @@ function showToast(msg,isErr) {
 }
 function mn(open) { document.getElementById('mobNav').classList.toggle('open',open); document.body.style.overflow=open?'hidden':''; }
 document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()=>mn(false)));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal'].forEach(closeModal);closeDetail();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal','adminPwModal'].forEach(closeModal);closeDetail();} });
 
 /* ═══════════════════════════════════════
    BOOT — 세션 복원
