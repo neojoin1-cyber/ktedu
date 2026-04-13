@@ -266,11 +266,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 <script>
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
-const ADMIN_ID = 'admin';
-const ADMIN_PW = 'ktedu2604';
-const SESSION_KEY = 'ktea_admin_session';
-const SESSION_TTL = 24 * 60 * 60 * 1000; // 24시간
-const PER_PAGE = 10;
+const ADMIN_ID    = 'admin';
+const ADMIN_PW    = 'ktedu2604';
+const SESSION_KEY      = 'ktea_admin_session';
+const MEMBER_SESSION_KEY = 'ktea_member_session';  // mypage.html 과 공유
+const SESSION_TTL = 24 * 60 * 60 * 1000;
+const PER_PAGE    = 10;
 </script>
 
 <div class="mob-nav" id="mobNav">
@@ -454,7 +455,10 @@ const PER_PAGE = 10;
         <div class="form-error" id="lerr">아이디 또는 비밀번호가 올바르지 않습니다.</div>
       </div>
       <button class="btn-login" onclick="doLogin()">로그인</button>
-      <p class="login-hint">관리자 ID : <strong>admin</strong> / 비밀번호 : <strong>ktedu2604</strong></p>
+      <p class="login-hint">
+        게시판 관리자 : ID <strong>admin</strong> / 비밀번호 <strong>ktedu2604</strong><br>
+        회원은 <a href="mypage.html" style="color:var(--hadon);font-weight:700;">회원 페이지</a>에서 로그인 후 이 페이지로 오면<br>자동으로 로그인 상태가 유지됩니다.
+      </p>
     </div>
   </div>
 </div>
@@ -550,13 +554,14 @@ const db = createClient(SUPA_URL, SUPA_KEY);
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-let isAdmin      = false;
+let isAdmin      = false;   // board 전용 관리자(ID/PW)
+let curMember    = null;    // mypage 로그인 회원 객체
 let curTab       = 'notice';
 let curPage      = { notice:1, program:1, archive:1 };
-let pendingFiles = [];
+let pendingFiles  = [];
 let existingFiles = [];
 
-/* ── 관리자 세션 (localStorage, 24시간 유지) ── */
+/* ── 게시판 관리자 세션 (localStorage, 24시간) ── */
 function saveAdminSession()  { localStorage.setItem(SESSION_KEY, JSON.stringify({ ts: Date.now() })); }
 function clearAdminSession() { localStorage.removeItem(SESSION_KEY); }
 function loadAdminSession()  {
@@ -568,6 +573,28 @@ function loadAdminSession()  {
     localStorage.removeItem(SESSION_KEY); return false;
   } catch(e) { return false; }
 }
+
+/* ── mypage 회원 세션 복원 ── */
+function loadMemberSession() {
+  try {
+    const s = localStorage.getItem(MEMBER_SESSION_KEY);
+    if (!s) return;
+    const { user, ts } = JSON.parse(s);
+    if (Date.now() - ts < SESSION_TTL) curMember = user;
+    else localStorage.removeItem(MEMBER_SESSION_KEY);
+  } catch(e) {}
+}
+
+/* ── 권한 헬퍼 ── */
+function canAdmin()         { return isAdmin || (curMember && curMember.role === 'admin'); }
+function canWrite()         { return canAdmin() || (curMember && curMember.role === 'member'); }
+function canEditPost(post)  {
+  if (canAdmin()) return true;
+  if (!curMember) return false;
+  return post.author_email === curMember.email;
+}
+function currentUserName()  { return curMember ? curMember.name : (isAdmin ? '관리자' : ''); }
+function currentUserEmail() { return curMember ? curMember.email : ''; }
 
 /* ═══════════════════════════════════════
    BADGE MAP
@@ -632,7 +659,7 @@ function showErr(board, msg) {
 function renderTable(board, rows, total, page) {
   const tbody = document.getElementById('tb-' + board);
   const thA   = document.getElementById('th-a-' + board);
-  if (thA) thA.style.display = isAdmin ? '' : 'none';
+  if (thA) thA.style.display = (canWrite()) ? '' : 'none';
 
   if (!rows.length) {
     tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>등록된 글이 없습니다.</p></div></td></tr>`;
@@ -651,7 +678,8 @@ function renderTable(board, rows, total, page) {
     const hasFile= p.files && p.files.length ? ' 📎' : '';
     const d      = board==='program' ? (p.extra1||p.date||'') : (p.date||'');
     const v2     = board==='program' ? (p.extra2||'-') : (p.views||0);
-    const acts   = isAdmin
+    const canEdit = canEditPost(p);
+    const acts   = canEdit
       ? `<div class="row-acts"><button class="btn-edit" onclick="openWrite('${board}',${p.id})">수정</button><button class="btn-del" onclick="delPost(${p.id})">삭제</button></div>`
       : '';
     html += `<tr class="${p.pin?'row-pinned':''}">
@@ -689,7 +717,8 @@ function renderArchive(rows, total, page) {
     const dlBtn = firstFile
       ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
       : '';
-    const acts = isAdmin
+    const canEdit = canEditPost(p);
+    const acts = canEdit
       ? `<button class="btn-edit" onclick="openWrite('archive',${p.id})">수정</button>
          <button class="btn-del" style="background:var(--red-lt);color:var(--red);border:none;padding:4px 9px;border-radius:2px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;" onclick="delPost(${p.id})">삭제</button>`
       : '';
@@ -822,15 +851,36 @@ function doLogout() {
 function updateAdminUI() {
   const bar = document.getElementById('adminBar');
   const btn = document.getElementById('navAdminBtn');
-  if (isAdmin) {
-    bar.classList.add('visible'); btn.textContent='🔓 관리자 ON'; btn.classList.add('logged');
-    ['notice','program','archive'].forEach(b=>{ const wb=document.getElementById('wb-'+b); if(wb)wb.style.display='inline-flex'; });
+  const canA = canAdmin();
+  const canW = canWrite();
+
+  if (canA) {
+    bar.classList.add('visible');
+    const label = curMember ? `🔓 ${curMember.name} (관리자)` : '🔓 관리자 ON';
+    btn.textContent = label; btn.classList.add('logged');
+    document.querySelector('.admin-bar-text').textContent =
+      curMember ? `${curMember.name}(${curMember.email}) — 전체 글 작성·수정·삭제 가능` :
+                  '관리자 모드 활성 — 전체 글 작성·수정·삭제 가능';
+  } else if (canW && curMember) {
+    bar.classList.add('visible');
+    btn.textContent = `✏ ${curMember.name}`; btn.classList.add('logged');
+    document.querySelector('.admin-bar-text').textContent =
+      `${curMember.name}님 — 글 작성 및 본인 글 수정·삭제 가능`;
   } else {
-    bar.classList.remove('visible'); btn.textContent='🔐 관리자'; btn.classList.remove('logged');
-    ['notice','program','archive'].forEach(b=>{ const wb=document.getElementById('wb-'+b); if(wb)wb.style.display='none'; });
+    bar.classList.remove('visible');
+    btn.textContent = curMember ? `👤 ${curMember.name}` : '🔐 관리자';
+    btn.classList.remove('logged');
   }
-  ['notice','program','archive'].forEach(b=>{
-    const th=document.getElementById('th-a-'+b); if(th)th.style.display=isAdmin?'':'none';
+
+  // 글쓰기 버튼 표시 여부
+  ['notice','program','archive'].forEach(b => {
+    const wb = document.getElementById('wb-'+b);
+    if (wb) wb.style.display = canW ? 'inline-flex' : 'none';
+  });
+  // 관리 컬럼 헤더
+  ['notice','program','archive'].forEach(b => {
+    const th = document.getElementById('th-a-'+b);
+    if (th) th.style.display = canW ? '' : 'none';
   });
   loadBoard(curTab);
 }
@@ -839,7 +889,14 @@ function updateAdminUI() {
    WRITE / EDIT
 ═══════════════════════════════════════ */
 async function openWrite(board, editId) {
-  if (!isAdmin) return;
+  if (!canWrite()) { showToast('로그인이 필요합니다.', true); return; }
+  if (editId) {
+    // 수정 권한 확인 — 본인 글 또는 관리자만
+    const { data:chk } = await db.from('posts').select('author_email').eq('id', editId).single();
+    if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
+      showToast('본인 글만 수정할 수 있습니다.', true); return;
+    }
+  }
   pendingFiles  = [];
   existingFiles = [];
   document.getElementById('fileChips').innerHTML = '';
@@ -957,7 +1014,8 @@ async function savePost() {
       }
     } else {
       const { data:ins } = await db.from('posts')
-        .insert({ board, cat, title, body, extra1, extra2, pin, date: dateStr, views: 0 })
+        .insert({ board, cat, title, body, extra1, extra2, pin, date: dateStr, views: 0,
+                  author_name: currentUserName(), author_email: currentUserEmail() })
         .select().single();
       postId = ins.id;
     }
@@ -983,7 +1041,13 @@ async function savePost() {
 }
 
 async function delPost(id) {
-  if (!isAdmin||!confirm('이 글을 삭제하시겠습니까?\n첨부 파일도 함께 삭제됩니다.')) return;
+  if (!canWrite()) return;
+  // 본인 글 또는 관리자만 삭제 가능
+  const { data:chk } = await db.from('posts').select('author_email').eq('id', id).single();
+  if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
+    showToast('본인 글만 삭제할 수 있습니다.', true); return;
+  }
+  if (!confirm('이 글을 삭제하시겠습니까?\n첨부 파일도 함께 삭제됩니다.')) return;
   // delete storage files
   const { data:files } = await db.from('files').select('storage_path').eq('post_id',id);
   if (files && files.length) {
@@ -1014,15 +1078,19 @@ document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal'].forEach(closeModal);closeDetail();} });
 
 /* ═══════════════════════════════════════
-   BOOT
+   BOOT — 세션 복원
 ═══════════════════════════════════════ */
-// 세션 복원 — 24시간 이내 로그인 기록 있으면 자동 관리자 모드
-if (loadAdminSession()) { isAdmin = true; updateAdminUI(); }
+// 1) mypage 회원 세션 먼저 복원 (kbe, phyunhoo 등 Supabase 회원)
+loadMemberSession();
+// 2) board 전용 관리자 세션 복원 (admin/ktedu2604)
+if (loadAdminSession()) { isAdmin = true; }
+// 3) UI 업데이트
+updateAdminUI();
 
 loadBoard('notice');
-Promise.all(['notice','program','archive'].map(b=>
-  db.from('posts').select('id',{count:'exact',head:true}).eq('board',b).then(({count})=>{
-    document.getElementById('sc-'+b).textContent = count||0;
+Promise.all(['notice','program','archive'].map(b =>
+  db.from('posts').select('id', { count:'exact', head:true }).eq('board', b).then(({ count }) => {
+    document.getElementById('sc-'+b).textContent = count || 0;
   })
 ));
 </script>
