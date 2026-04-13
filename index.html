@@ -718,6 +718,145 @@
     .greeting-portrait { aspect-ratio: 4/3; }
   }
 
+  /* ── POPUP OVERLAY ── */
+  .popup-overlay {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(10,20,10,0.7);
+    align-items: center; justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+  }
+  .popup-overlay.open { display: flex; }
+
+  .popup-box {
+    background: var(--paper);
+    border-radius: 6px;
+    max-width: 760px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+    animation: popIn 0.28s cubic-bezier(0.34,1.4,0.64,1) forwards;
+  }
+  @keyframes popIn {
+    from { opacity:0; transform: scale(0.93) translateY(16px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  /* Program popup */
+  .pp-head {
+    background: var(--forest);
+    padding: 32px 36px 28px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    border-bottom: 3px solid var(--gold);
+  }
+  .pp-head-icon { font-size: 36px; margin-bottom: 14px; display: block; }
+  .pp-head-tag { color: var(--sage); font-size: 11px; letter-spacing: 0.14em; margin-bottom: 8px; }
+  .pp-head-title { color: #fff; font-family: 'Nanum Myeongjo', serif; font-size: 1.7rem; font-weight: 800; line-height: 1.3; }
+  .pp-head-sub { color: rgba(255,255,255,0.55); font-size: 13.5px; margin-top: 10px; line-height: 1.7; }
+  .pp-close {
+    position: absolute; top: 20px; right: 24px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7); font-size: 18px;
+    width: 36px; height: 36px; border-radius: 50%;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .pp-close:hover { background: rgba(255,255,255,0.2); color: white; }
+
+  .pp-body { padding: 32px 36px; }
+  .pp-section { margin-bottom: 28px; }
+  .pp-section:last-child { margin-bottom: 0; }
+  .pp-section-title {
+    font-size: 12px; font-weight: 700; color: var(--hadon);
+    letter-spacing: 0.12em; margin-bottom: 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .pp-section p { font-size: 14px; color: var(--ink-mid); line-height: 1.95; margin-bottom: 10px; }
+  .pp-section p:last-child { margin-bottom: 0; }
+  .pp-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pp-chip {
+    background: var(--cream); border: 1px solid var(--border);
+    color: var(--hadon); font-size: 12.5px; padding: 5px 14px;
+    border-radius: 20px; font-weight: 500;
+  }
+  .pp-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .pp-info-item {
+    background: var(--cream); border-radius: 4px; padding: 14px 16px;
+    border-left: 3px solid var(--hadon);
+  }
+  .pp-info-item-label { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.06em; margin-bottom: 4px; }
+  .pp-info-item-value { font-size: 14px; color: var(--ink); font-weight: 500; }
+  .pp-cta {
+    display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;
+    padding-top: 24px; border-top: 1px solid var(--border);
+  }
+  .pp-btn-primary {
+    background: var(--hadon); color: white; border: none;
+    padding: 13px 28px; border-radius: 3px; font-size: 14px; font-weight: 700;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    text-decoration: none; display: inline-block; transition: background 0.2s;
+  }
+  .pp-btn-primary:hover { background: var(--path); }
+  .pp-btn-outline {
+    background: transparent; color: var(--hadon);
+    border: 1px solid var(--hadon); padding: 13px 24px;
+    border-radius: 3px; font-size: 14px; font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif; cursor: pointer;
+    text-decoration: none; display: inline-block; transition: all 0.2s;
+  }
+  .pp-btn-outline:hover { background: var(--cream); }
+
+  /* News popup specific */
+  .np-head {
+    background: var(--deep);
+    padding: 28px 36px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+  }
+  .np-badge {
+    display: inline-block; background: var(--gold); color: var(--forest);
+    font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 2px;
+    letter-spacing: 0.06em; margin-bottom: 12px;
+  }
+  .np-title { color: #fff; font-family: 'Nanum Myeongjo', serif; font-size: 1.5rem; font-weight: 800; line-height: 1.35; }
+  .np-meta { color: rgba(255,255,255,0.45); font-size: 12px; margin-top: 10px; display: flex; gap: 16px; }
+  .np-img-area {
+    background: var(--forest); height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px; position: relative; overflow: hidden;
+  }
+  .np-img-area::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 20px, rgba(45,90,61,0.12) 20px, rgba(45,90,61,0.12) 21px);
+  }
+  .np-img-icon { position: relative; z-index: 1; }
+  .np-body { padding: 28px 36px; }
+  .np-body p { font-size: 14px; color: var(--ink-mid); line-height: 2.0; margin-bottom: 16px; }
+  .np-body p:last-child { margin-bottom: 0; }
+  .np-highlight {
+    background: var(--cream); border-left: 3px solid var(--gold);
+    padding: 14px 18px; border-radius: 0 4px 4px 0;
+    margin: 18px 0; font-size: 14px; color: var(--ink-mid); line-height: 1.8;
+  }
+  .np-stats {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+    margin: 20px 0;
+  }
+  .np-stat {
+    background: var(--forest); border-radius: 4px; padding: 16px;
+    text-align: center;
+  }
+  .np-stat-num { font-family: 'Nanum Myeongjo', serif; font-size: 1.6rem; font-weight: 800; color: var(--gold); }
+  .np-stat-label { font-size: 11.5px; color: var(--sage); margin-top: 4px; }
+
+  @media (max-width: 700px) {
+    .pp-head, .pp-body, .np-head, .np-body { padding-left: 20px; padding-right: 20px; }
+    .pp-info-grid { grid-template-columns: 1fr; }
+    .np-stats { grid-template-columns: 1fr; }
+  }
+
   /* ── ANIMATIONS ── */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
@@ -1052,37 +1191,37 @@
     <h2 class="section-title">사업 및 체험 프로그램</h2>
     <p class="section-sub">학교 단체부터 일반인까지, 역사의 길을 함께 걷는 다양한 프로그램을 운영합니다.</p>
     <div class="program-grid">
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('trail')" style="cursor:pointer;">
         <div class="program-icon">🎒</div>
         <h3>백의종군로 탐방 체험학습</h3>
         <p>학생 눈높이에 맞는 구간별 스토리텔링과 함께하는 현장 체험학습. 농어촌인성학교 연계 수료식 운영.</p>
         <span class="program-arrow">→</span>
       </div>
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('academy')" style="cursor:pointer;">
         <div class="program-icon">⚔</div>
         <h3>임진왜란 아카데미</h3>
         <p>정기룡 장군 유숙지 체험, 하동군 역사문화 현장 탐방, 임진왜란 승첩지 연계 교육 프로그램.</p>
         <span class="program-arrow">→</span>
       </div>
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('leadership')" style="cursor:pointer;">
         <div class="program-icon">🏅</div>
         <h3>이순신 리더십 교육</h3>
         <p>이순신파워공무원아카데미(경상남도), 이순신 팸투어 등 리더십 중심의 기업·공공기관 프로그램.</p>
         <span class="program-arrow">→</span>
       </div>
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('school')" style="cursor:pointer;">
         <div class="program-icon">🏫</div>
         <h3>학교 연계 프로그램</h3>
         <p>전국 관광교사 네트워크를 통한 학교별 맞춤 탐방 연계. 6박 7일 전구간 완주 특별 프로그램 포함.</p>
         <span class="program-arrow">→</span>
       </div>
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('publish')" style="cursor:pointer;">
         <div class="program-icon">📖</div>
         <h3>교재 및 콘텐츠 발간</h3>
         <p>재밌는 스토리텔링 기법과 체험 활동 중심의 역사문화관광 교양지 및 교재 발간 사업.</p>
         <span class="program-arrow">→</span>
       </div>
-      <div class="program-item">
+      <div class="program-item" onclick="openProgram('consign')" style="cursor:pointer;">
         <div class="program-icon">🤝</div>
         <h3>지자체 위탁·대행 사업</h3>
         <p>하동군 문화체육과 협력 백의종군로 활성화 사업. 자치단체 위탁 및 위임 사업 수행.</p>
@@ -1148,7 +1287,7 @@
       <a href="board.html" style="color: var(--hadon); font-size: 13.5px; text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--hadon); padding-bottom: 2px;">공지사항·자료실 →</a>
     </div>
     <div class="news-grid">
-      <div class="news-card">
+      <div class="news-card" onclick="openNews('gyeongju')" style="cursor:pointer;">
         <div class="news-card-img">
           🏯
           <div class="news-card-img-overlay"></div>
@@ -1160,7 +1299,7 @@
           <div class="news-card-desc">농어촌인성학교 프로그램과 연계, 완주 후 수료식 개최. 학생들의 도전정신과 극기 체험.</div>
         </div>
       </div>
-      <div class="news-card">
+      <div class="news-card" onclick="openNews('haeundae')" style="cursor:pointer;">
         <div class="news-card-img">
           🌊
           <div class="news-card-img-overlay"></div>
@@ -1172,7 +1311,7 @@
           <div class="news-card-desc">백의종군로 전 구간을 6박 7일에 걸쳐 완주한 특별 기록. 중학생 70km 완주의 감동.</div>
         </div>
       </div>
-      <div class="news-card">
+      <div class="news-card" onclick="openNews('busan')" style="cursor:pointer;">
         <div class="news-card-img">
           🎒
           <div class="news-card-img-overlay"></div>
@@ -1309,7 +1448,40 @@
   </div>
 </footer>
 
+<!-- ══════════════════════════════════════════
+     PROGRAM POPUP
+══════════════════════════════════════════ -->
+<div class="popup-overlay" id="programPopup" onclick="closeProgramPopup(event)">
+  <div class="popup-box" id="programBox">
+    <div class="pp-head">
+      <button class="pp-close" onclick="closePopup('programPopup')">✕</button>
+      <span class="pp-head-icon" id="ppIcon"></span>
+      <div class="pp-head-tag" id="ppTag"></div>
+      <div class="pp-head-title" id="ppTitle"></div>
+      <div class="pp-head-sub" id="ppSub"></div>
+    </div>
+    <div class="pp-body" id="ppBody"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     NEWS POPUP
+══════════════════════════════════════════ -->
+<div class="popup-overlay" id="newsPopup" onclick="closeNewsPopupOuter(event)">
+  <div class="popup-box" id="newsBox">
+    <div class="np-head">
+      <button class="pp-close" onclick="closePopup('newsPopup')">✕</button>
+      <div class="np-badge" id="npBadge"></div>
+      <div class="np-title" id="npTitle"></div>
+      <div class="np-meta" id="npMeta"></div>
+    </div>
+    <div class="np-img-area"><span class="np-img-icon" id="npImg"></span></div>
+    <div class="np-body" id="npBody"></div>
+  </div>
+</div>
+
 <script>
+  /* ── EXISTING SCRIPTS ── */
   function openMobileNav() {
     document.getElementById('mobileNav').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1330,7 +1502,6 @@
     btn.disabled = true;
   }
 
-  // Scroll-triggered fade-in
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -1340,7 +1511,6 @@
       }
     });
   }, { threshold: 0.1 });
-
   document.querySelectorAll('.mission-item, .course-card, .program-item, .timeline-item, .news-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
@@ -1348,20 +1518,386 @@
     observer.observe(el);
   });
 
-  // Nav active state
-  const sections = document.querySelectorAll('section[id], div.band');
   const navLinks = document.querySelectorAll('.nav-links a');
   const scrollSpy = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const id = entry.target.getAttribute('id');
-        navLinks.forEach(a => {
-          a.style.color = a.href.includes(id) ? 'var(--gold-lt)' : '';
-        });
+        navLinks.forEach(a => { a.style.color = a.href.includes(id) ? 'var(--gold-lt)' : ''; });
       }
     });
   }, { rootMargin: '-40% 0px -50% 0px' });
   document.querySelectorAll('section[id]').forEach(s => scrollSpy.observe(s));
+
+  /* ── POPUP UTILITY ── */
+  function openPopup(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closePopup(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function closeProgramPopup(e) { if (e.target === document.getElementById('programPopup')) closePopup('programPopup'); }
+  function closeNewsPopupOuter(e) { if (e.target === document.getElementById('newsPopup')) closePopup('newsPopup'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePopup('programPopup'); closePopup('newsPopup'); } });
+
+  /* ── PROGRAM DATA ── */
+  const programData = {
+    trail: {
+      icon: '🎒', tag: 'PROGRAM 01 · 체험학습',
+      title: '백의종군로 탐방 체험학습',
+      sub: '역사의 현장에서 배우는 살아있는 교육 — 학생부터 일반인까지',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">프로그램 개요</div>
+          <p>1597년 이순신 장군이 걸었던 경남 하동 백의종군로 82km를 직접 걸으며 역사적 의미와 장군의 도전·극기·인내 정신을 체험하는 현장 교육 프로그램입니다. 2014년부터 운영하여 3,272명이 참여한 검증된 체험학습 코스입니다.</p>
+          <p>구간별로 스토리텔링 해설이 제공되며, 학생 눈높이에 맞는 이야기 중심의 역사 교육을 실현합니다. 농어촌인성학교 연계 프로그램으로 수료식도 운영합니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">탐방 코스 선택</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">1구간 · 좌절의 길</div>
+              <div class="pp-info-item-value">화개장터 → 하동읍성 (28km)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2구간 · 고난의 길</div>
+              <div class="pp-info-item-value">하동읍성 → 추동 (28km)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">3구간 · 고뇌의 길</div>
+              <div class="pp-info-item-value">추동 → 문암정 (26km)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">전구간 완주</div>
+              <div class="pp-info-item-value">화개장터 → 문암정 (82km, 5박6일~)</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">프로그램 포함 사항</div>
+          <div class="pp-chips">
+            <span class="pp-chip">✔ 전문 인솔 가이드</span>
+            <span class="pp-chip">✔ 구간별 스토리텔링 해설</span>
+            <span class="pp-chip">✔ 탐방 교재 제공</span>
+            <span class="pp-chip">✔ 수료증 발급</span>
+            <span class="pp-chip">✔ 안전 인솔 지원</span>
+            <span class="pp-chip">✔ 농어촌인성학교 연계 가능</span>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">참가 대상 및 신청</div>
+          <p>초·중·고등학생 단체, 일반 시민, 기업 연수팀 등 다양한 형태로 참가 가능합니다. 인원, 코스, 일정은 협의를 통해 맞춤형으로 조정 가능합니다.</p>
+        </div>
+        <div class="pp-cta">
+          <a href="#contact" class="pp-btn-primary" onclick="closePopup('programPopup')">탐방 신청하기</a>
+          <a href="tel:010-2786-7822" class="pp-btn-outline">📞 010-2786-7822</a>
+        </div>`
+    },
+    academy: {
+      icon: '⚔', tag: 'PROGRAM 02 · 역사 아카데미',
+      title: '임진왜란 아카데미',
+      sub: '하동 지역 영웅 정기룡 장군과 임진왜란 현장을 직접 체험하는 심층 역사 교육',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">프로그램 개요</div>
+          <p>임진왜란 당시 경남 하동 지역 영웅인 정기룡 장군의 발자취를 따라가며, 유숙지 현장 체험과 하동군 역사문화 탐방을 병행하는 심층 역사 교육 프로그램입니다.</p>
+          <p>단순한 역사 암기 교육을 넘어, 현장에서 직접 보고 느끼는 살아있는 역사 수업을 제공합니다. 임진왜란 승첩지 연계 탐방으로 당시 전쟁의 생생한 기록을 접할 수 있습니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">주요 체험 코스</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">정기룡 장군 유숙지</div>
+              <div class="pp-info-item-value">하동군 내 유숙지 현장 탐방</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">임진왜란 승첩지</div>
+              <div class="pp-info-item-value">하동군 역사 현장 연계 체험</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">하동군 문화 체험</div>
+              <div class="pp-info-item-value">지역 전통문화 체험 병행</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">스토리텔링 강의</div>
+              <div class="pp-info-item-value">역사인물 중심 현장 해설</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">참가 대상</div>
+          <div class="pp-chips">
+            <span class="pp-chip">중·고등학교 단체</span>
+            <span class="pp-chip">20명 이상 신청 가능</span>
+            <span class="pp-chip">교과연계 체험학습</span>
+            <span class="pp-chip">수학여행 연계 가능</span>
+          </div>
+        </div>
+        <div class="pp-cta">
+          <a href="#contact" class="pp-btn-primary" onclick="closePopup('programPopup')">아카데미 신청</a>
+          <a href="mailto:phyunhoo@naver.com" class="pp-btn-outline">✉ 이메일 문의</a>
+        </div>`
+    },
+    leadership: {
+      icon: '🏅', tag: 'PROGRAM 03 · 리더십 교육',
+      title: '이순신 리더십 교육',
+      sub: '충무공의 도전·극기·인내 정신을 통한 기업·공공기관 맞춤 리더십 프로그램',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">프로그램 개요</div>
+          <p>이순신파워공무원아카데미(경상남도 주관) 운영 경험을 바탕으로, 이순신 장군의 리더십 정신을 기업과 공공기관 맞춤형으로 재구성한 교육 프로그램입니다.</p>
+          <p>절체절명의 위기 상황에서도 포기하지 않고 재기한 이순신 장군의 리더십은 현대 조직의 위기관리, 팀워크, 도전정신 교육에 강력한 메시지를 전달합니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">운영 이력</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2010년</div>
+              <div class="pp-info-item-value">이순신파워공무원아카데미 (경상남도)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2012년</div>
+              <div class="pp-info-item-value">이순신 팸투어 운영 (경상남도)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2013~2014년</div>
+              <div class="pp-info-item-value">백의종군로 리더십교육 (경상남도)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2017~현재</div>
+              <div class="pp-info-item-value">이충무공 백의종군로 활성화 (하동군)</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">교육 적합 대상</div>
+          <div class="pp-chips">
+            <span class="pp-chip">공무원·공공기관 연수</span>
+            <span class="pp-chip">기업 임직원 리더십 교육</span>
+            <span class="pp-chip">팀빌딩 워크숍</span>
+            <span class="pp-chip">조직문화 혁신 프로그램</span>
+          </div>
+        </div>
+        <div class="pp-cta">
+          <a href="#contact" class="pp-btn-primary" onclick="closePopup('programPopup')">프로그램 문의</a>
+          <a href="tel:010-2786-7822" class="pp-btn-outline">📞 010-2786-7822</a>
+        </div>`
+    },
+    school: {
+      icon: '🏫', tag: 'PROGRAM 04 · 학교 연계',
+      title: '학교 연계 프로그램',
+      sub: '전국 관광교사 네트워크와 연계한 학교 맞춤형 탐방 교육',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">프로그램 개요</div>
+          <p>전국 100명의 관광교사 회원 네트워크를 기반으로, 각 학교의 교육과정과 연계한 맞춤형 탐방 프로그램을 설계·운영합니다. 당일 코스부터 6박 7일 전구간 완주까지 학교 일정에 맞는 유연한 운영이 가능합니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">대표 운영 사례</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">해운대여자중학교 (2018)</div>
+              <div class="pp-info-item-value">6박7일 전구간 70km 완주</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">부산관광고등학교 (2017)</div>
+              <div class="pp-info-item-value">250명 단체 탐방 (18km)</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">경주정보고등학교 (2019)</div>
+              <div class="pp-info-item-value">45명 완주 수료식</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">누적 참여 (2014~)</div>
+              <div class="pp-info-item-value">3,272명 참여 달성</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">운영 형태</div>
+          <div class="pp-chips">
+            <span class="pp-chip">당일 코스 (1구간 28km)</span>
+            <span class="pp-chip">1박2일 ~ 6박7일</span>
+            <span class="pp-chip">전구간 완주 프로그램</span>
+            <span class="pp-chip">수학여행 연계</span>
+            <span class="pp-chip">농어촌인성학교 연계</span>
+            <span class="pp-chip">수료증 발급</span>
+          </div>
+        </div>
+        <div class="pp-cta">
+          <a href="#contact" class="pp-btn-primary" onclick="closePopup('programPopup')">학교 탐방 신청</a>
+          <a href="mailto:phyunhoo@naver.com" class="pp-btn-outline">✉ 이메일 문의</a>
+        </div>`
+    },
+    publish: {
+      icon: '📖', tag: 'PROGRAM 05 · 콘텐츠 발간',
+      title: '교재 및 콘텐츠 발간',
+      sub: '재밌는 스토리텔링 기법으로 만드는 역사문화관광 교양지 및 체험 교재',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">사업 개요</div>
+          <p>이순신 백의종군로와 임진왜란 역사를 청소년과 일반인이 쉽고 재미있게 이해할 수 있도록 스토리텔링 기법을 활용한 교재와 교양지를 개발·발간합니다.</p>
+          <p>단순한 역사 나열이 아닌, 구간별 이야기와 체험 활동을 결합하여 탐방 현장에서 바로 활용할 수 있는 실용적인 콘텐츠를 만들어갑니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">발간 콘텐츠 종류</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">탐방 스토리텔링 교재</div>
+              <div class="pp-info-item-value">구간별 역사 이야기 수록</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">역사문화관광 교양지</div>
+              <div class="pp-info-item-value">정기 발간 · 회원 배포</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">체험 활동 워크북</div>
+              <div class="pp-info-item-value">학생용 현장 체험 학습지</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">지역 역사인물 홍보물</div>
+              <div class="pp-info-item-value">정기룡 장군 등 소개 자료</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">자료 신청</div>
+          <p>발간 자료는 이메일 또는 전화로 신청하시면 안내해 드립니다.</p>
+          <div class="pp-chips">
+            <span class="pp-chip">학교·기관 단체 신청 가능</span>
+            <span class="pp-chip">탐방 참가자 무상 제공</span>
+          </div>
+        </div>
+        <div class="pp-cta">
+          <a href="mailto:phyunhoo@naver.com" class="pp-btn-primary">✉ 자료 신청</a>
+          <a href="tel:010-2786-7822" class="pp-btn-outline">📞 전화 문의</a>
+        </div>`
+    },
+    consign: {
+      icon: '🤝', tag: 'PROGRAM 06 · 위탁·대행',
+      title: '지자체 위탁·대행 사업',
+      sub: '하동군 문화체육과 협력 백의종군로 활성화 사업 및 자치단체 위탁 프로그램 운영',
+      body: `
+        <div class="pp-section">
+          <div class="pp-section-title">사업 개요</div>
+          <p>사단법인 한국관광교육연구원은 민법 및 관계법령에 의거, 지방자치단체의 위탁·위임·대행 사업을 수행할 수 있는 비영리법인입니다. 하동군 문화체육과와의 긴밀한 협력 하에 2017년부터 이충무공 백의종군로 활성화 사업을 지속 운영하고 있습니다.</p>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">주요 협력·위탁 실적</div>
+          <div class="pp-info-grid">
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2010년 (문체부)</div>
+              <div class="pp-info-item-value">경남 백의종군로 문화생태탐방로 선정·운영</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2010년 (경상남도)</div>
+              <div class="pp-info-item-value">이순신파워공무원아카데미 운영</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2014년 (하동군)</div>
+              <div class="pp-info-item-value">이순신 백의종군로 활성화 업무협약</div>
+            </div>
+            <div class="pp-info-item">
+              <div class="pp-info-item-label">2017~2025년 (하동군)</div>
+              <div class="pp-info-item-value">이충무공 백의종군로 활성화 지속 운영</div>
+            </div>
+          </div>
+        </div>
+        <div class="pp-section">
+          <div class="pp-section-title">위탁 가능 사업 분야</div>
+          <div class="pp-chips">
+            <span class="pp-chip">역사문화 탐방 프로그램 운영</span>
+            <span class="pp-chip">관광교육 콘텐츠 개발</span>
+            <span class="pp-chip">지역 역사인물 홍보 사업</span>
+            <span class="pp-chip">체험학습 현장 운영</span>
+            <span class="pp-chip">관광상품 개발·연구</span>
+          </div>
+        </div>
+        <div class="pp-cta">
+          <a href="#contact" class="pp-btn-primary" onclick="closePopup('programPopup')">사업 제안·문의</a>
+          <a href="mailto:phyunhoo@naver.com" class="pp-btn-outline">✉ 이메일 문의</a>
+        </div>`
+    }
+  };
+
+  function openProgram(id) {
+    const d = programData[id];
+    if (!d) return;
+    document.getElementById('ppIcon').textContent = d.icon;
+    document.getElementById('ppTag').textContent = d.tag;
+    document.getElementById('ppTitle').textContent = d.title;
+    document.getElementById('ppSub').textContent = d.sub;
+    document.getElementById('ppBody').innerHTML = d.body;
+    openPopup('programPopup');
+  }
+
+  /* ── NEWS DATA ── */
+  const newsData = {
+    gyeongju: {
+      badge: '탐방 기록', icon: '🏯',
+      title: '경주정보고등학교 45명 — 백의종군로 완주 및 수료식',
+      meta: '2019년 9월 · 경북 경주정보고등학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">45명</div><div class="np-stat-label">참가 학생 수</div></div>
+          <div class="np-stat"><div class="np-stat-num">3구간</div><div class="np-stat-label">탐방 코스</div></div>
+          <div class="np-stat"><div class="np-stat-num">수료식</div><div class="np-stat-label">농어촌인성학교 연계</div></div>
+        </div>
+        <p>2019년 9월, 경주정보고등학교 학생 45명이 한국관광교육연구원이 주관하는 백의종군로 탐방 프로그램에 참가하여 완주 수료식을 가졌습니다.</p>
+        <div class="np-highlight">
+          "길을 걷는 동안 이순신 장군의 마음이 조금이나마 느껴졌습니다. 포기하고 싶을 때마다 장군을 떠올렸습니다." — 참가 학생 소감
+        </div>
+        <p>농어촌인성학교 프로그램과 연계하여 진행된 이번 탐방은 단순한 걷기 행사를 넘어, 이순신 장군의 도전·극기·인내 정신을 몸으로 체험하는 살아있는 역사 교육의 장이 되었습니다. 탐방 완주 후 진행된 수료식에서 학생들은 뜨거운 감동을 나눴습니다.</p>
+        <p>한국관광교육연구원 팽현호 원장은 "오늘 이 길을 완주한 경험은 앞으로 살아가면서 무언가 힘든 순간이 올 때 스스로를 일으켜 세울 수 있는 소중한 기억이 될 것"이라고 격려했습니다.</p>`
+    },
+    haeundae: {
+      badge: '특별 완주', icon: '🌊',
+      title: '해운대여자중학교 — 6박 7일 전구간 70km 완주',
+      meta: '2018년 8월 · 부산 해운대여자중학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">70km</div><div class="np-stat-label">전구간 완주 거리</div></div>
+          <div class="np-stat"><div class="np-stat-num">6박7일</div><div class="np-stat-label">탐방 기간</div></div>
+          <div class="np-stat"><div class="np-stat-num">전원</div><div class="np-stat-label">완주 달성</div></div>
+        </div>
+        <p>2018년 8월, 부산 해운대여자중학교 학생들이 이순신 백의종군로 전구간 70km를 6박 7일에 걸쳐 전원 완주하는 역사적인 기록을 세웠습니다.</p>
+        <div class="np-highlight">
+          중학생이 70km를 전원 완주한 것은 이 프로그램 역사상 손꼽히는 감동적인 순간이었습니다. 포기자 없이 모두가 끝까지 걸었습니다.
+        </div>
+        <p>화개장터에서 문암정까지 하루 약 10km씩 걸으며 구간마다 스토리텔링 해설을 들었고, 1597년 이순신 장군의 백의종군 여정을 몸소 체험했습니다. 고난의 길 북천 코스모스 구간, 정기룡 장군 유숙지 등 역사 현장을 직접 밟으며 역사의식을 키웠습니다.</p>
+        <p>인솔 교사는 "처음에는 힘들다며 투정하던 아이들이 마지막 날에는 서로를 격려하며 끝까지 포기하지 않는 모습을 보였다. 이것이 진짜 교육"이라고 소감을 전했습니다.</p>`
+    },
+    busan: {
+      badge: '단체 탐방', icon: '🎒',
+      title: '부산관광고등학교 250명 — 화개장터~하동읍성 18km',
+      meta: '2017년 6월 · 부산관광고등학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">250명</div><div class="np-stat-label">역대 최대 규모</div></div>
+          <div class="np-stat"><div class="np-stat-num">18km</div><div class="np-stat-label">1구간 탐방 거리</div></div>
+          <div class="np-stat"><div class="np-stat-num">좌절의 길</div><div class="np-stat-label">탐방 코스</div></div>
+        </div>
+        <p>2017년 6월, 부산관광고등학교 학생 250명이 백의종군로 1구간 '좌절의 길'(화개장터~하동읍성, 18km)을 탐방하였습니다. 이는 한국관광교육연구원 운영 이래 역대 최대 규모의 단체 탐방 행사였습니다.</p>
+        <div class="np-highlight">
+          250명이 한 줄로 화개장터를 출발하는 장관은 이순신 장군의 정신을 이어받은 역사 교육의 감동적인 현장이었습니다.
+        </div>
+        <p>관광 분야 특성화고 학생들답게 역사 현장에 대한 높은 관심을 보였으며, 구간별 이순신 스토리텔링 해설에 집중하며 역사의식을 높이는 시간을 가졌습니다.</p>
+        <p>특히 이 탐방은 관광 전공 학생들이 현장 체험과 역사 교육을 결합하는 모범 사례로 평가받았으며, 이후 다수의 관광 계열 학교들의 탐방 신청으로 이어지는 계기가 되었습니다.</p>`
+    }
+  };
+
+  function openNews(id) {
+    const d = newsData[id];
+    if (!d) return;
+    document.getElementById('npBadge').textContent = d.badge;
+    document.getElementById('npTitle').textContent = d.title;
+    document.getElementById('npMeta').textContent = d.meta;
+    document.getElementById('npImg').textContent = d.icon;
+    document.getElementById('npBody').innerHTML = d.body;
+    openPopup('newsPopup');
+  }
 </script>
 </body>
 </html>
