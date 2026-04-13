@@ -776,23 +776,34 @@ function renderMembers() {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--ink-soft)">해당 회원이 없습니다.</td></tr>`;
     return;
   }
-  const roleMap = { pending:'sp-pending', member:'sp-member', admin:'sp-admin' };
+  const roleMap   = { pending:'sp-pending', member:'sp-member', admin:'sp-admin' };
   const roleLabel = { pending:'대기', member:'회원', admin:'관리자' };
   let html = '';
   filtered.forEach((m, i) => {
-    const date = (m.created_at||'').slice(0,10);
+    const date   = (m.created_at||'').slice(0,10);
     const isSelf = curUser && m.id === curUser.id;
-    const acts = isSelf ? `<span style="font-size:11px;color:var(--ink-soft)">본인</span>` :
-      (m.role==='pending'
-        ? `<div class="act-btns">
-             <button class="btn-approve" onclick="approveMember(${m.id})">승인</button>
-             <button class="btn-reject"  onclick="rejectMember(${m.id})">거절·삭제</button>
-             <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
-           </div>`
-        : `<div class="act-btns">
-             <button class="btn-reject" onclick="rejectMember(${m.id})">삭제</button>
-             <button class="btn-memo"   onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
-           </div>`);
+    let acts = '';
+    if (isSelf) {
+      acts = `<span style="font-size:11px;color:var(--ink-soft)">본인</span>`;
+    } else if (m.role === 'pending') {
+      acts = `<div class="act-btns">
+        <button class="btn-approve" onclick="approveMember(${m.id})">승인</button>
+        <button class="btn-reject"  onclick="rejectMember(${m.id})">거절·삭제</button>
+        <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+      </div>`;
+    } else if (m.role === 'member') {
+      acts = `<div class="act-btns">
+        <button class="btn-approve" onclick="setAdminRole(${m.id},'admin')" title="관리자로 승급">관리자 승급</button>
+        <button class="btn-reject"  onclick="rejectMember(${m.id})">삭제</button>
+        <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+      </div>`;
+    } else if (m.role === 'admin') {
+      acts = `<div class="act-btns">
+        <button class="btn-memo" style="background:#faeeda;color:#633806;border:1px solid rgba(201,168,76,.3);" onclick="setAdminRole(${m.id},'member')" title="일반 회원으로 강등">회원 강등</button>
+        <button class="btn-reject" onclick="rejectMember(${m.id})">삭제</button>
+        <button class="btn-memo"   onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+      </div>`;
+    }
     html += `<tr>
       <td class="tc">${i+1}</td>
       <td><strong>${m.name}</strong>${m.memo?` <span style="font-size:10px;color:var(--ink-soft)">📝</span>`:''}</td>
@@ -805,6 +816,17 @@ function renderMembers() {
     </tr>`;
   });
   tbody.innerHTML = html;
+}
+
+async function setAdminRole(id, newRole) {
+  const msg = newRole === 'admin'
+    ? '이 회원을 관리자로 승급하시겠습니까?\n관리자는 모든 글을 작성·수정·삭제할 수 있습니다.'
+    : '이 회원을 일반 회원으로 강등하시겠습니까?';
+  if (!confirm(msg)) return;
+  const { error } = await db.from('members').update({ role: newRole }).eq('id', id);
+  if (error) { showToast('오류: '+error.message, true); return; }
+  showToast(newRole === 'admin' ? '관리자로 승급되었습니다.' : '일반 회원으로 변경되었습니다.');
+  loadMembers();
 }
 
 async function approveMember(id) {
