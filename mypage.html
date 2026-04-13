@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원 — 한국관광교육연구원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --forest:#152a15;--deep:#1e3d1e;--hadon:#2d5a3d;
+  --path:#4a7c59;--moss:#6b9e78;--sage:#a8c5a0;
+  --gold:#c9a84c;--gold-lt:#e8d5a3;--cream:#f7f3ec;
+  --paper:#fdfbf7;--ink:#1a1a14;--ink-mid:#3d3d30;
+  --ink-soft:#6e6e5a;--border:rgba(45,90,61,0.15);
+  --red:#c0392b;--red-lt:#fdf0ef;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;min-height:100vh;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(21,42,21,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:64px;}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.nav-logo-emblem{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.nav-logo-text{color:var(--gold-lt);font-size:15px;font-weight:500;}
+.nav-logo-sub{color:var(--sage);font-size:10px;letter-spacing:.06em;}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13.5px;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--gold-lt);}
+.nav-back{color:var(--sage);border:1px solid rgba(168,197,160,.4);padding:7px 16px;border-radius:2px;font-size:12.5px;text-decoration:none;}
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
+.nav-hamburger span{width:22px;height:1.5px;background:var(--gold-lt);display:block;}
+
+/* HERO */
+.page-hero{background:var(--forest);padding:100px 5% 48px;position:relative;overflow:hidden;}
+.page-hero::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 50px,rgba(201,168,76,.04) 50px,rgba(201,168,76,.04) 51px);}
+.page-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;}
+.hero-inner h1{font-family:'Nanum Myeongjo',serif;font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:#fff;}
+.hero-inner h1 em{font-style:normal;color:var(--gold);}
+.hero-desc{color:rgba(255,255,255,.55);font-size:14px;margin-top:8px;}
+
+/* MAIN CONTAINER */
+.main{max-width:960px;margin:0 auto;padding:48px 5% 80px;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--hadon);margin-bottom:32px;}
+.tab{padding:11px 28px;font-size:14px;font-weight:500;color:var(--ink-soft);cursor:pointer;border:none;background:none;font-family:'Noto Sans KR',sans-serif;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .18s;}
+.tab:hover{color:var(--hadon);}
+.tab.active{color:var(--hadon);font-weight:700;border-bottom-color:var(--hadon);}
+.panel{display:none;}.panel.active{display:block;}
+
+/* FORM CARD */
+.form-card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;max-width:520px;margin:0 auto;}
+.form-card-head{background:var(--hadon);padding:22px 28px;}
+.form-card-head h2{font-family:'Nanum Myeongjo',serif;color:#fff;font-size:1.3rem;font-weight:800;}
+.form-card-head p{color:var(--sage);font-size:13px;margin-top:6px;}
+.form-card-body{padding:28px;}
+.fgroup{margin-bottom:18px;}
+.fgroup:last-of-type{margin-bottom:0;}
+.flabel{display:block;font-size:12.5px;font-weight:700;color:var(--ink-mid);letter-spacing:.05em;margin-bottom:7px;}
+.finput{width:100%;border:1px solid rgba(45,90,61,.25);border-radius:3px;padding:11px 14px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#fff;outline:none;transition:border-color .2s;}
+.finput:focus{border-color:var(--hadon);}
+.finput.err{border-color:var(--red);}
+.ferr{font-size:12px;color:var(--red);margin-top:5px;display:none;}
+.ferr.show{display:block;}
+.fhint{font-size:12px;color:var(--ink-soft);margin-top:5px;}
+.btn-primary{width:100%;background:var(--hadon);color:white;border:none;padding:13px;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border-radius:3px;cursor:pointer;transition:background .2s;letter-spacing:.04em;margin-top:8px;}
+.btn-primary:hover{background:var(--path);}
+.btn-primary:disabled{background:var(--ink-soft);cursor:not-allowed;}
+.form-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.form-link{text-align:center;font-size:13px;color:var(--ink-soft);}
+.form-link a{color:var(--hadon);text-decoration:none;font-weight:700;cursor:pointer;}
+.form-link a:hover{text-decoration:underline;}
+.spin-sm{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* STATUS CARDS */
+.status-card{background:#fff;border:1px solid var(--border);border-radius:6px;padding:28px;text-align:center;max-width:520px;margin:0 auto;}
+.status-icon{font-size:48px;margin-bottom:16px;}
+.status-title{font-family:'Nanum Myeongjo',serif;font-size:1.3rem;font-weight:800;color:var(--ink);margin-bottom:8px;}
+.status-desc{font-size:14px;color:var(--ink-soft);line-height:1.8;margin-bottom:20px;}
+.status-badge{display:inline-block;padding:5px 16px;border-radius:2px;font-size:13px;font-weight:700;letter-spacing:.04em;}
+.badge-pending{background:#FAEEDA;color:#633806;}
+.badge-member{background:#E1F5EE;color:#085041;}
+.badge-admin{background:var(--hadon);color:white;}
+
+/* MYPAGE */
+.mypage-grid{display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
+.mypage-sidebar{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.mp-profile{background:var(--hadon);padding:24px 20px;text-align:center;}
+.mp-avatar{width:64px;height:64px;border-radius:50%;background:rgba(201,168,76,.25);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;}
+.mp-name{color:#fff;font-size:15px;font-weight:700;margin-bottom:4px;}
+.mp-role{display:inline-block;background:var(--gold);color:var(--forest);font-size:11px;font-weight:700;padding:2px 10px;border-radius:2px;letter-spacing:.04em;}
+.mp-menu{padding:8px 0;}
+.mp-menu-item{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:13.5px;color:var(--ink-mid);cursor:pointer;transition:all .15s;border-left:3px solid transparent;}
+.mp-menu-item:hover{background:var(--cream);color:var(--hadon);}
+.mp-menu-item.active{background:var(--cream);color:var(--hadon);font-weight:700;border-left-color:var(--hadon);}
+.mp-menu-sep{height:1px;background:var(--border);margin:4px 0;}
+.mp-menu-logout{color:var(--red)!important;}
+.mp-menu-logout:hover{background:var(--red-lt)!important;}
+.mypage-content{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.mp-section{display:none;}.mp-section.active{display:block;}
+.mp-section-head{background:var(--cream);padding:18px 24px;border-bottom:1px solid var(--border);}
+.mp-section-head h3{font-size:15px;font-weight:700;color:var(--hadon);}
+.mp-section-head p{font-size:12.5px;color:var(--ink-soft);margin-top:3px;}
+.mp-section-body{padding:24px;}
+.mp-row{margin-bottom:18px;}
+.mp-row:last-of-type{margin-bottom:0;}
+.mp-label{font-size:12.5px;font-weight:700;color:var(--ink-mid);letter-spacing:.05em;margin-bottom:7px;display:block;}
+.mp-input{width:100%;border:1px solid rgba(45,90,61,.25);border-radius:3px;padding:10px 13px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--ink);outline:none;transition:border-color .2s;background:#fff;}
+.mp-input:focus{border-color:var(--hadon);}
+.mp-input:disabled{background:var(--cream);color:var(--ink-soft);}
+.mp-row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.mp-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:20px;border-top:1px solid var(--border);margin-top:8px;}
+.btn-save{background:var(--hadon);color:white;border:none;padding:11px 28px;border-radius:3px;font-size:13.5px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:background .2s;}
+.btn-save:hover{background:var(--path);}
+.btn-outline{background:#fff;color:var(--hadon);border:1px solid var(--hadon);padding:11px 20px;border-radius:3px;font-size:13.5px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-outline:hover{background:var(--cream);}
+
+/* ADMIN — MEMBER TABLE */
+.member-table{width:100%;border-collapse:collapse;}
+.member-table thead tr{background:var(--cream);border-bottom:2px solid var(--hadon);}
+.member-table th{padding:10px 13px;font-size:12.5px;font-weight:700;color:var(--hadon);text-align:left;}
+.member-table th.tc{text-align:center;width:60px;}
+.member-table th.ts{width:80px;}
+.member-table th.ta{width:120px;text-align:center;}
+.member-table tbody tr{border-bottom:1px solid rgba(45,90,61,.1);transition:background .15s;}
+.member-table tbody tr:hover{background:var(--cream);}
+.member-table td{padding:12px 13px;font-size:13px;color:var(--ink-mid);vertical-align:middle;}
+.member-table td.tc{text-align:center;font-size:12px;color:var(--ink-soft);}
+.status-pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;letter-spacing:.04em;}
+.sp-pending{background:#FAEEDA;color:#633806;}
+.sp-member{background:#E1F5EE;color:#085041;}
+.sp-admin{background:var(--hadon);color:white;}
+.act-btns{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;}
+.btn-approve{background:#E1F5EE;color:#085041;border:1px solid rgba(9,80,65,.2);padding:4px 10px;border-radius:2px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.btn-approve:hover{background:#085041;color:white;}
+.btn-reject{background:var(--red-lt);color:var(--red);border:1px solid rgba(192,57,43,.15);padding:4px 10px;border-radius:2px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.btn-reject:hover{background:var(--red);color:white;}
+.btn-memo{background:var(--cream);color:var(--ink-mid);border:1px solid var(--border);padding:4px 10px;border-radius:2px;font-size:11.5px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.btn-memo:hover{border-color:var(--hadon);color:var(--hadon);}
+
+/* TOOLBAR */
+.mp-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.mp-cnt{font-size:13px;color:var(--ink-soft);}
+.mp-cnt strong{color:var(--hadon);font-weight:700;}
+.filter-btns{display:flex;gap:6px;}
+.filter-btn{background:var(--cream);border:1px solid var(--border);color:var(--ink-soft);padding:6px 14px;border-radius:2px;font-size:12.5px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s;}
+.filter-btn:hover,.filter-btn.active{background:var(--hadon);color:white;border-color:var(--hadon);}
+
+/* MEMO MODAL */
+.overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px);}
+.overlay.open{display:flex;}
+.modal{background:var(--paper);border-radius:6px;width:100%;max-width:440px;box-shadow:0 32px 80px rgba(0,0,0,.28);animation:mIn .22s cubic-bezier(.34,1.3,.64,1) forwards;}
+@keyframes mIn{from{opacity:0;transform:scale(.94) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-head{background:var(--hadon);padding:18px 24px;border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-head h3{font-family:'Nanum Myeongjo',serif;color:#fff;font-size:1.1rem;font-weight:800;}
+.modal-close{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.modal-close:hover{color:white;}
+.modal-body{padding:20px 24px;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px;border-top:1px solid var(--border);}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--hadon);color:white;padding:12px 24px;border-radius:4px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--red);}
+
+/* MOBILE */
+@media(max-width:800px){
+  .nav-links{display:none;}.nav-hamburger{display:flex;}
+  .mypage-grid{grid-template-columns:1fr;}
+  .mp-row-2{grid-template-columns:1fr;}
+  .tabs{overflow-x:auto;}
+}
+.mob-nav{display:none;position:fixed;inset:0;z-index:500;background:rgba(21,42,21,.98);flex-direction:column;align-items:center;justify-content:center;gap:28px;}
+.mob-nav.open{display:flex;}
+.mob-nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:18px;}
+.mob-nav a:hover{color:var(--gold);}
+.mob-close{position:absolute;top:20px;right:5%;font-size:24px;color:var(--sage);cursor:pointer;background:none;border:none;}
+</style>
+</head>
+<body>
+
+<!-- ★★★ Supabase 설정 — board.html과 동일한 값 입력 ★★★ -->
+<script>
+const SUPA_URL  = 'https://qinhvivdlbhmchjeiehn.supabase.co';
+const SUPA_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';
+const SITE_NAME = '한국관광교육연구원';
+</script>
+
+<div class="mob-nav" id="mobNav">
+  <button class="mob-close" onclick="mn(false)">✕</button>
+  <a href="index.html#greeting">원장 인사말</a>
+  <a href="index.html#about">연구원 소개</a>
+  <a href="index.html#course">백의종군로</a>
+  <a href="board.html">공지·자료</a>
+  <a href="mypage.html" class="active">회원</a>
+  <a href="index.html#contact">문의·신청</a>
+</div>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-emblem">⛵</div>
+    <div>
+      <div class="nav-logo-text">한국관광교육연구원</div>
+      <div class="nav-logo-sub">Korea Tourism Education Research Association</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#greeting">원장 인사말</a>
+    <a href="index.html#about">연구원 소개</a>
+    <a href="index.html#course">백의종군로</a>
+    <a href="board.html">공지·자료</a>
+    <a href="mypage.html" class="active">회원</a>
+    <a href="index.html#contact">문의·신청</a>
+  </div>
+  <a href="index.html" class="nav-back">← 홈으로</a>
+  <div class="nav-hamburger" onclick="mn(true)"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="page-hero">
+  <div class="hero-inner">
+    <h1 id="heroTitle">회원 <em>로그인</em></h1>
+    <p class="hero-desc" id="heroDesc">로그인하거나 회원가입을 신청하세요.</p>
+  </div>
+</div>
+
+<div class="main" id="mainArea">
+
+  <!-- ══════ 비로그인 화면 ══════ -->
+  <div id="guestArea">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchAuthTab('login')">로그인</button>
+      <button class="tab" id="tab-signup" onclick="switchAuthTab('signup')">회원가입 신청</button>
+    </div>
+
+    <!-- 로그인 -->
+    <div class="panel active" id="panel-login">
+      <div class="form-card">
+        <div class="form-card-head">
+          <h2>로그인</h2>
+          <p>가입 승인된 회원만 로그인 가능합니다.</p>
+        </div>
+        <div class="form-card-body">
+          <div class="fgroup">
+            <label class="flabel">이메일</label>
+            <input class="finput" type="email" id="loginEmail" placeholder="이메일 주소" autocomplete="email">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">비밀번호</label>
+            <input class="finput" type="password" id="loginPw" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+            <div class="ferr" id="loginErr">이메일 또는 비밀번호가 올바르지 않거나 승인 대기 중입니다.</div>
+          </div>
+          <button class="btn-primary" id="btnLogin" onclick="doLogin()">로그인</button>
+          <hr class="form-divider">
+          <p class="form-link">아직 회원이 아니신가요? <a onclick="switchAuthTab('signup')">회원가입 신청 →</a></p>
+          <p style="font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:14px;line-height:1.9;background:var(--cream);border-radius:4px;padding:10px 14px;">
+            🔐 관리자 계정 : <strong style="color:var(--ink);">kbe@daum.net</strong><br>
+            초기 비밀번호 : <strong style="color:var(--ink);">ktea2025!</strong><br>
+            <span style="color:var(--red);font-size:11px;">로그인 후 마이페이지 → 비밀번호 변경 권장</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 회원가입 -->
+    <div class="panel" id="panel-signup">
+      <div class="form-card">
+        <div class="form-card-head">
+          <h2>회원가입 신청</h2>
+          <p>관리자 승인 후 로그인이 가능합니다.</p>
+        </div>
+        <div class="form-card-body">
+          <div class="fgroup">
+            <label class="flabel">이름 *</label>
+            <input class="finput" type="text" id="signName" placeholder="실명 입력">
+            <div class="ferr" id="signNameErr">이름을 입력해 주세요.</div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">이메일 *</label>
+            <input class="finput" type="email" id="signEmail" placeholder="로그인에 사용할 이메일">
+            <div class="ferr" id="signEmailErr">올바른 이메일을 입력해 주세요.</div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">비밀번호 * (6자 이상)</label>
+            <input class="finput" type="password" id="signPw" placeholder="비밀번호 설정" autocomplete="new-password">
+            <div class="ferr" id="signPwErr">비밀번호는 6자 이상이어야 합니다.</div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">비밀번호 확인 *</label>
+            <input class="finput" type="password" id="signPw2" placeholder="비밀번호 재입력" autocomplete="new-password">
+            <div class="ferr" id="signPw2Err">비밀번호가 일치하지 않습니다.</div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">연락처</label>
+            <input class="finput" type="tel" id="signPhone" placeholder="010-0000-0000">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">소속 기관·학교</label>
+            <input class="finput" type="text" id="signOrg" placeholder="소속 기관 또는 학교명">
+            <p class="fhint">관리자 승인 시 참고됩니다.</p>
+          </div>
+          <button class="btn-primary" id="btnSignup" onclick="doSignup()">가입 신청하기</button>
+          <hr class="form-divider">
+          <p class="form-link">이미 회원이신가요? <a onclick="switchAuthTab('login')">로그인 →</a></p>
+        </div>
+      </div>
+    </div>
+  </div><!-- /guestArea -->
+
+  <!-- ══════ 로그인 후 화면 ══════ -->
+  <div id="memberArea" style="display:none">
+
+    <!-- 승인 대기 안내 -->
+    <div id="pendingArea" style="display:none">
+      <div class="status-card">
+        <div class="status-icon">⏳</div>
+        <div class="status-title">가입 승인 대기 중</div>
+        <div class="status-desc">
+          회원가입 신청이 완료되었습니다.<br>
+          관리자 검토 후 승인되면 모든 기능을 이용하실 수 있습니다.<br>
+          승인 문의 : <a href="tel:010-2786-7822" style="color:var(--hadon);font-weight:700;">010-2786-7822</a>
+        </div>
+        <span class="status-badge badge-pending">승인 대기</span>
+        <br><br>
+        <button class="btn-outline" onclick="doLogout()" style="width:auto;margin-top:4px;">로그아웃</button>
+      </div>
+    </div>
+
+    <!-- 마이페이지 (승인 회원 / 관리자) -->
+    <div id="mypageArea" style="display:none">
+      <div class="mypage-grid">
+
+        <!-- 사이드바 -->
+        <div class="mypage-sidebar">
+          <div class="mp-profile">
+            <div class="mp-avatar">👤</div>
+            <div class="mp-name" id="mpName">-</div>
+            <div><span class="mp-role" id="mpRole">회원</span></div>
+          </div>
+          <div class="mp-menu">
+            <div class="mp-menu-item active" id="mpMenu-info" onclick="mpSwitch('info')">👤 내 정보</div>
+            <div class="mp-menu-item" id="mpMenu-pw" onclick="mpSwitch('pw')">🔒 비밀번호 변경</div>
+            <div class="mp-menu-sep"></div>
+            <div class="mp-menu-item" id="mpMenu-admin" style="display:none" onclick="mpSwitch('admin')">⚙ 회원 관리</div>
+            <div class="mp-menu-sep" id="mpSep-admin" style="display:none"></div>
+            <div class="mp-menu-item" onclick="window.location.href='board.html'">📋 공지·자료실</div>
+            <div class="mp-menu-sep"></div>
+            <div class="mp-menu-item mp-menu-logout" onclick="doLogout()">🚪 로그아웃</div>
+          </div>
+        </div>
+
+        <!-- 콘텐츠 영역 -->
+        <div class="mypage-content">
+
+          <!-- 내 정보 수정 -->
+          <div class="mp-section active" id="sec-info">
+            <div class="mp-section-head">
+              <h3>내 정보 수정</h3>
+              <p>이름, 연락처, 소속을 변경할 수 있습니다.</p>
+            </div>
+            <div class="mp-section-body">
+              <div class="mp-row">
+                <label class="mp-label">이메일 (변경 불가)</label>
+                <input class="mp-input" type="email" id="infoEmail" disabled>
+              </div>
+              <div class="mp-row-2">
+                <div>
+                  <label class="mp-label">이름 *</label>
+                  <input class="mp-input" type="text" id="infoName">
+                </div>
+                <div>
+                  <label class="mp-label">연락처</label>
+                  <input class="mp-input" type="tel" id="infoPhone" placeholder="010-0000-0000">
+                </div>
+              </div>
+              <div class="mp-row">
+                <label class="mp-label">소속 기관·학교</label>
+                <input class="mp-input" type="text" id="infoOrg" placeholder="소속 기관명">
+              </div>
+              <div class="mp-row">
+                <label class="mp-label">가입일</label>
+                <input class="mp-input" type="text" id="infoJoined" disabled>
+              </div>
+              <div class="mp-footer">
+                <button class="btn-save" onclick="saveInfo()">정보 저장</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 비밀번호 변경 -->
+          <div class="mp-section" id="sec-pw">
+            <div class="mp-section-head">
+              <h3>비밀번호 변경</h3>
+              <p>현재 비밀번호 확인 후 새 비밀번호로 변경합니다.</p>
+            </div>
+            <div class="mp-section-body">
+              <div class="mp-row">
+                <label class="mp-label">현재 비밀번호</label>
+                <input class="mp-input" type="password" id="pwCurrent" placeholder="현재 비밀번호 입력">
+                <div class="ferr" id="pwCurrentErr" style="margin-top:5px;">현재 비밀번호가 올바르지 않습니다.</div>
+              </div>
+              <div class="mp-row">
+                <label class="mp-label">새 비밀번호 (6자 이상)</label>
+                <input class="mp-input" type="password" id="pwNew" placeholder="새 비밀번호">
+                <div class="ferr" id="pwNewErr" style="margin-top:5px;">비밀번호는 6자 이상이어야 합니다.</div>
+              </div>
+              <div class="mp-row">
+                <label class="mp-label">새 비밀번호 확인</label>
+                <input class="mp-input" type="password" id="pwNew2" placeholder="새 비밀번호 재입력">
+                <div class="ferr" id="pwNew2Err" style="margin-top:5px;">비밀번호가 일치하지 않습니다.</div>
+              </div>
+              <div class="mp-footer">
+                <button class="btn-save" onclick="changePw()">비밀번호 변경</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 관리자 — 회원 관리 -->
+          <div class="mp-section" id="sec-admin">
+            <div class="mp-section-head">
+              <h3>회원 관리</h3>
+              <p>가입 신청을 승인하거나 회원 정보를 관리합니다.</p>
+            </div>
+            <div class="mp-section-body">
+              <div class="mp-toolbar">
+                <span class="mp-cnt">전체 <strong id="memberTotal">-</strong>명</span>
+                <div class="filter-btns">
+                  <button class="filter-btn active" id="fb-all" onclick="filterMembers('all')">전체</button>
+                  <button class="filter-btn" id="fb-pending" onclick="filterMembers('pending')">대기 <span id="pendingBadge" style="background:#BA7517;color:white;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:2px;">0</span></button>
+                  <button class="filter-btn" id="fb-member" onclick="filterMembers('member')">회원</button>
+                  <button class="filter-btn" id="fb-admin" onclick="filterMembers('admin')">관리자</button>
+                </div>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="member-table">
+                  <thead><tr>
+                    <th class="tc">번호</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>소속</th>
+                    <th>연락처</th>
+                    <th class="ts">상태</th>
+                    <th class="tc">가입일</th>
+                    <th class="ta">관리</th>
+                  </tr></thead>
+                  <tbody id="memberTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /mypage-content -->
+      </div><!-- /mypage-grid -->
+    </div><!-- /mypageArea -->
+
+  </div><!-- /memberArea -->
+
+</div><!-- /main -->
+
+<!-- MEMO MODAL -->
+<div class="overlay" id="memoModal" onclick="if(event.target===this)closeModal('memoModal')">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>관리자 메모</h3>
+      <button class="modal-close" onclick="closeModal('memoModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="memoMemberId">
+      <label class="mp-label">메모 내용</label>
+      <textarea class="mp-input" id="memoText" style="min-height:100px;resize:vertical;" placeholder="이 회원에 대한 메모를 입력하세요."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('memoModal')">취소</button>
+      <button class="btn-save" onclick="saveMemo()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer style="background:var(--forest);padding:36px 5%;border-top:1px solid rgba(201,168,76,.2);">
+  <div style="max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;">
+    <div style="color:rgba(255,255,255,.45);font-size:12.5px;line-height:2.1;">
+      <span style="color:var(--gold);font-family:'Nanum Myeongjo',serif;font-size:15px;font-weight:800;">사단법인 한국관광교육연구원</span><br>
+      경남 하동군 옥종면 옥종중앙길 132 &nbsp;|&nbsp;
+      <a href="tel:010-2786-7822" style="color:rgba(255,255,255,.6);text-decoration:none;">010-2786-7822</a>
+    </div>
+    <a href="index.html" style="color:var(--sage);font-size:13px;text-decoration:none;border:1px solid rgba(168,197,160,.3);padding:8px 18px;border-radius:2px;">← 메인으로</a>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════
+   SUPABASE INIT
+══════════════════════════════════ */
+const { createClient } = supabase;
+const db = createClient(SUPA_URL, SUPA_KEY);
+
+/* ══════════════════════════════════
+   STATE
+══════════════════════════════════ */
+let curUser = null;      // 로그인한 회원 객체
+let allMembers = [];     // 관리자용 전체 회원 목록
+let curFilter = 'all';
+
+/* ══════════════════════════════════
+   SHA-256 해시 (비밀번호용)
+══════════════════════════════════ */
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ══════════════════════════════════
+   AUTH TAB SWITCH
+══════════════════════════════════ */
+function switchAuthTab(tab) {
+  ['login','signup'].forEach(t => {
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+}
+
+/* ══════════════════════════════════
+   SIGNUP
+══════════════════════════════════ */
+async function doSignup() {
+  const name  = document.getElementById('signName').value.trim();
+  const email = document.getElementById('signEmail').value.trim();
+  const pw    = document.getElementById('signPw').value;
+  const pw2   = document.getElementById('signPw2').value;
+  const phone = document.getElementById('signPhone').value.trim();
+  const org   = document.getElementById('signOrg').value.trim();
+
+  let valid = true;
+  const setErr = (id, show) => { document.getElementById(id).classList.toggle('show', show); if(show) valid=false; };
+  setErr('signNameErr',  !name);
+  setErr('signEmailErr', !email || !email.includes('@'));
+  setErr('signPwErr',    pw.length < 6);
+  setErr('signPw2Err',   pw !== pw2);
+  if (!valid) return;
+
+  const btn = document.getElementById('btnSignup');
+  btn.innerHTML = '<span class="spin-sm"></span>처리 중...'; btn.disabled = true;
+
+  try {
+    const pwHash = await sha256(pw);
+    const { error } = await db.from('members').insert({ name, email, phone, org, role:'pending', password_hash: pwHash });
+    if (error) {
+      if (error.code === '23505') showToast('이미 가입된 이메일입니다.', true);
+      else showToast('오류: ' + error.message, true);
+      return;
+    }
+    // 자동 로그인
+    const { data: rows } = await db.rpc('login_member', { p_email: email, p_pw_hash: pwHash });
+    if (rows && rows.length) { curUser = rows[0]; saveSession(); showMemberArea(); }
+    showToast('가입 신청이 완료되었습니다. 관리자 승인을 기다려 주세요.');
+  } catch(e) { showToast('오류: ' + e.message, true); }
+  finally { btn.innerHTML = '가입 신청하기'; btn.disabled = false; }
+}
+
+/* ══════════════════════════════════
+   LOGIN
+══════════════════════════════════ */
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw    = document.getElementById('loginPw').value;
+  const err   = document.getElementById('loginErr');
+
+  if (!email || !pw) { err.classList.add('show'); return; }
+  const btn = document.getElementById('btnLogin');
+  btn.innerHTML = '<span class="spin-sm"></span>로그인 중...'; btn.disabled = true;
+
+  try {
+    const pwHash = await sha256(pw);
+    const { data: rows } = await db.rpc('login_member', { p_email: email, p_pw_hash: pwHash });
+    if (!rows || !rows.length) { err.classList.add('show'); document.getElementById('loginPw').value = ''; return; }
+    curUser = rows[0];
+    err.classList.remove('show');
+    saveSession();
+    showMemberArea();
+    showToast(`${curUser.name}님, 환영합니다!`);
+  } catch(e) { showToast('오류: ' + e.message, true); }
+  finally { btn.innerHTML = '로그인'; btn.disabled = false; }
+}
+
+/* ══════════════════════════════════
+   SESSION (sessionStorage)
+══════════════════════════════════ */
+function saveSession()   { sessionStorage.setItem('ktea_user', JSON.stringify(curUser)); }
+function clearSession()  { sessionStorage.removeItem('ktea_user'); }
+function loadSession()   {
+  try { const s = sessionStorage.getItem('ktea_user'); if(s) curUser = JSON.parse(s); } catch(e){}
+}
+
+function doLogout() {
+  curUser = null; clearSession();
+  document.getElementById('memberArea').style.display = 'none';
+  document.getElementById('guestArea').style.display  = 'block';
+  updateHero(false);
+  showToast('로그아웃되었습니다.');
+}
+
+/* ══════════════════════════════════
+   SHOW MEMBER AREA
+══════════════════════════════════ */
+function showMemberArea() {
+  document.getElementById('guestArea').style.display  = 'none';
+  document.getElementById('memberArea').style.display = 'block';
+
+  if (curUser.role === 'pending') {
+    document.getElementById('pendingArea').style.display  = 'block';
+    document.getElementById('mypageArea').style.display   = 'none';
+    updateHero(true, '승인 대기', '관리자 승인 후 이용 가능합니다.');
+    return;
+  }
+
+  document.getElementById('pendingArea').style.display  = 'none';
+  document.getElementById('mypageArea').style.display   = 'block';
+
+  // fill profile
+  document.getElementById('mpName').textContent = curUser.name;
+  const roleLabel = { admin:'관리자', member:'회원', pending:'대기' };
+  document.getElementById('mpRole').textContent = roleLabel[curUser.role]||'회원';
+
+  // fill info form
+  document.getElementById('infoEmail').value  = curUser.email;
+  document.getElementById('infoName').value   = curUser.name;
+  document.getElementById('infoPhone').value  = curUser.phone||'';
+  document.getElementById('infoOrg').value    = curUser.org||'';
+  document.getElementById('infoJoined').value = (curUser.created_at||'').slice(0,10);
+
+  // show admin menu
+  const isAdm = curUser.role === 'admin';
+  document.getElementById('mpMenu-admin').style.display = isAdm ? '' : 'none';
+  document.getElementById('mpSep-admin').style.display  = isAdm ? '' : 'none';
+
+  updateHero(true, curUser.name + '님 마이페이지', curUser.org || curUser.email);
+}
+
+function updateHero(loggedIn, title, desc) {
+  document.getElementById('heroTitle').innerHTML = loggedIn
+    ? `<em>${title}</em>` : '회원 <em>로그인</em>';
+  document.getElementById('heroDesc').textContent = desc || '로그인하거나 회원가입을 신청하세요.';
+}
+
+/* ══════════════════════════════════
+   MYPAGE SECTION SWITCH
+══════════════════════════════════ */
+function mpSwitch(sec) {
+  document.querySelectorAll('.mp-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mp-menu-item').forEach(m=>m.classList.remove('active'));
+  document.getElementById('sec-'+sec).classList.add('active');
+  document.getElementById('mpMenu-'+sec)?.classList.add('active');
+  if (sec === 'admin') loadMembers();
+}
+
+/* ══════════════════════════════════
+   SAVE INFO
+══════════════════════════════════ */
+async function saveInfo() {
+  const name  = document.getElementById('infoName').value.trim();
+  const phone = document.getElementById('infoPhone').value.trim();
+  const org   = document.getElementById('infoOrg').value.trim();
+  if (!name) { showToast('이름을 입력해 주세요.', true); return; }
+
+  const { error } = await db.rpc('update_member_info', {
+    member_id: curUser.id, new_name: name, new_phone: phone, new_org: org
+  });
+  if (error) { showToast('저장 오류: '+error.message, true); return; }
+  curUser.name = name; curUser.phone = phone; curUser.org = org;
+  saveSession();
+  document.getElementById('mpName').textContent = name;
+  showToast('정보가 저장되었습니다.');
+}
+
+/* ══════════════════════════════════
+   CHANGE PASSWORD
+══════════════════════════════════ */
+async function changePw() {
+  const cur  = document.getElementById('pwCurrent').value;
+  const nw   = document.getElementById('pwNew').value;
+  const nw2  = document.getElementById('pwNew2').value;
+
+  const setE = (id, show) => document.getElementById(id).classList.toggle('show', show);
+  setE('pwCurrentErr', false); setE('pwNewErr', nw.length<6); setE('pwNew2Err', nw!==nw2);
+  if (nw.length<6 || nw!==nw2) return;
+
+  // verify current password
+  const curHash = await sha256(cur);
+  const { data: rows } = await db.rpc('login_member', { p_email: curUser.email, p_pw_hash: curHash });
+  if (!rows || !rows.length) { setE('pwCurrentErr', true); return; }
+
+  const newHash = await sha256(nw);
+  const { error } = await db.rpc('change_password', { member_id: curUser.id, new_pw_hash: newHash });
+  if (error) { showToast('오류: '+error.message, true); return; }
+
+  document.getElementById('pwCurrent').value = '';
+  document.getElementById('pwNew').value     = '';
+  document.getElementById('pwNew2').value    = '';
+  showToast('비밀번호가 변경되었습니다.');
+}
+
+/* ══════════════════════════════════
+   ADMIN — LOAD MEMBERS
+══════════════════════════════════ */
+async function loadMembers() {
+  document.getElementById('memberTbody').innerHTML =
+    `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--ink-soft)">불러오는 중...</td></tr>`;
+
+  const { data, error } = await db.from('members')
+    .select('*').order('created_at', { ascending: false });
+  if (error) { showToast('오류: '+error.message, true); return; }
+
+  allMembers = data || [];
+  const pending = allMembers.filter(m=>m.role==='pending').length;
+  document.getElementById('pendingBadge').textContent = pending;
+  renderMembers();
+}
+
+function filterMembers(f) {
+  curFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('fb-'+f).classList.add('active');
+  renderMembers();
+}
+
+function renderMembers() {
+  const filtered = curFilter==='all' ? allMembers : allMembers.filter(m=>m.role===curFilter);
+  document.getElementById('memberTotal').textContent = filtered.length;
+  const tbody = document.getElementById('memberTbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--ink-soft)">해당 회원이 없습니다.</td></tr>`;
+    return;
+  }
+  const roleMap = { pending:'sp-pending', member:'sp-member', admin:'sp-admin' };
+  const roleLabel = { pending:'대기', member:'회원', admin:'관리자' };
+  let html = '';
+  filtered.forEach((m, i) => {
+    const date = (m.created_at||'').slice(0,10);
+    const isSelf = curUser && m.id === curUser.id;
+    const acts = isSelf ? `<span style="font-size:11px;color:var(--ink-soft)">본인</span>` :
+      (m.role==='pending'
+        ? `<div class="act-btns">
+             <button class="btn-approve" onclick="approveMember(${m.id})">승인</button>
+             <button class="btn-reject"  onclick="rejectMember(${m.id})">거절·삭제</button>
+             <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+           </div>`
+        : `<div class="act-btns">
+             <button class="btn-reject" onclick="rejectMember(${m.id})">삭제</button>
+             <button class="btn-memo"   onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+           </div>`);
+    html += `<tr>
+      <td class="tc">${i+1}</td>
+      <td><strong>${m.name}</strong>${m.memo?` <span style="font-size:10px;color:var(--ink-soft)">📝</span>`:''}</td>
+      <td style="font-size:12.5px">${m.email}</td>
+      <td style="font-size:12.5px">${m.org||'-'}</td>
+      <td style="font-size:12.5px">${m.phone||'-'}</td>
+      <td><span class="status-pill ${roleMap[m.role]||'sp-member'}">${roleLabel[m.role]||m.role}</span></td>
+      <td class="tc" style="font-size:11.5px">${date}</td>
+      <td>${acts}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+async function approveMember(id) {
+  const { error } = await db.rpc('approve_member', { member_id: id });
+  if (error) { showToast('오류: '+error.message, true); return; }
+  showToast('승인되었습니다.');
+  loadMembers();
+}
+
+async function rejectMember(id) {
+  if (!confirm('이 회원을 삭제하시겠습니까?')) return;
+  const { error } = await db.from('members').delete().eq('id', id);
+  if (error) { showToast('오류: '+error.message, true); return; }
+  showToast('삭제되었습니다.');
+  loadMembers();
+}
+
+function openMemo(id, existing) {
+  document.getElementById('memoMemberId').value = id;
+  document.getElementById('memoText').value = existing || '';
+  document.getElementById('memoModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function saveMemo() {
+  const id   = parseInt(document.getElementById('memoMemberId').value);
+  const memo = document.getElementById('memoText').value.trim();
+  const { error } = await db.from('members').update({ memo }).eq('id', id);
+  if (error) { showToast('오류: '+error.message, true); return; }
+  closeModal('memoModal');
+  showToast('메모가 저장되었습니다.');
+  loadMembers();
+}
+
+/* ══════════════════════════════════
+   UTILS
+══════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open');  document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function showToast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show'+(isErr?' err':'');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+function mn(open) { document.getElementById('mobNav').classList.toggle('open',open); document.body.style.overflow=open?'hidden':''; }
+document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()=>mn(false)));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal('memoModal'); });
+
+/* ══════════════════════════════════
+   BOOT — 세션 복원
+══════════════════════════════════ */
+loadSession();
+if (curUser) showMemberArea();
+</script>
+</body>
+</html>

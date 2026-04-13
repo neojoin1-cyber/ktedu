@@ -267,7 +267,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 const ADMIN_ID = 'admin';
-const ADMIN_PW = 'vodgusgh2604';   // ← 변경 권장
+const ADMIN_PW = 'ktea2025!';   // ← 변경 권장
 const PER_PAGE = 10;
 </script>
 
@@ -278,6 +278,7 @@ const PER_PAGE = 10;
   <a href="index.html#course">백의종군로</a>
   <a href="index.html#programs">프로그램</a>
   <a href="board.html">공지·자료</a>
+  <a href="mypage.html">회원</a>
   <a href="index.html#contact">문의·신청</a>
 </div>
 
@@ -295,6 +296,7 @@ const PER_PAGE = 10;
     <a href="index.html#course">백의종군로</a>
     <a href="index.html#programs">프로그램</a>
     <a href="board.html" class="active">공지·자료</a>
+    <a href="mypage.html">회원</a>
     <a href="index.html#contact">문의·신청</a>
   </div>
   <div class="nav-right">
@@ -450,7 +452,7 @@ const PER_PAGE = 10;
         <div class="form-error" id="lerr">아이디 또는 비밀번호가 올바르지 않습니다.</div>
       </div>
       <button class="btn-login" onclick="doLogin()">로그인</button>
-      <p class="login-hint">관리자용 <strong>admin</strong> / <strong>메뉴</strong><br>글쓰기 기능 필요하면 신청 부탁드립니다.</p>
+      <p class="login-hint">초기 계정 : <strong>admin</strong> / <strong>ktea2025!</strong><br>서버 배포 전 코드 내 비밀번호를 변경하세요.</p>
     </div>
   </div>
 </div>
@@ -546,10 +548,11 @@ const db = createClient(SUPA_URL, SUPA_KEY);
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-let isAdmin   = false;
-let curTab    = 'notice';
-let curPage   = { notice:1, program:1, archive:1 };
-let pendingFiles = [];   // { file: File, name, size } — before upload
+let isAdmin      = false;
+let curTab       = 'notice';
+let curPage      = { notice:1, program:1, archive:1 };
+let pendingFiles = [];    // File objects — new uploads
+let existingFiles = [];   // { id, name, size, storage_path } — already saved, deletable
 
 /* ═══════════════════════════════════════
    BADGE MAP
@@ -812,39 +815,66 @@ function updateAdminUI() {
 ═══════════════════════════════════════ */
 async function openWrite(board, editId) {
   if (!isAdmin) return;
-  pendingFiles = [];
-  document.getElementById('fileChips').innerHTML='';
-  document.getElementById('fileInput').value='';
+  pendingFiles  = [];
+  existingFiles = [];
+  document.getElementById('fileChips').innerHTML = '';
+  document.getElementById('fileInput').value     = '';
 
   if (editId) {
-    const { data:p } = await db.from('posts').select('*, files(*)').eq('id',editId).single();
+    const { data:p } = await db.from('posts').select('*, files(*)').eq('id', editId).single();
     if (!p) return;
-    document.getElementById('wTitle').textContent = '글 수정';
-    document.getElementById('wEditId').value = editId;
-    document.getElementById('wBoard').value  = p.board;
-    document.getElementById('wCat').value    = p.cat;
-    document.getElementById('wTitleInput').value = p.title;
-    document.getElementById('wBody').value   = p.body;
-    document.getElementById('wEx1').value    = p.extra1||'';
-    document.getElementById('wEx2').value    = p.extra2||'';
-    document.getElementById('wPin').checked  = !!p.pin;
-    // show existing files as chips (non-removable in edit for simplicity)
-    if (p.files && p.files.length) {
-      document.getElementById('fileChips').innerHTML =
-        p.files.map(f=>`<div class="file-chip">📎 ${f.name} <span class="chip-prog">(기존)</span></div>`).join('');
-    }
+    document.getElementById('wTitle').textContent    = '글 수정';
+    document.getElementById('wEditId').value         = editId;
+    document.getElementById('wBoard').value          = p.board;
+    document.getElementById('wCat').value            = p.cat;
+    document.getElementById('wTitleInput').value     = p.title;
+    document.getElementById('wBody').value           = p.body;
+    document.getElementById('wEx1').value            = p.extra1 || '';
+    document.getElementById('wEx2').value            = p.extra2 || '';
+    document.getElementById('wPin').checked          = !!p.pin;
+    // 기존 파일 — 삭제 가능한 칩으로 표시
+    existingFiles = p.files ? [...p.files] : [];
+    renderAllChips();
   } else {
     document.getElementById('wTitle').textContent = '새 글 작성';
-    document.getElementById('wEditId').value = '';
-    document.getElementById('wBoard').value  = board || curTab;
-    document.getElementById('wCat').value    = 'notice';
-    document.getElementById('wTitleInput').value='';
-    document.getElementById('wBody').value='';
-    document.getElementById('wEx1').value=''; document.getElementById('wEx2').value='';
-    document.getElementById('wPin').checked=false;
+    document.getElementById('wEditId').value      = '';
+    document.getElementById('wBoard').value       = board || curTab;
+    document.getElementById('wCat').value         = 'notice';
+    document.getElementById('wTitleInput').value  = '';
+    document.getElementById('wBody').value        = '';
+    document.getElementById('wEx1').value         = '';
+    document.getElementById('wEx2').value         = '';
+    document.getElementById('wPin').checked       = false;
   }
   onBoardChange();
   openModal('writeModal');
+}
+
+function renderAllChips() {
+  const chips = document.getElementById('fileChips');
+  let html = '';
+  // 기존 파일 (초록색 배경 — 삭제 가능)
+  existingFiles.forEach((f, i) => {
+    if (!f) return;
+    html += `<div class="file-chip" id="ex-chip-${i}" style="background:#e8f2e9;">
+      📎 ${f.name} <span class="chip-prog">${fmtSize(f.size)} · 기존</span>
+      <span class="chip-del" onclick="removeExisting(${i})" title="이 파일 삭제">✕</span>
+    </div>`;
+  });
+  // 새 파일 (파란색 배경)
+  pendingFiles.forEach((f, i) => {
+    if (!f) return;
+    html += `<div class="file-chip" id="chip-${i}" style="background:#E6F1FB;color:#0C447C;">
+      📎 ${f.name} <span class="chip-prog" style="color:#185FA5;">${fmtSize(f.size)} · 신규</span>
+      <span class="chip-del" onclick="removeChip(${i})">✕</span>
+    </div>`;
+  });
+  chips.innerHTML = html;
+}
+
+function removeExisting(i) {
+  existingFiles[i] = null;
+  renderAllChips();
 }
 
 function onBoardChange() {
@@ -856,63 +886,74 @@ function onBoardChange() {
 }
 
 function handleFiles(files) {
-  Array.from(files).forEach(f=>{
-    if (f.size>20*1024*1024){ showToast('20MB 이하 파일만 첨부 가능합니다.',true); return; }
+  Array.from(files).forEach(f => {
+    if (f.size > 20*1024*1024) { showToast('20MB 이하 파일만 첨부 가능합니다.', true); return; }
     pendingFiles.push(f);
-    const chips = document.getElementById('fileChips');
-    chips.innerHTML += `<div class="file-chip" id="chip-${pendingFiles.length-1}">📎 ${f.name} <span class="chip-prog">${fmtSize(f.size)}</span> <span class="chip-del" onclick="removeChip(${pendingFiles.length-1})">✕</span></div>`;
+    renderAllChips();
   });
 }
-function removeChip(i) {
-  pendingFiles[i]=null;
-  const el=document.getElementById('chip-'+i); if(el)el.remove();
-}
+function removeChip(i) { pendingFiles[i] = null; renderAllChips(); }
 
 async function savePost() {
-  const title = document.getElementById('wTitleInput').value.trim();
-  const body  = document.getElementById('wBody').value.trim();
-  if (!title) { showToast('제목을 입력해 주세요.',true); return; }
-  if (!body)  { showToast('내용을 입력해 주세요.',true); return; }
+  const title  = document.getElementById('wTitleInput').value.trim();
+  const body   = document.getElementById('wBody').value.trim();
+  if (!title) { showToast('제목을 입력해 주세요.', true); return; }
+  if (!body)  { showToast('내용을 입력해 주세요.', true); return; }
 
   const btn = document.getElementById('btnSave');
-  btn.innerHTML='<span class="save-spin"></span>저장 중...'; btn.disabled=true;
+  btn.innerHTML = '<span class="save-spin"></span>저장 중...'; btn.disabled = true;
 
   try {
-    const board  = document.getElementById('wBoard').value;
-    const cat    = document.getElementById('wCat').value;
-    const extra1 = document.getElementById('wEx1').value.trim();
-    const extra2 = document.getElementById('wEx2').value.trim();
-    const pin    = document.getElementById('wPin').checked;
-    const editId = document.getElementById('wEditId').value;
-    const now    = new Date();
-    const dateStr= `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    const board   = document.getElementById('wBoard').value;
+    const cat     = document.getElementById('wCat').value;
+    const extra1  = document.getElementById('wEx1').value.trim();
+    const extra2  = document.getElementById('wEx2').value.trim();
+    const pin     = document.getElementById('wPin').checked;
+    const editId  = document.getElementById('wEditId').value;
+    const now     = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
 
     let postId = editId ? parseInt(editId) : null;
 
     if (editId) {
-      await db.from('posts').update({ board,cat,title,body,extra1,extra2,pin }).eq('id',editId);
+      await db.from('posts').update({ board, cat, title, body, extra1, extra2, pin }).eq('id', editId);
+
+      // 삭제 표시된 기존 파일 처리
+      const toDelete = existingFiles.filter(f => f === null);
+      // existingFiles 배열에서 null인 것들의 원본 id를 찾기 위해 원본을 다시 조회
+      const { data: origFiles } = await db.from('files').select('*').eq('post_id', editId);
+      if (origFiles) {
+        const keptIds = existingFiles.filter(f => f !== null).map(f => f.id);
+        const delFiles = origFiles.filter(f => !keptIds.includes(f.id));
+        if (delFiles.length) {
+          await db.storage.from('attachments').remove(delFiles.map(f => f.storage_path));
+          await db.from('files').delete().in('id', delFiles.map(f => f.id));
+        }
+      }
     } else {
-      const { data:ins } = await db.from('posts').insert({ board,cat,title,body,extra1,extra2,pin,date:dateStr,views:0 }).select().single();
+      const { data:ins } = await db.from('posts')
+        .insert({ board, cat, title, body, extra1, extra2, pin, date: dateStr, views: 0 })
+        .select().single();
       postId = ins.id;
     }
 
-    // upload new files
-    const filesToUpload = pendingFiles.filter(f=>f!==null);
+    // 새 파일 업로드
+    const filesToUpload = pendingFiles.filter(f => f !== null);
     for (const f of filesToUpload) {
       const path = `${postId}/${Date.now()}_${f.name}`;
-      const { error:upErr } = await db.storage.from('attachments').upload(path, f, { upsert:true });
+      const { error: upErr } = await db.storage.from('attachments').upload(path, f, { upsert: true });
       if (!upErr) {
-        await db.from('files').insert({ post_id:postId, name:f.name, size:f.size, storage_path:path });
+        await db.from('files').insert({ post_id: postId, name: f.name, size: f.size, storage_path: path });
       }
     }
 
     closeModal('writeModal');
     switchTab(board, null);
-    showToast(editId?'수정되었습니다.':'등록되었습니다.');
+    showToast(editId ? '수정되었습니다.' : '등록되었습니다.');
   } catch(e) {
-    showToast('저장 중 오류가 발생했습니다: '+e.message, true);
+    showToast('저장 중 오류: ' + e.message, true);
   } finally {
-    btn.innerHTML='저장하기'; btn.disabled=false;
+    btn.innerHTML = '저장하기'; btn.disabled = false;
   }
 }
 
