@@ -901,7 +901,6 @@
   .mobile-nav-close { position: absolute; top: 20px; right: 5%; font-size: 24px; color: var(--sage); cursor: pointer; background: none; border: none; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -1504,12 +1503,6 @@
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 
-  // ★ EmailJS 설정 (선택) — emailjs.com 가입 후 입력, 없으면 빈 문자열로 두세요
-  const _EJS_PUBLIC_KEY  = '';   // 예) 'abc123xyz'
-  const _EJS_SERVICE_ID  = '';   // 예) 'service_xxxxxx'
-  const _EJS_TEMPLATE_ID = '';   // 예) 'template_xxxxxx'
-  const _ADMIN_EMAIL     = 'kbe@daum.net';
-
   // Supabase 클라이언트 초기화 (페이지 로드 시 1회)
   let _db = null;
   function getDB() {
@@ -1562,27 +1555,6 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
       } catch(e) { console.warn('posts 오류:', e); }
     } else {
       console.warn('Supabase 미연결 — index.html의 _SUPA_URL, _SUPA_KEY를 교체하세요.');
-    }
-
-    // ③ EmailJS 이메일 발송 (설정된 경우만)
-    if (_EJS_PUBLIC_KEY && _EJS_SERVICE_ID && _EJS_TEMPLATE_ID && window.emailjs) {
-      try {
-        emailjs.init({ publicKey: _EJS_PUBLIC_KEY });
-        await emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
-          to_email  : _ADMIN_EMAIL,
-          to_name   : '관리자',
-          from_name : name,
-          from_email: email || '미입력',
-          phone     : phone,
-          org       : org || '미입력',
-          program   : program || '미입력',
-          schedule  : schedule || '미입력',
-          message   : message || '없음',
-          site_name : '한국관광교육연구원'
-        });
-      } catch(mailErr) {
-        console.warn('이메일 발송 실패:', mailErr);
-      }
     }
 
     btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';

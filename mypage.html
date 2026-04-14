@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 :root{
   --forest:#152a15;--deep:#1e3d1e;--hadon:#2d5a3d;
@@ -191,12 +190,7 @@ const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project UR
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 const SITE_NAME = '한국관광교육연구원';
 
-// ★ EmailJS 설정 — emailjs.com 가입 후 아래 3가지 값 교체
-// 가입 방법은 아래 주석 참고
-const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';   // Account → General → Public Key
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';           // Email Services → Service ID
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';          // Email Templates → Template ID
-const ADMIN_EMAIL         = 'kbe@daum.net';              // 수신할 관리자 이메일
+const ADMIN_EMAIL = 'kbe@daum.net';
 </script>
 
 <div class="mob-nav" id="mobNav">
@@ -583,28 +577,6 @@ async function doSignup() {
       if (error.code === '23505') showToast('이미 가입된 이메일입니다.', true);
       else showToast('오류: ' + error.message, true);
       return;
-    }
-
-    // 관리자에게 이메일 발송 (EmailJS)
-    if (EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY') {
-      try {
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email   : ADMIN_EMAIL,
-          to_name    : '관리자',
-          from_name  : name,
-          from_email : email,
-          phone      : phone    || '미입력',
-          org        : org      || '미입력',
-          position   : position || '미입력',
-          greeting   : greeting || '없음',
-          site_name  : SITE_NAME,
-          approve_url: window.location.href,
-          message    : `${name}님(${email})이 회원가입을 신청했습니다.\n소속: ${org||'-'}\n직위: ${position||'-'}\n연락처: ${phone||'-'}\n가입인사: ${greeting||'-'}`
-        });
-      } catch(mailErr) {
-        console.warn('이메일 발송 실패:', mailErr);
-      }
     }
 
     // 자동 로그인
