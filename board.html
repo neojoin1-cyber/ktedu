@@ -522,6 +522,26 @@ const ADMIN_PW = 'ktedu2604';
           </select>
         </div>
       </div>
+
+      <!-- 공개 범위 — 눈에 잘 띄도록 별도 행 배치 -->
+      <div class="wr" style="background:var(--cream);border-radius:4px;padding:12px 16px;border-left:3px solid var(--hadon);">
+        <label class="wlabel" style="margin-bottom:8px;">🔒 공개 범위 설정</label>
+        <div style="display:flex;gap:16px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--ink-mid);">
+            <input type="radio" name="visibility" id="visPublic" value="public" checked style="accent-color:var(--hadon);width:16px;height:16px;">
+            🌐 전체 공개 <span style="font-size:12px;color:var(--ink-soft);">(누구나 읽기 가능)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:var(--ink-mid);">
+            <input type="radio" name="visibility" id="visMembers" value="members" style="accent-color:var(--hadon);width:16px;height:16px;">
+            👥 회원 전용 <span style="font-size:12px;color:var(--ink-soft);">(로그인 회원만 읽기)</span>
+          </label>
+        </div>
+        <!-- 기존 select는 JS 호환성 유지용으로 숨김 처리 -->
+        <select id="wVisibility" style="display:none;">
+          <option value="public">전체 공개</option>
+          <option value="members">회원 전용</option>
+        </select>
+      </div>
       <div class="wr">
         <label class="wlabel">제목 *</label>
         <input class="winput" type="text" id="wTitleInput" placeholder="제목을 입력하세요">
@@ -553,13 +573,6 @@ const ADMIN_PW = 'ktedu2604';
         <div class="pin-row" style="margin-bottom:0;">
           <input type="checkbox" id="wPin">
           <label for="wPin">📌 상단 고정</label>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <label style="font-size:13.5px;color:var(--ink-mid);">🔒 공개 범위</label>
-          <select class="wselect" id="wVisibility" style="width:auto;padding:6px 12px;font-size:13px;">
-            <option value="public">전체 공개</option>
-            <option value="members">회원 전용</option>
-          </select>
         </div>
       </div>
       <div class="write-footer">
@@ -1050,7 +1063,7 @@ async function openWrite(board, editId) {
     document.getElementById('wEx1').value            = p.extra1 || '';
     document.getElementById('wEx2').value            = p.extra2 || '';
     document.getElementById('wPin').checked          = !!p.pin;
-    document.getElementById('wVisibility').value     = p.visibility || 'public';
+    setVisibility(p.visibility || 'public');
     existingFiles = p.files ? [...p.files] : [];
     renderAllChips();
   } else {
@@ -1063,7 +1076,7 @@ async function openWrite(board, editId) {
     document.getElementById('wEx1').value            = '';
     document.getElementById('wEx2').value            = '';
     document.getElementById('wPin').checked          = false;
-    document.getElementById('wVisibility').value     = 'public';
+    setVisibility('public');
   }
   onBoardChange();
   openModal('writeModal');
@@ -1104,6 +1117,18 @@ function onBoardChange() {
   else { l1.textContent='부제 (선택)'; l2.textContent='조회수 초기값'; }
 }
 
+// 라디오 ↔ hidden select 동기화
+function getVisibility() {
+  const r = document.querySelector('input[name="visibility"]:checked');
+  return r ? r.value : 'public';
+}
+function setVisibility(val) {
+  const r = document.querySelector(`input[name="visibility"][value="${val}"]`);
+  if (r) r.checked = true;
+  else document.getElementById('visPublic').checked = true;
+  document.getElementById('wVisibility').value = val || 'public';
+}
+
 function handleFiles(files) {
   Array.from(files).forEach(f => {
     if (f.size > 20*1024*1024) { showToast('20MB 이하 파일만 첨부 가능합니다.', true); return; }
@@ -1128,7 +1153,7 @@ async function savePost() {
     const extra1     = document.getElementById('wEx1').value.trim();
     const extra2     = document.getElementById('wEx2').value.trim();
     const pin        = document.getElementById('wPin').checked;
-    const visibility = document.getElementById('wVisibility').value;
+    const visibility = getVisibility();
     const editId     = document.getElementById('wEditId').value;
     const now        = new Date();
     const dateStr    = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
