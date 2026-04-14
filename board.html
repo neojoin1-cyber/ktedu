@@ -266,6 +266,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 <script>
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
+
 const SESSION_KEY        = 'ktea_board_admin';     // board 전용 (admin ID/PW)
 const MEMBER_SESSION_KEY = 'ktea_member_session';  // mypage 공유
 const SESSION_TTL        = 24 * 60 * 60 * 1000;   // 24시간
@@ -431,7 +432,7 @@ const ADMIN_PW = 'ktedu2604';
       <div class="attach-title">첨부 파일</div>
       <div id="dAttachList"></div>
     </div>
-    <div class="detail-nav">
+    <div class="detail-nav" id="detailNav">
       <a onclick="closeDetail()">← 목록으로</a>
       <button class="detail-nav-back" onclick="closeDetail()">목록</button>
     </div>
@@ -579,6 +580,27 @@ const ADMIN_PW = 'ktedu2604';
         <button class="btn-cancel" onclick="closeModal('writeModal')">취소</button>
         <button class="btn-save" id="btnSave" onclick="savePost()">저장하기</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ POST PASSWORD MODAL ════ -->
+<div class="overlay" id="postPwModal" onclick="if(event.target===this)closeModal('postPwModal')">
+  <div class="modal" style="max-width:400px;">
+    <div class="login-head">
+      <button class="modal-close" onclick="closeModal('postPwModal')">✕</button>
+      <h2>비밀번호 확인</h2>
+      <p>신청 시 입력한 비밀번호를 입력하세요.</p>
+    </div>
+    <div class="login-body">
+      <input type="hidden" id="ppPostId">
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input class="form-input" type="password" id="ppInput" placeholder="수정용 비밀번호 입력"
+               onkeydown="if(event.key==='Enter')checkPostPw()">
+        <div class="form-error" id="ppErr">비밀번호가 올바르지 않습니다.</div>
+      </div>
+      <button class="btn-login" onclick="checkPostPw()">확인</button>
     </div>
   </div>
 </div>
@@ -813,11 +835,50 @@ function fmtSize(b) {
    DETAIL VIEW
 ═══════════════════════════════════════ */
 async function openDetail(id) {
-  // increment views (fire and forget)
-  db.rpc('increment_views', { post_id: id }).then(()=>{});
-
   const { data:p } = await db.from('posts').select('*, files(id,name,size,storage_path)').eq('id',id).single();
   if (!p) return;
+
+  // 비밀번호가 있는 글이고 관리자가 아닌 경우 → 비밀번호 모달
+  if (p.post_password && !canAdmin()) {
+    document.getElementById('ppPostId').value = id;
+    document.getElementById('ppInput').value  = '';
+    document.getElementById('ppErr').classList.remove('show');
+    openModal('postPwModal');
+    setTimeout(()=>document.getElementById('ppInput').focus(), 100);
+    return;
+  }
+
+  // 관리자이거나 비밀번호 없는 글 → 바로 열기
+  showDetailData(p);
+}
+
+async function checkPostPw() {
+  const id  = parseInt(document.getElementById('ppPostId').value);
+  const pw  = document.getElementById('ppInput').value;
+  const err = document.getElementById('ppErr');
+
+  if (!pw) { err.classList.add('show'); return; }
+
+  // SHA-256 해시 후 비교
+  const hash = await sha256(pw);
+  const { data:p } = await db.from('posts').select('*, files(id,name,size,storage_path)').eq('id',id).single();
+  if (!p) return;
+
+  if (p.post_password && p.post_password !== hash) {
+    err.classList.add('show');
+    document.getElementById('ppInput').value = '';
+    document.getElementById('ppInput').focus();
+    return;
+  }
+
+  // 비밀번호 일치 → 상세 보기 + 수정 가능
+  closeModal('postPwModal');
+  showDetailData(p, true); // true = 수정 허용
+}
+
+function showDetailData(p, canEdit) {
+  // 조회수 증가
+  db.rpc('increment_views', { post_id: p.id }).then(()=>{});
 
   document.getElementById('dCat').textContent   = CAT_LBL[p.cat]||p.cat;
   document.getElementById('dTitle').textContent = p.title;
@@ -835,15 +896,35 @@ async function openDetail(id) {
     ).join('');
   } else { attachEl.style.display='none'; }
 
+  // 수정/삭제 버튼 — 관리자이거나 비밀번호 인증한 경우
+  const detailNav = document.getElementById('detailNav');
+  if (detailNav) {
+    if (canAdmin() || canEdit) {
+      detailNav.innerHTML = `
+        <a onclick="closeDetail()">← 목록으로</a>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-edit" onclick="closeDetail();openWrite('${p.board}',${p.id})">수정</button>
+          <button class="btn-del" onclick="closeDetail();delPost(${p.id})">삭제</button>
+        </div>`;
+    } else {
+      detailNav.innerHTML = `<a onclick="closeDetail()">← 목록으로</a><button class="detail-nav-back" onclick="closeDetail()">목록</button>`;
+    }
+  }
+
   document.getElementById('detailOv').classList.add('open');
   document.body.style.overflow='hidden';
-
-  // refresh view count in table
   if (p.board!=='archive') loadBoard(p.board);
 }
+
 function closeDetail() {
   document.getElementById('detailOv').classList.remove('open');
   document.body.style.overflow='';
+}
+
+// SHA-256 함수 (board.html 전용)
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
 /* ═══════════════════════════════════════
@@ -1236,19 +1317,24 @@ function showToast(msg,isErr) {
 }
 function mn(open) { document.getElementById('mobNav').classList.toggle('open',open); document.body.style.overflow=open?'hidden':''; }
 document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()=>mn(false)));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal','adminPwModal'].forEach(closeModal);closeDetail();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal','adminPwModal','postPwModal'].forEach(closeModal);closeDetail();} });
 
 /* ═══════════════════════════════════════
    BOOT — 세션 복원
 ═══════════════════════════════════════ */
-// 1) mypage 회원 세션 먼저 복원 (kbe, phyunhoo 등 Supabase 회원)
+// 1) mypage 회원 세션 먼저 복원
 loadMemberSession();
-// 2) board 전용 관리자 세션 복원 (admin/ktedu2604)
+// 2) board 전용 관리자 세션 복원
 if (loadAdminSession()) { isAdmin = true; }
 // 3) UI 업데이트
 updateAdminUI();
 
-loadBoard('notice');
+// 4) URL 파라미터로 탭 자동 전환 (예: board.html?tab=program)
+const _urlTab = new URLSearchParams(window.location.search).get('tab');
+const _initTab = ['notice','program','archive'].includes(_urlTab) ? _urlTab : 'notice';
+if (_initTab !== 'notice') switchTab(_initTab, null);
+else loadBoard('notice');
+
 Promise.all(['notice','program','archive'].map(b =>
   db.from('posts').select('id', { count:'exact', head:true }).eq('board', b).then(({ count }) => {
     document.getElementById('sc-'+b).textContent = count || 0;

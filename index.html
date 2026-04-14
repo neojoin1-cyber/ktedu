@@ -1405,6 +1405,8 @@
         </select>
         <input type="text" id="applySchedule" placeholder="참가 예정 인원 및 희망 일정">
         <textarea id="applyMessage"           placeholder="문의 내용을 자유롭게 작성해 주세요."></textarea>
+        <input type="password" id="applyPw"   placeholder="글 수정용 비밀번호 (4자 이상, 본인만 알 수 있는 번호)" required style="border:1.5px solid var(--gold);background:#fffdf5;">
+        <p style="font-size:12px;color:var(--ink-soft);margin-top:-8px;margin-bottom:4px;">📌 비밀번호는 나중에 신청 내용을 수정할 때 필요합니다. 꼭 기억해 두세요.</p>
         <button type="submit" class="btn-submit" id="btnApply">신청 / 문의 보내기</button>
       </form>
     </div>
@@ -1503,6 +1505,7 @@
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
 
+
   // Supabase 클라이언트 초기화
   let _db = null;
   function getDB() {
@@ -1522,6 +1525,13 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
     const program  = document.getElementById('applyProgram').value;
     const schedule = document.getElementById('applySchedule').value.trim();
     const message  = document.getElementById('applyMessage').value.trim();
+    const pw       = document.getElementById('applyPw').value;
+
+    if (pw.length < 4) {
+      alert('수정용 비밀번호는 4자 이상 입력해 주세요.');
+      document.getElementById('applyPw').focus();
+      return;
+    }
 
     btn.textContent = '⏳ 처리 중...'; btn.disabled = true;
 
@@ -1530,38 +1540,46 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
     const postTitle = `[탐방신청] ${org || name} — ${program || '탐방 문의'}`;
     const postBody  = `신청자: ${name}\n기관·학교: ${org||'-'}\n연락처: ${phone}\n이메일: ${email||'-'}\n프로그램: ${program||'-'}\n인원·일정: ${schedule||'-'}\n\n문의 내용:\n${message||'-'}`;
 
+    // 비밀번호 SHA-256 해시
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+
     try {
       const db = getDB();
+      const pwHash = await sha256(pw);
 
       if (db) {
         // ① applications 테이블 저장
-        const { error: appErr } = await db.from('applications')
+        await db.from('applications')
           .insert({ org, name, phone, email, program, schedule, message });
-        if (appErr) console.warn('applications 오류:', appErr.message);
 
-        // ② 탐방일정 탭 자동 등록
-        const { error: postErr } = await db.from('posts').insert({
+        // ② 탐방일정 탭 자동 등록 — visibility: public (목록 전체공개), 비밀번호 해시 저장
+        await db.from('posts').insert({
           board: 'program', cat: 'prog',
           title: postTitle, body: postBody,
           extra1: dateStr, extra2: '-',
           date: dateStr, views: 0,
-          visibility: 'members',
+          visibility: 'public',        // 목록 전체 공개
           author_email: email || '',
-          author_name: name
+          author_name: name,
+          post_password: pwHash         // 수정용 비밀번호
         });
-        if (postErr) console.warn('posts 오류:', postErr.message);
       }
 
-      // 완료 처리 (Supabase 연결 여부와 관계없이 항상 실행)
-      btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
+      // 완료 후 board.html 탐방일정 탭으로 이동
+      btn.textContent = '✓ 접수! 탐방일정 화면으로 이동합니다...';
       btn.style.background = 'var(--path)';
       document.getElementById('applyForm').reset();
+      setTimeout(() => { window.location.href = 'board.html?tab=program'; }, 1500);
 
     } catch(err) {
       console.warn('신청 오류:', err);
       btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
       btn.style.background = 'var(--path)';
       document.getElementById('applyForm').reset();
+      setTimeout(() => { window.location.href = 'board.html?tab=program'; }, 1500);
     }
   }
 
