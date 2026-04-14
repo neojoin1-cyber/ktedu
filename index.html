@@ -1495,70 +1495,98 @@
     </div>
     <div class="news-grid">
       <div class="news-card" onclick="openNews('workshop2025')" style="cursor:pointer;">
-        <div class="news-card-img" style="background:linear-gradient(135deg,var(--hadon),var(--deep));display:flex;align-items:center;justify-content:center;font-size:48px;">
-          🎌
+        <div class="news-card-img" style="padding:0;overflow:hidden;">
+          <img src="images/2025_workshop.jpg" alt="2025 영호남 워크숍" style="width:100%;height:100%;object-fit:cover;display:block;">
           <div class="news-card-img-overlay"></div>
           <div class="news-card-badge">워크숍</div>
         </div>
         <div class="news-card-body">
-          <div class="news-card-date">2025. 04</div>
+          <div class="news-card-date">2025. 04. 19~20</div>
           <div class="news-card-title">2025 영호남 관광교사 백의종군로 활성화 워크숍</div>
-          <div class="news-card-desc">2025. 4. 19~20 하동군 횡천민사무소. 영호남 관광교수·교사 및 이순신 전문가를 위한 백의종군로 활용 워크숍 개최.</div>
+          <div class="news-card-desc">하동군 횡천민사무소. 영호남 관광교수·교사 및 이순신 전문가를 위한 워크숍.</div>
         </div>
       </div>
       <div class="news-card" onclick="openNews('jinju2025')" style="cursor:pointer;">
-        <div class="news-card-img" style="background:linear-gradient(135deg,#1a3a2a,var(--hadon));display:flex;align-items:center;justify-content:center;font-size:48px;">
-          🚩
+        <div class="news-card-img" style="padding:0;overflow:hidden;">
+          <img src="images/2025_jinju.jpg" alt="2025 진주대아고 탐방" style="width:100%;height:100%;object-fit:cover;display:block;">
           <div class="news-card-img-overlay"></div>
           <div class="news-card-badge">단체 탐방</div>
         </div>
         <div class="news-card-body">
           <div class="news-card-date">2025. 06</div>
           <div class="news-card-title">진주대아고 — 백의종군로 탐방</div>
-          <div class="news-card-desc">섬진강변을 따라 걷는 백의종군로 탐방. 학생들이 장군의 발걸음을 따라 직접 역사의 길을 체험했습니다.</div>
+          <div class="news-card-desc">섬진강변을 따라 걷는 백의종군로. 학생들이 장군의 발걸음을 따라 역사의 길을 체험.</div>
         </div>
       </div>
       <div class="news-card" onclick="openNews('haeundae2025')" style="cursor:pointer;">
-        <div class="news-card-img" style="background:linear-gradient(135deg,#0C447C,#2d5a3d);display:flex;align-items:center;justify-content:center;font-size:48px;">
-          🌊
+        <div class="news-card-img" style="padding:0;overflow:hidden;">
+          <img src="images/2025_haeundae.jpg" alt="2025 해운대여중 탐방" style="width:100%;height:100%;object-fit:cover;display:block;">
           <div class="news-card-img-overlay"></div>
           <div class="news-card-badge">학교 탐방</div>
         </div>
         <div class="news-card-body">
           <div class="news-card-date">2025. 06</div>
           <div class="news-card-title">해운대여중 — 강정(문암정) 나루터 탐방</div>
-          <div class="news-card-desc">이충무공이 두 차례 쉬어간 강정나루터에서 역사 해설과 함께 스토리텔링 체험. 학생들의 뜨거운 반응.</div>
+          <div class="news-card-desc">이충무공이 두 차례 쉬어간 강정나루터. 스토리텔링 해설과 함께하는 역사 체험.</div>
         </div>
       </div>
     </div>
 
-    <!-- 탐방 연혁 타임라인 -->
+    <!-- 탐방 연혁 갤러리 -->
     <div style="margin-top:64px;background:var(--forest);border-radius:8px;padding:40px;position:relative;overflow:hidden;">
       <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,transparent,transparent 50px,rgba(201,168,76,0.03) 50px,rgba(201,168,76,0.03) 51px);pointer-events:none;"></div>
       <div style="position:relative;z-index:1;">
         <div style="color:var(--gold);font-size:11px;letter-spacing:0.15em;font-weight:700;margin-bottom:8px;">GALLERY HIGHLIGHTS</div>
         <h3 style="font-family:'Nanum Myeongjo',serif;color:#fff;font-size:1.35rem;font-weight:800;margin-bottom:28px;">연도별 주요 탐방 기록</h3>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
-          <div style="background:rgba(255,255,255,0.07);border-radius:6px;padding:18px;border-top:2px solid var(--gold);">
-            <div style="color:var(--gold);font-size:18px;font-weight:800;font-family:'Nanum Myeongjo',serif;margin-bottom:8px;">2025</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:13px;line-height:1.7;">영호남 관광교사 백의종군로 탐방<br>해운대여중 강정나루터 탐방<br>진주대아고 백의종군로 탐방</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+          <div onclick="openNews('workshop2024')" style="cursor:pointer;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;border-top:2px solid var(--gold);">
+            <img src="images/2024_workshop.jpg" alt="2024 워크숍" style="width:100%;height:160px;object-fit:cover;display:block;">
+            <div style="padding:14px 16px;">
+              <div style="color:var(--gold);font-size:16px;font-weight:800;font-family:'Nanum Myeongjo',serif;">2024</div>
+              <div style="color:rgba(255,255,255,0.8);font-size:12.5px;line-height:1.7;margin-top:4px;">영호남 관광교사 워크숍<br>수료증 수여식</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.07);border-radius:6px;padding:18px;border-top:2px solid var(--gold);">
-            <div style="color:var(--gold);font-size:18px;font-weight:800;font-family:'Nanum Myeongjo',serif;margin-bottom:8px;">2024</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:13px;line-height:1.7;">영호남 관광교사 백의종군로 탐방<br>이순신백의종군로 활성화 워크숍</div>
+          <div onclick="openNews('workshop2019')" style="cursor:pointer;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;border-top:2px solid var(--gold);">
+            <img src="images/2019_workshop.jpg" alt="2019 워크숍" style="width:100%;height:160px;object-fit:cover;display:block;">
+            <div style="padding:14px 16px;">
+              <div style="color:var(--gold);font-size:16px;font-weight:800;font-family:'Nanum Myeongjo',serif;">2019</div>
+              <div style="color:rgba(255,255,255,0.8);font-size:12.5px;line-height:1.7;margin-top:4px;">전국관광교사대상<br>백의종군로 워크숍</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.07);border-radius:6px;padding:18px;border-top:2px solid var(--sage);">
-            <div style="color:var(--sage);font-size:18px;font-weight:800;font-family:'Nanum Myeongjo',serif;margin-bottom:8px;">2019</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:13px;line-height:1.7;">전국관광교사대상 백의종군로 워크숍<br>이순신 백의종군로 관광 활성화</div>
+          <div onclick="openNews('haeundae2015')" style="cursor:pointer;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;border-top:2px solid var(--sage);">
+            <img src="images/2015_haeundae.jpg" alt="2015 해운대여중" style="width:100%;height:160px;object-fit:cover;display:block;">
+            <div style="padding:14px 16px;">
+              <div style="color:var(--sage);font-size:16px;font-weight:800;font-family:'Nanum Myeongjo',serif;">2015</div>
+              <div style="color:rgba(255,255,255,0.8);font-size:12.5px;line-height:1.7;margin-top:4px;">해운대여중<br>백의종군로 탐방</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.07);border-radius:6px;padding:18px;border-top:2px solid var(--sage);">
-            <div style="color:var(--sage);font-size:18px;font-weight:800;font-family:'Nanum Myeongjo',serif;margin-bottom:8px;">2015</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:13px;line-height:1.7;">해운대여중 백의종군로 탐방<br>부산관광고 백의종군로 탐방</div>
+          <div onclick="openNews('maasan2014')" style="cursor:pointer;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;border-top:2px solid var(--sage);">
+            <img src="images/2014_maasan.jpg" alt="2014 마산대" style="width:100%;height:160px;object-fit:cover;display:block;">
+            <div style="padding:14px 16px;">
+              <div style="color:var(--sage);font-size:16px;font-weight:800;font-family:'Nanum Myeongjo',serif;">2014</div>
+              <div style="color:rgba(255,255,255,0.8);font-size:12.5px;line-height:1.7;margin-top:4px;">마산대학교 학생<br>백의종군로 탐방</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.07);border-radius:6px;padding:18px;border-top:2px solid rgba(255,255,255,0.3);">
-            <div style="color:rgba(255,255,255,0.6);font-size:18px;font-weight:800;font-family:'Nanum Myeongjo',serif;margin-bottom:8px;">2014</div>
-            <div style="color:rgba(255,255,255,0.8);font-size:13px;line-height:1.7;">이순신 골든벨 대회<br>이순신 스토리텔링 대회<br>마산대학교·경남연합중학생 탐방</div>
-          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 특강 사진 -->
+    <div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div onclick="openNews('lecture')" style="cursor:pointer;border-radius:6px;overflow:hidden;position:relative;">
+        <img src="images/lecture.jpg" alt="이순신 승리의 비결 특강" style="width:100%;height:220px;object-fit:cover;display:block;">
+        <div style="position:absolute;inset:0;background:rgba(21,42,21,0.45);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;color:#fff;">
+          <div style="font-size:11px;color:var(--gold-lt);margin-bottom:4px;">전문가 특강</div>
+          <div style="font-weight:700;font-size:14px;">윤영수 작가 — 이순신 승리의 비결</div>
+        </div>
+      </div>
+      <div onclick="openNews('gyeongnam2014')" style="cursor:pointer;border-radius:6px;overflow:hidden;position:relative;">
+        <img src="images/2014_gyeongnam.jpg" alt="2014 경남연합중학생 탐방" style="width:100%;height:220px;object-fit:cover;display:block;">
+        <div style="position:absolute;inset:0;background:rgba(21,42,21,0.35);"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;color:#fff;">
+          <div style="font-size:11px;color:var(--gold-lt);margin-bottom:4px;">2014 단체 탐방</div>
+          <div style="font-weight:700;font-size:14px;">경남연합중학생 — 백의종군로 완주</div>
         </div>
       </div>
     </div>
@@ -2151,56 +2179,131 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
   /* ── NEWS DATA ── */
   const newsData = {
-    gyeongju: {
-      badge: '탐방 기록', icon: '🏯',
-      title: '경주정보고등학교 45명 — 백의종군로 완주 및 수료식',
-      meta: '2019년 9월 · 경북 경주정보고등학교 · 주관: 한국관광교육연구원',
+    workshop2025: {
+      badge: '워크숍', img: 'images/2025_workshop.jpg',
+      title: '2025 영호남 관광교사 백의종군로 활성화 워크숍',
+      meta: '2025. 4. 19~20 · 하동군 횡천민사무소 · 주최: 하동군 · 주관: 한국관광교육연구원',
       body: `
         <div class="np-stats">
-          <div class="np-stat"><div class="np-stat-num">45명</div><div class="np-stat-label">참가 학생 수</div></div>
-          <div class="np-stat"><div class="np-stat-num">3구간</div><div class="np-stat-label">탐방 코스</div></div>
-          <div class="np-stat"><div class="np-stat-num">수료식</div><div class="np-stat-label">농어촌인성학교 연계</div></div>
+          <div class="np-stat"><div class="np-stat-num">2일</div><div class="np-stat-label">4.19(토)~20(일)</div></div>
+          <div class="np-stat"><div class="np-stat-num">영호남</div><div class="np-stat-label">관광교수·교사 참가</div></div>
+          <div class="np-stat"><div class="np-stat-num">하동군</div><div class="np-stat-label">공동 주최</div></div>
         </div>
-        <p>2019년 9월, 경주정보고등학교 학생 45명이 한국관광교육연구원이 주관하는 백의종군로 탐방 프로그램에 참가하여 완주 수료식을 가졌습니다.</p>
-        <div class="np-highlight">
-          "길을 걷는 동안 이순신 장군의 마음이 조금이나마 느껴졌습니다. 포기하고 싶을 때마다 장군을 떠올렸습니다." — 참가 학생 소감
-        </div>
-        <p>농어촌인성학교 프로그램과 연계하여 진행된 이번 탐방은 단순한 걷기 행사를 넘어, 이순신 장군의 도전·극기·인내 정신을 몸으로 체험하는 살아있는 역사 교육의 장이 되었습니다. 탐방 완주 후 진행된 수료식에서 학생들은 뜨거운 감동을 나눴습니다.</p>
-        <p>한국관광교육연구원 팽현호 원장은 "오늘 이 길을 완주한 경험은 앞으로 살아가면서 무언가 힘든 순간이 올 때 스스로를 일으켜 세울 수 있는 소중한 기억이 될 것"이라고 격려했습니다.</p>`
+        <p>2025년 4월 19~20일, 하동군과 한국관광교육연구원이 공동 주최·주관한 워크숍입니다. 영호남 관광교수·교사 및 이순신 전문가를 대상으로 백의종군로의 역사적 의미와 교육적 활용 방안을 집중 논의하였습니다.</p>
+        <div class="np-highlight">2025년에도 이어지는 이순신 백의종군로 교육 활성화 — 매년 전국 관광교사들이 모이는 소중한 자리입니다.</div>
+        <p>이번 워크숍에는 방송작가 윤영수 선생(드라마 '불멸의 이순신' 작가)의 특강을 비롯하여 해군사관학교 이순신리더십연구소 전문가의 강연이 포함되어, 참가자들에게 깊은 인상을 남겼습니다.</p>`
     },
-    haeundae: {
-      badge: '특별 완주', icon: '🌊',
-      title: '해운대여자중학교 — 6박 7일 전구간 70km 완주',
-      meta: '2018년 8월 · 부산 해운대여자중학교 · 주관: 한국관광교육연구원',
+    jinju2025: {
+      badge: '단체 탐방', img: 'images/2025_jinju.jpg',
+      title: '진주대아고 — 섬진강변 백의종군로 탐방',
+      meta: '2025년 · 진주대아고등학교 · 주관: 한국관광교육연구원',
       body: `
         <div class="np-stats">
-          <div class="np-stat"><div class="np-stat-num">70km</div><div class="np-stat-label">전구간 완주 거리</div></div>
-          <div class="np-stat"><div class="np-stat-num">6박7일</div><div class="np-stat-label">탐방 기간</div></div>
-          <div class="np-stat"><div class="np-stat-num">전원</div><div class="np-stat-label">완주 달성</div></div>
+          <div class="np-stat"><div class="np-stat-num">섬진강</div><div class="np-stat-label">강변 탐방로</div></div>
+          <div class="np-stat"><div class="np-stat-num">1구간</div><div class="np-stat-label">좌절의 길</div></div>
+          <div class="np-stat"><div class="np-stat-num">태극기</div><div class="np-stat-label">백의종군 깃발 행진</div></div>
         </div>
-        <p>2018년 8월, 부산 해운대여자중학교 학생들이 이순신 백의종군로 전구간 70km를 6박 7일에 걸쳐 전원 완주하는 역사적인 기록을 세웠습니다.</p>
-        <div class="np-highlight">
-          중학생이 70km를 전원 완주한 것은 이 프로그램 역사상 손꼽히는 감동적인 순간이었습니다. 포기자 없이 모두가 끝까지 걸었습니다.
-        </div>
-        <p>화개장터에서 문암정까지 하루 약 10km씩 걸으며 구간마다 스토리텔링 해설을 들었고, 1597년 이순신 장군의 백의종군 여정을 몸소 체험했습니다. 고난의 길 북천 코스모스 구간, 정기룡 장군 유숙지 등 역사 현장을 직접 밟으며 역사의식을 키웠습니다.</p>
-        <p>인솔 교사는 "처음에는 힘들다며 투정하던 아이들이 마지막 날에는 서로를 격려하며 끝까지 포기하지 않는 모습을 보였다. 이것이 진짜 교육"이라고 소감을 전했습니다.</p>`
+        <p>진주대아고등학교 학생들이 섬진강을 따라 이어지는 백의종군로를 탐방하였습니다. 태극기와 백의종군 깃발을 들고 역사의 길을 걷는 학생들의 모습은 그 자체로 감동적인 장면이었습니다.</p>
+        <div class="np-highlight">"1597년 이 길을 걸었던 이순신 장군의 마음을 조금이나마 느낄 수 있었습니다." — 참가 학생</div>
+        <p>구간별 스토리텔링 해설을 통해 난중일기에 기록된 실제 유숙지를 확인하고, 장군이 어떤 마음으로 이 길을 걸었는지 되새기는 시간을 가졌습니다.</p>`
     },
-    busan: {
-      badge: '단체 탐방', icon: '🎒',
-      title: '부산관광고등학교 250명 — 화개장터~하동읍성 18km',
-      meta: '2017년 6월 · 부산관광고등학교 · 주관: 한국관광교육연구원',
+    haeundae2025: {
+      badge: '학교 탐방', img: 'images/2025_haeundae.jpg',
+      title: '해운대여중 — 강정(문암정) 나루터 탐방',
+      meta: '2025년 · 부산 해운대여자중학교 · 주관: 한국관광교육연구원',
       body: `
         <div class="np-stats">
-          <div class="np-stat"><div class="np-stat-num">250명</div><div class="np-stat-label">역대 최대 규모</div></div>
-          <div class="np-stat"><div class="np-stat-num">18km</div><div class="np-stat-label">1구간 탐방 거리</div></div>
-          <div class="np-stat"><div class="np-stat-num">좌절의 길</div><div class="np-stat-label">탐방 코스</div></div>
+          <div class="np-stat"><div class="np-stat-num">강정</div><div class="np-stat-label">문암정 나루터</div></div>
+          <div class="np-stat"><div class="np-stat-num">2회</div><div class="np-stat-label">장군 유숙 역사 현장</div></div>
+          <div class="np-stat"><div class="np-stat-num">스토리</div><div class="np-stat-label">텔링 해설 동반</div></div>
         </div>
-        <p>2017년 6월, 부산관광고등학교 학생 250명이 백의종군로 1구간 '좌절의 길'(화개장터~하동읍성, 18km)을 탐방하였습니다. 이는 한국관광교육연구원 운영 이래 역대 최대 규모의 단체 탐방 행사였습니다.</p>
-        <div class="np-highlight">
-          250명이 한 줄로 화개장터를 출발하는 장관은 이순신 장군의 정신을 이어받은 역사 교육의 감동적인 현장이었습니다.
+        <p>해운대여자중학교 학생들이 강정(문암정) 나루터를 탐방하였습니다. 강정은 이충무공이 백의종군 중 두 차례나 쉬어간 역사적 장소로, 현재 동갑제 비와 정자가 남아있습니다.</p>
+        <div class="np-highlight">강정(文巖亭) — 덕천강을 굽어보던 이 정자에서 장군은 지인들을 만나 잠시 쉬어갔습니다. 난중일기에 두 차례 기록된 곳입니다.</div>
+        <p>학생들은 난중일기 속 강정 기록을 직접 읽어보고, 당시 장군의 심경을 상상해보는 체험 활동을 진행하였습니다. 역사 현장에서 이루어지는 생생한 교육의 감동을 느꼈습니다.</p>`
+    },
+    workshop2024: {
+      badge: '워크숍', img: 'images/2024_workshop.jpg',
+      title: '2024 영호남 관광교사 백의종군로 탐방 & 수료식',
+      meta: '2024년 10월 · 하동군 · 주최: 하동군 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">수료증</div><div class="np-stat-label">완주 수여식</div></div>
+          <div class="np-stat"><div class="np-stat-num">선상</div><div class="np-stat-label">수료식 진행</div></div>
+          <div class="np-stat"><div class="np-stat-num">영호남</div><div class="np-stat-label">관광교사 참가</div></div>
         </div>
-        <p>관광 분야 특성화고 학생들답게 역사 현장에 대한 높은 관심을 보였으며, 구간별 이순신 스토리텔링 해설에 집중하며 역사의식을 높이는 시간을 가졌습니다.</p>
-        <p>특히 이 탐방은 관광 전공 학생들이 현장 체험과 역사 교육을 결합하는 모범 사례로 평가받았으며, 이후 다수의 관광 계열 학교들의 탐방 신청으로 이어지는 계기가 되었습니다.</p>`
+        <p>2024년 영호남 관광교사를 대상으로 한 백의종군로 탐방이 성황리에 마무리되었습니다. 특히 이번 행사는 선상에서 수료증 수여식이 진행되어 더욱 특별한 기억으로 남았습니다.</p>
+        <div class="np-highlight">섬진강 위 배 위에서 수료증을 받는 감동적인 장면 — 관광교사들의 백의종군로 교육 열정을 보여주었습니다.</div>
+        <p>참가 교사들은 현장 탐방을 통해 학생들에게 더 생생하고 깊이 있는 역사 교육을 전달할 수 있는 역량을 키울 수 있었습니다.</p>`
+    },
+    workshop2019: {
+      badge: '워크숍', img: 'images/2019_workshop.jpg',
+      title: '2019 전국관광교사대상 이순신 백의종군로 관광 활성화 워크숍',
+      meta: '2019. 4. 27~28 · 하동군 버버리체리조트 · 주최: 하동군 문화관광과 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">2일</div><div class="np-stat-label">4.27(토)~28(일)</div></div>
+          <div class="np-stat"><div class="np-stat-num">전국</div><div class="np-stat-label">관광교사 참가</div></div>
+          <div class="np-stat"><div class="np-stat-num">버버리</div><div class="np-stat-label">체리조트 개최</div></div>
+        </div>
+        <p>2019년 4월 27~28일, 하동군 버버리체리조트에서 전국 관광교사를 대상으로 한 이순신 백의종군로 활성화 워크숍이 개최되었습니다. 전국 각지의 관광교사들이 한자리에 모인 의미 있는 자리였습니다.</p>
+        <div class="np-highlight">전국 관광교사가 모여 주먹을 불끈 쥔 채 "이순신 정신을 학생들에게 전하겠다"는 다짐을 나눴습니다.</div>
+        <p>워크숍에서는 백의종군로 현장 탐방, 스토리텔링 교육 방법론 공유, 교육 자료 개발 등 다양한 프로그램이 진행되었습니다. 이 워크숍은 매년 이어지는 영호남 관광교사 탐방의 중요한 출발점이 되었습니다.</p>`
+    },
+    haeundae2015: {
+      badge: '학교 탐방', img: 'images/2015_haeundae.jpg',
+      title: '2015 해운대여중 — 백의종군로 탐방',
+      meta: '2015년 · 부산 해운대여자중학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">형광</div><div class="np-stat-label">조끼 단체 행진</div></div>
+          <div class="np-stat"><div class="np-stat-num">강정</div><div class="np-stat-label">나루터 출발</div></div>
+          <div class="np-stat"><div class="np-stat-num">백의종군</div><div class="np-stat-label">깃발 행진</div></div>
+        </div>
+        <p>2015년 해운대여자중학교 학생들이 형광 조끼를 입고 강정나루터에서 출발하는 백의종군로 탐방을 진행하였습니다. 태극기와 백의종군 깃발을 들고 구간을 행진하는 모습이 인상적이었습니다.</p>
+        <div class="np-highlight">해운대여중은 이후에도 꾸준히 백의종군로 탐방 프로그램에 참가하여 연구원과 깊은 인연을 이어가고 있습니다.</div>
+        <p>이 탐방은 해운대여중이 이순신 정신 교육을 학교 교육과정과 연계한 대표적인 사례로, 학생들에게 역사 의식과 극기 정신을 심어주는 살아있는 교육이었습니다.</p>`
+    },
+    maasan2014: {
+      badge: '대학 탐방', img: 'images/2014_maasan.jpg',
+      title: '2014 마산대학교 학생 — 백의종군로 탐방',
+      meta: '2014년 · 마산대학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">대학생</div><div class="np-stat-label">탐방 참가</div></div>
+          <div class="np-stat"><div class="np-stat-num">3개</div><div class="np-stat-label">단체 깃발 행진</div></div>
+          <div class="np-stat"><div class="np-stat-num">2014</div><div class="np-stat-label">초창기 탐방</div></div>
+        </div>
+        <p>2014년 마산대학교 관광학과 학생들이 이순신 백의종군로 탐방에 참가하였습니다. 여러 개의 깃발을 들고 줄지어 행진하는 모습에서 활기찬 에너지가 느껴집니다.</p>
+        <div class="np-highlight">대학생들이 현장에서 직접 백의종군로를 체험함으로써 관광 전문가로서의 역량과 역사 의식을 동시에 키울 수 있었습니다.</div>
+        <p>이 탐방은 이순신 리더십 교육과 관광 전문 교육을 결합한 프로그램의 모범 사례로, 이후 마산대학교와의 지속적인 협력 관계로 이어졌습니다. 마산대학교 이장환 명예교수는 현재 연구원 이사장을 맡고 있습니다.</p>`
+    },
+    gyeongnam2014: {
+      badge: '단체 탐방', img: 'images/2014_gyeongnam.jpg',
+      title: '2014 경남연합중학생 — 백의종군로 완주',
+      meta: '2014년 · 경남 연합 중학교 · 주관: 한국관광교육연구원',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">겨울</div><div class="np-stat-label">산길 탐방</div></div>
+          <div class="np-stat"><div class="np-stat-num">경남</div><div class="np-stat-label">연합 중학생</div></div>
+          <div class="np-stat"><div class="np-stat-num">완주</div><div class="np-stat-label">전원 달성</div></div>
+        </div>
+        <p>겨울 건조한 산길을 태극기를 들고 줄지어 오르는 경남연합중학생들의 모습입니다. 울퉁불퉁한 비탈길도 서로를 격려하며 포기 없이 완주하였습니다.</p>
+        <div class="np-highlight">영하의 겨울에도 이 길을 완주한 학생들 — 바로 이것이 이순신 장군의 정신입니다. 필사즉생(必死則生)의 마음으로 걷습니다.</div>
+        <p>험한 겨울 산길을 오르는 이 탐방은 학생들에게 극기 정신과 도전의식을 심어주는 특별한 경험이 되었습니다. 완주 후 학생들이 나눈 소감은 그 무엇보다 깊은 울림을 주었습니다.</p>`
+    },
+    lecture: {
+      badge: '전문가 특강', img: 'images/lecture.jpg',
+      title: '윤영수 작가 특강 — 이순신 승리의 비결',
+      meta: '한국관광교육연구원 · 방송작가 윤영수 선생 (드라마 '불멸의 이순신' 작가)',
+      body: `
+        <div class="np-stats">
+          <div class="np-stat"><div class="np-stat-num">전쟁은</div><div class="np-stat-label">과학이다</div></div>
+          <div class="np-stat"><div class="np-stat-num">판옥선</div><div class="np-stat-label">거북선 전술 해설</div></div>
+          <div class="np-stat"><div class="np-stat-num">이순신</div><div class="np-stat-label">승리의 비결</div></div>
+        </div>
+        <p>드라마 '불멸의 이순신'을 집필한 방송작가 윤영수 선생이 한국관광교육연구원 행사에서 '이순신 승리의 비결'을 주제로 특강을 진행하였습니다. 화면에는 "전쟁은 과학이다"라는 이순신 장군의 전략 철학이 보입니다.</p>
+        <div class="np-highlight">윤영수 작가는 현재 한국관광교육연구원 고문으로 활동하며 이순신 정신 교육 확산에 함께하고 있습니다.</div>
+        <p>판옥선과 거북선의 구조적 우위, 명량해전의 전략적 분석 등 이순신 장군의 승리가 단순한 용기가 아닌 철저한 과학적 준비에서 비롯되었음을 생생하게 해설하였습니다. 참가자들에게 큰 인상을 남긴 특강이었습니다.</p>`
     }
   };
 
@@ -2210,10 +2313,16 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
     document.getElementById('npBadge').textContent = d.badge;
     document.getElementById('npTitle').textContent = d.title;
     document.getElementById('npMeta').textContent = d.meta;
-    document.getElementById('npImg').textContent = d.icon;
+    if (d.img) {
+      document.getElementById('npImg').innerHTML = `<img src="${d.img}" alt="${d.title}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+      document.getElementById('npImg').textContent = d.icon || '📸';
+    }
     document.getElementById('npBody').innerHTML = d.body;
     openPopup('newsPopup');
   }
+
+
 </script>
 </body>
 </html>
