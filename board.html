@@ -317,7 +317,7 @@ const ADMIN_PW = 'ktedu2604';
     <span class="admin-bar-text">관리자 모드 활성 — 글 작성·수정·삭제 가능</span>
   </div>
   <div class="admin-bar-right">
-    <button class="btn-write" onclick="openWrite(null,null)">✏ 새 글 작성</button>
+    <button class="btn-write" onclick="onWriteClick(curTab)">✏ 새 글 작성</button>
     <button class="btn-logout" id="btnAdminPwChange" style="display:none" onclick="openAdminPwModal()">🔑 비번 변경</button>
     <button class="btn-logout" onclick="doLogout()">로그아웃</button>
   </div>
@@ -361,7 +361,7 @@ const ADMIN_PW = 'ktedu2604';
             <input type="text" placeholder="제목 검색..." id="q-notice" onkeyup="if(event.key==='Enter')loadBoard('notice')">
             <button onclick="loadBoard('notice')">🔍</button>
           </div>
-          <button class="btn-write" id="wb-notice" style="display:none" onclick="openWrite('notice',null)">✏ 글쓰기</button>
+          <button class="btn-write" id="wb-notice" onclick="onWriteClick('notice')">✏ 글쓰기</button>
         </div>
       </div>
       <table class="notice-table">
@@ -384,7 +384,7 @@ const ADMIN_PW = 'ktedu2604';
             <input type="text" placeholder="제목 검색..." id="q-program" onkeyup="if(event.key==='Enter')loadBoard('program')">
             <button onclick="loadBoard('program')">🔍</button>
           </div>
-          <button class="btn-write" id="wb-program" style="display:none" onclick="openWrite('program',null)">✏ 글쓰기</button>
+          <button class="btn-write" id="wb-program" onclick="onWriteClick('program')">✏ 글쓰기</button>
         </div>
       </div>
       <table class="notice-table">
@@ -395,7 +395,10 @@ const ADMIN_PW = 'ktedu2604';
         </tr></thead>
         <tbody id="tb-program"></tbody>
       </table>
-      <div class="info-box" style="margin-top:16px;">탐방 신청 : <a href="index.html#contact">홈페이지 신청폼</a> 또는 <a href="tel:010-2786-7822">010-2786-7822</a></div>
+      <div class="info-box" style="margin-top:16px;">
+        📋 탐방 신청 : <a href="index.html#contact">홈페이지 신청폼</a> 또는 <a href="tel:010-2786-7822">010-2786-7822</a><br>
+        <span style="font-size:12.5px;color:var(--ink-soft);">🔒 신청 내용은 신청 시 입력한 비밀번호로 확인·수정할 수 있습니다.</span>
+      </div>
       <div class="pagination" id="pg-program"></div>
     </div>
 
@@ -408,7 +411,7 @@ const ADMIN_PW = 'ktedu2604';
             <input type="text" placeholder="자료명 검색..." id="q-archive" onkeyup="if(event.key==='Enter')loadBoard('archive')">
             <button onclick="loadBoard('archive')">🔍</button>
           </div>
-          <button class="btn-write" id="wb-archive" style="display:none" onclick="openWrite('archive',null)">✏ 자료 등록</button>
+          <button class="btn-write" id="wb-archive" onclick="onWriteClick('archive')">✏ 자료 등록</button>
         </div>
       </div>
       <div class="file-grid" id="fg-archive"></div>
@@ -584,19 +587,42 @@ const ADMIN_PW = 'ktedu2604';
   </div>
 </div>
 
+<!-- ════ LOGIN REQUIRED MODAL ════ -->
+<div class="overlay" id="loginRequiredModal" onclick="if(event.target===this)closeModal('loginRequiredModal')">
+  <div class="modal" style="max-width:420px;">
+    <div class="login-head">
+      <button class="modal-close" onclick="closeModal('loginRequiredModal')">✕</button>
+      <h2>로그인이 필요합니다</h2>
+      <p>글을 작성하려면 로그인 또는 회원가입이 필요합니다.</p>
+    </div>
+    <div class="login-body" style="display:flex;flex-direction:column;gap:12px;">
+      <button class="btn-login" onclick="closeModal('loginRequiredModal');openModal('loginModal')">
+        🔐 로그인하기
+      </button>
+      <a href="mypage.html" style="display:block;text-align:center;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:12px;border-radius:3px;font-size:14px;font-weight:700;text-decoration:none;">
+        ✏ 회원가입 신청하기
+      </a>
+      <p style="font-size:12px;color:var(--ink-soft);text-align:center;line-height:1.7;">
+        탐방 신청은 로그인 없이도 가능합니다.<br>
+        <a href="index.html#contact" style="color:var(--hadon);font-weight:700;">→ 탐방 신청 바로가기</a>
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- ════ POST PASSWORD MODAL ════ -->
 <div class="overlay" id="postPwModal" onclick="if(event.target===this)closeModal('postPwModal')">
   <div class="modal" style="max-width:400px;">
     <div class="login-head">
       <button class="modal-close" onclick="closeModal('postPwModal')">✕</button>
-      <h2>비밀번호 확인</h2>
-      <p>신청 시 입력한 비밀번호를 입력하세요.</p>
+      <h2 id="ppModalTitle">비밀번호 확인</h2>
+      <p id="ppModalSubtitle" style="white-space:pre-line;">신청 시 입력한 비밀번호를 입력하세요.</p>
     </div>
     <div class="login-body">
       <input type="hidden" id="ppPostId">
       <div class="form-group">
         <label class="form-label">비밀번호</label>
-        <input class="form-input" type="password" id="ppInput" placeholder="수정용 비밀번호 입력"
+        <input class="form-input" type="password" id="ppInput" placeholder="비밀번호 입력"
                onkeydown="if(event.key==='Enter')checkPostPw()">
         <div class="form-error" id="ppErr">비밀번호가 올바르지 않습니다.</div>
       </div>
@@ -695,12 +721,14 @@ async function loadBoard(board) {
   if (board !== 'archive') showLoading(tbody, 6);
   else if (fg) fg.innerHTML = loadingHTML();
 
-  // 비회원은 public 글만, 로그인한 회원·관리자는 전체
-  const isMember = canWrite();
+  // program 게시판은 항상 전체 공개
+  // 나머지는 비로그인 시 public 글만
+  const isMember     = canWrite();
+  const showAll      = isMember || board === 'program';
 
   // count
   let cntQ = db.from('posts').select('id', { count:'exact', head:true }).eq('board', board);
-  if (!isMember) cntQ = cntQ.eq('visibility', 'public');
+  if (!showAll) cntQ = cntQ.eq('visibility', 'public');
   if (q) cntQ = cntQ.ilike('title', `%${q}%`);
   const { count } = await cntQ;
   document.getElementById('cnt-' + board).textContent = count || 0;
@@ -716,7 +744,7 @@ async function loadBoard(board) {
     .order('pin', { ascending:false })
     .order('created_at', { ascending:false })
     .range(from, to);
-  if (!isMember) dataQ = dataQ.eq('visibility', 'public');
+  if (!showAll) dataQ = dataQ.eq('visibility', 'public');
   if (q) dataQ = dataQ.ilike('title', `%${q}%`);
 
   const { data, error } = await dataQ;
@@ -762,7 +790,9 @@ function renderTable(board, rows, total, page) {
     const newMk  = isNew ? `<span class="badge-new">NEW</span>` : '';
     const strong = p.pin ? `<strong>${p.title}</strong>` : p.title;
     const hasFile= p.files && p.files.length ? ' 📎' : '';
-    const lockMk = p.visibility === 'members' ? ' <span style="font-size:11px;color:var(--moss);" title="회원 전용">🔒</span>' : '';
+    const lockMk = p.board === 'program'
+      ? ' <span style="font-size:11px;color:var(--moss);" title="비밀번호로 내용 확인">🔒</span>'
+      : (p.visibility === 'members' ? ' <span style="font-size:11px;color:var(--moss);" title="회원 전용">🔒</span>' : '');
     const d      = board==='program' ? (p.extra1||p.date||'') : (p.date||'');
     const v2     = board==='program' ? (p.extra2||'-') : (p.views||0);
     const canEdit = canEditPost(p);
@@ -838,17 +868,39 @@ async function openDetail(id) {
   const { data:p } = await db.from('posts').select('*, files(id,name,size,storage_path)').eq('id',id).single();
   if (!p) return;
 
-  // 비밀번호가 있는 글이고 관리자가 아닌 경우 → 비밀번호 모달
-  if (p.post_password && !canAdmin()) {
+  // 관리자는 항상 바로 열기
+  if (canAdmin()) { showDetailData(p); return; }
+
+  // 탐방일정(program) 게시판 — 비밀번호로 본인 확인 필수
+  if (p.board === 'program') {
+    if (!p.post_password) {
+      // 비밀번호가 없는 오래된 글(이전 데이터)은 관리자만 열람 가능
+      showToast('이 글은 관리자만 열람할 수 있습니다.', true);
+      return;
+    }
     document.getElementById('ppPostId').value = id;
     document.getElementById('ppInput').value  = '';
     document.getElementById('ppErr').classList.remove('show');
+    document.getElementById('ppModalTitle').textContent   = '신청 내용 확인';
+    document.getElementById('ppModalSubtitle').textContent = '신청 시 입력한 비밀번호를 입력하세요.\n비밀번호가 맞으면 내용 확인 및 수정이 가능합니다.';
     openModal('postPwModal');
     setTimeout(()=>document.getElementById('ppInput').focus(), 100);
     return;
   }
 
-  // 관리자이거나 비밀번호 없는 글 → 바로 열기
+  // 그 외 게시판 — post_password 있는 글만 비밀번호 확인
+  if (p.post_password) {
+    document.getElementById('ppPostId').value = id;
+    document.getElementById('ppInput').value  = '';
+    document.getElementById('ppErr').classList.remove('show');
+    document.getElementById('ppModalTitle').textContent   = '비밀번호 확인';
+    document.getElementById('ppModalSubtitle').textContent = '이 글은 비밀번호로 보호되어 있습니다.';
+    openModal('postPwModal');
+    setTimeout(()=>document.getElementById('ppInput').focus(), 100);
+    return;
+  }
+
+  // 비밀번호 없는 일반 글 → 바로 열기
   showDetailData(p);
 }
 
@@ -1064,21 +1116,27 @@ function updateAdminUI() {
     btn.classList.remove('logged');
   }
 
-  // 글쓰기 버튼 표시 여부
-  ['notice','program','archive'].forEach(b => {
-    const wb = document.getElementById('wb-'+b);
-    if (wb) wb.style.display = canW ? 'inline-flex' : 'none';
-  });
-  // 관리 컬럼 헤더
+  // 관리 컬럼 헤더 (로그인 사용자만)
   ['notice','program','archive'].forEach(b => {
     const th = document.getElementById('th-a-'+b);
     if (th) th.style.display = canW ? '' : 'none';
   });
-  // admin 전용 비번 변경 버튼 — board 전용 admin 계정으로 로그인 시만 표시
+  // admin 전용 비번 변경 버튼
   const pwBtn = document.getElementById('btnAdminPwChange');
   if (pwBtn) pwBtn.style.display = isAdmin ? 'inline-block' : 'none';
 
   loadBoard(curTab);
+}
+
+/* ═══════════════════════════════════════
+   WRITE CLICK — 로그인 여부 확인 후 처리
+═══════════════════════════════════════ */
+function onWriteClick(board) {
+  if (canWrite()) {
+    openWrite(board, null);
+  } else {
+    openModal('loginRequiredModal');
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -1317,7 +1375,7 @@ function showToast(msg,isErr) {
 }
 function mn(open) { document.getElementById('mobNav').classList.toggle('open',open); document.body.style.overflow=open?'hidden':''; }
 document.querySelectorAll('.mob-nav a').forEach(a=>a.addEventListener('click',()=>mn(false)));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal','adminPwModal','postPwModal'].forEach(closeModal);closeDetail();} });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){['loginModal','writeModal','adminPwModal','postPwModal','loginRequiredModal'].forEach(closeModal);closeDetail();} });
 
 /* ═══════════════════════════════════════
    BOOT — 세션 복원
