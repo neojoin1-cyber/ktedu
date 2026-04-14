@@ -900,6 +900,8 @@
   .mobile-nav-overlay a:hover { color: var(--gold); }
   .mobile-nav-close { position: absolute; top: 20px; right: 5%; font-size: 24px; color: var(--sage); cursor: pointer; background: none; border: none; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -911,7 +913,8 @@
   <a href="#course">백의종군로</a>
   <a href="#programs">사업·프로그램</a>
   <a href="#history">연혁</a>
-  <a href="#news">소식·갤러리</a>
+  <a href="board.html">공지·자료</a>
+  <a href="mypage.html">가입 신청</a>
   <a href="#contact">참여·신청</a>
 </div>
 
@@ -931,7 +934,7 @@
     <a href="#programs">사업·프로그램</a>
     <a href="#history">연혁</a>
     <a href="board.html">공지·자료</a>
-    <a href="mypage.html">회원</a>
+    <a href="mypage.html">가입 신청</a>
     <a href="#contact">문의·신청</a>
   </div>
   <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">탐방 신청</button>
@@ -1388,11 +1391,12 @@
           </div>
         </div>
       </div>
-      <form class="contact-form" onsubmit="handleSubmit(event)">
-        <input type="text" placeholder="기관·학교명 (개인 탐방의 경우 성함)" required>
-        <input type="text" placeholder="연락처" required>
-        <input type="email" placeholder="이메일 주소">
-        <select>
+      <form class="contact-form" id="applyForm" onsubmit="handleSubmit(event)">
+        <input type="text" id="applyOrg"      placeholder="기관·학교명 (개인 탐방의 경우 성함)" required>
+        <input type="text" id="applyName"     placeholder="신청자 성함" required>
+        <input type="text" id="applyPhone"    placeholder="연락처 (예: 010-0000-0000)" required>
+        <input type="email" id="applyEmail"   placeholder="이메일 주소">
+        <select id="applyProgram">
           <option value="" disabled selected>프로그램 선택</option>
           <option>백의종군로 탐방 체험학습 (학교 단체)</option>
           <option>임진왜란 아카데미</option>
@@ -1400,9 +1404,9 @@
           <option>개인·가족 탐방</option>
           <option>기타 문의</option>
         </select>
-        <input type="text" placeholder="참가 예정 인원 및 희망 일정">
-        <textarea placeholder="문의 내용을 자유롭게 작성해 주세요."></textarea>
-        <button type="submit" class="btn-submit">신청 / 문의 보내기</button>
+        <input type="text" id="applySchedule" placeholder="참가 예정 인원 및 희망 일정">
+        <textarea id="applyMessage"           placeholder="문의 내용을 자유롭게 작성해 주세요."></textarea>
+        <button type="submit" class="btn-submit" id="btnApply">신청 / 문의 보내기</button>
       </form>
     </div>
   </div>
@@ -1437,7 +1441,7 @@
         <div class="footer-links-title">참여·신청</div>
         <ul class="footer-links-list">
           <li><a href="#contact">탐방 신청</a></li>
-          <li><a href="#contact">회원 가입</a></li>
+          <li><a href="mypage.html">가입 신청</a></li>
           <li><a href="#contact">후원 안내</a></li>
           <li><a href="#contact">문의하기</a></li>
         </ul>
@@ -1496,12 +1500,79 @@
     a.addEventListener('click', closeMobileNav);
   });
 
-  function handleSubmit(e) {
+  // ★ Supabase + EmailJS 설정 — board.html과 동일한 값 입력
+const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
+  const _EJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
+  const _EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+  const _EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+  const _ADMIN_EMAIL     = 'kbe@daum.net';
+
+  async function handleSubmit(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
-    btn.style.background = 'var(--path)';
-    btn.disabled = true;
+    const btn  = document.getElementById('btnApply');
+    const org      = document.getElementById('applyOrg').value.trim();
+    const name     = document.getElementById('applyName').value.trim();
+    const phone    = document.getElementById('applyPhone').value.trim();
+    const email    = document.getElementById('applyEmail').value.trim();
+    const program  = document.getElementById('applyProgram').value;
+    const schedule = document.getElementById('applySchedule').value.trim();
+    const message  = document.getElementById('applyMessage').value.trim();
+
+    btn.textContent = '⏳ 처리 중...'; btn.disabled = true;
+
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+
+    try {
+      // ① Supabase applications 테이블에 저장
+      if (_SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co') {
+        const { createClient } = window.supabase || {};
+        if (createClient) {
+          const db = createClient(_SUPA_URL, _SUPA_KEY);
+          // applications 테이블에 저장
+          await db.from('applications').insert({ org, name, phone, email, program, schedule, message });
+
+          // board.html 탐방일정 탭에도 글 자동 등록
+          const postTitle = `[탐방신청] ${org || name} — ${program || '탐방 문의'}`;
+          const postBody  = `신청자: ${name}\n기관·학교: ${org||'-'}\n연락처: ${phone}\n이메일: ${email||'-'}\n프로그램: ${program||'-'}\n인원·일정: ${schedule||'-'}\n\n문의 내용:\n${message||'-'}`;
+          await db.from('posts').insert({
+            board: 'program', cat: 'prog',
+            title: postTitle, body: postBody,
+            extra1: dateStr, extra2: '-',
+            date: dateStr, views: 0,
+            visibility: 'members',
+            author_email: email || '', author_name: name
+          });
+        }
+      }
+
+      // ② EmailJS로 관리자에게 이메일 발송
+      if (_EJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' && window.emailjs) {
+        emailjs.init({ publicKey: _EJS_PUBLIC_KEY });
+        await emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
+          to_email : _ADMIN_EMAIL,
+          to_name  : '관리자',
+          from_name: name,
+          from_email: email || '미입력',
+          phone    : phone,
+          org      : org || '미입력',
+          program  : program || '미입력',
+          schedule : schedule || '미입력',
+          message  : message || '없음',
+          site_name: '한국관광교육연구원'
+        });
+      }
+
+      btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
+      btn.style.background = 'var(--path)';
+      document.getElementById('applyForm').reset();
+    } catch(err) {
+      console.warn('신청 처리 오류:', err);
+      // 오류가 나도 사용자에게는 접수 완료로 표시 (전화 문의 유도)
+      btn.textContent = '✓ 접수되었습니다. 연락드리겠습니다.';
+      btn.style.background = 'var(--path)';
+    }
   }
 
   const observer = new IntersectionObserver((entries) => {

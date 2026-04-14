@@ -309,6 +309,14 @@ const ADMIN_EMAIL         = 'kbe@daum.net';              // 수신할 관리자 
           <div class="fgroup">
             <label class="flabel">소속 기관·학교</label>
             <input class="finput" type="text" id="signOrg" placeholder="소속 기관 또는 학교명">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">직위</label>
+            <input class="finput" type="text" id="signPosition" placeholder="예) 교사, 연구원, 학생 등">
+          </div>
+          <div class="fgroup">
+            <label class="flabel">가입 인사</label>
+            <textarea class="finput" id="signGreeting" placeholder="가입 인사 또는 가입 목적을 간단히 적어주세요." style="min-height:80px;resize:vertical;line-height:1.7;"></textarea>
             <p class="fhint">관리자 승인 시 참고됩니다.</p>
           </div>
           <button class="btn-primary" id="btnSignup" onclick="doSignup()">가입 신청하기</button>
@@ -385,9 +393,15 @@ const ADMIN_EMAIL         = 'kbe@daum.net';              // 수신할 관리자 
                   <input class="mp-input" type="tel" id="infoPhone" placeholder="010-0000-0000">
                 </div>
               </div>
-              <div class="mp-row">
-                <label class="mp-label">소속 기관·학교</label>
-                <input class="mp-input" type="text" id="infoOrg" placeholder="소속 기관명">
+              <div class="mp-row-2">
+                <div>
+                  <label class="mp-label">소속 기관·학교</label>
+                  <input class="mp-input" type="text" id="infoOrg" placeholder="소속 기관명">
+                </div>
+                <div>
+                  <label class="mp-label">직위</label>
+                  <input class="mp-input" type="text" id="infoPosition" placeholder="예) 교사, 연구원">
+                </div>
               </div>
               <div class="mp-row">
                 <label class="mp-label">가입일</label>
@@ -450,9 +464,11 @@ const ADMIN_EMAIL         = 'kbe@daum.net';              // 수신할 관리자 
                     <th>이름</th>
                     <th>이메일</th>
                     <th>소속</th>
+                    <th>직위</th>
                     <th>연락처</th>
                     <th class="ts">상태</th>
                     <th class="tc">가입일</th>
+                    <th style="min-width:160px;text-align:left;padding-left:13px;">가입 인사</th>
                     <th class="ta">관리</th>
                   </tr></thead>
                   <tbody id="memberTbody"></tbody>
@@ -537,12 +553,14 @@ function switchAuthTab(tab) {
    SIGNUP
 ══════════════════════════════════ */
 async function doSignup() {
-  const name  = document.getElementById('signName').value.trim();
-  const email = document.getElementById('signEmail').value.trim();
-  const pw    = document.getElementById('signPw').value;
-  const pw2   = document.getElementById('signPw2').value;
-  const phone = document.getElementById('signPhone').value.trim();
-  const org   = document.getElementById('signOrg').value.trim();
+  const name     = document.getElementById('signName').value.trim();
+  const email    = document.getElementById('signEmail').value.trim();
+  const pw       = document.getElementById('signPw').value;
+  const pw2      = document.getElementById('signPw2').value;
+  const phone    = document.getElementById('signPhone').value.trim();
+  const org      = document.getElementById('signOrg').value.trim();
+  const position = document.getElementById('signPosition').value.trim();
+  const greeting = document.getElementById('signGreeting').value.trim();
 
   let valid = true;
   const setErr = (id, show) => { document.getElementById(id).classList.toggle('show', show); if(show) valid=false; };
@@ -557,7 +575,10 @@ async function doSignup() {
 
   try {
     const pwHash = await sha256(pw);
-    const { error } = await db.from('members').insert({ name, email, phone, org, role:'pending', password_hash: pwHash });
+    const { error } = await db.from('members').insert({
+      name, email, phone, org, position, greeting,
+      role: 'pending', password_hash: pwHash
+    });
     if (error) {
       if (error.code === '23505') showToast('이미 가입된 이메일입니다.', true);
       else showToast('오류: ' + error.message, true);
@@ -573,15 +594,16 @@ async function doSignup() {
           to_name    : '관리자',
           from_name  : name,
           from_email : email,
-          phone      : phone || '미입력',
-          org        : org   || '미입력',
+          phone      : phone    || '미입력',
+          org        : org      || '미입력',
+          position   : position || '미입력',
+          greeting   : greeting || '없음',
           site_name  : SITE_NAME,
           approve_url: window.location.href,
-          message    : `${name}님(${email})이 회원가입을 신청했습니다.\n소속: ${org||'미입력'}\n연락처: ${phone||'미입력'}\n\n${window.location.href} 에서 승인해 주세요.`
+          message    : `${name}님(${email})이 회원가입을 신청했습니다.\n소속: ${org||'-'}\n직위: ${position||'-'}\n연락처: ${phone||'-'}\n가입인사: ${greeting||'-'}`
         });
       } catch(mailErr) {
         console.warn('이메일 발송 실패:', mailErr);
-        // 이메일 실패해도 가입 신청은 정상 처리
       }
     }
 
@@ -667,11 +689,12 @@ function showMemberArea() {
   document.getElementById('mpRole').textContent = roleLabel[curUser.role]||'회원';
 
   // fill info form
-  document.getElementById('infoEmail').value  = curUser.email;
-  document.getElementById('infoName').value   = curUser.name;
-  document.getElementById('infoPhone').value  = curUser.phone||'';
-  document.getElementById('infoOrg').value    = curUser.org||'';
-  document.getElementById('infoJoined').value = (curUser.created_at||'').slice(0,10);
+  document.getElementById('infoEmail').value    = curUser.email;
+  document.getElementById('infoName').value     = curUser.name;
+  document.getElementById('infoPhone').value    = curUser.phone    || '';
+  document.getElementById('infoOrg').value      = curUser.org      || '';
+  document.getElementById('infoPosition').value = curUser.position || '';
+  document.getElementById('infoJoined').value   = (curUser.created_at||'').slice(0,10);
 
   // show admin menu
   const isAdm = curUser.role === 'admin';
@@ -702,16 +725,15 @@ function mpSwitch(sec) {
    SAVE INFO
 ══════════════════════════════════ */
 async function saveInfo() {
-  const name  = document.getElementById('infoName').value.trim();
-  const phone = document.getElementById('infoPhone').value.trim();
-  const org   = document.getElementById('infoOrg').value.trim();
+  const name     = document.getElementById('infoName').value.trim();
+  const phone    = document.getElementById('infoPhone').value.trim();
+  const org      = document.getElementById('infoOrg').value.trim();
+  const position = document.getElementById('infoPosition').value.trim();
   if (!name) { showToast('이름을 입력해 주세요.', true); return; }
 
-  const { error } = await db.rpc('update_member_info', {
-    member_id: curUser.id, new_name: name, new_phone: phone, new_org: org
-  });
+  const { error } = await db.from('members').update({ name, phone, org, position }).eq('id', curUser.id);
   if (error) { showToast('저장 오류: '+error.message, true); return; }
-  curUser.name = name; curUser.phone = phone; curUser.org = org;
+  curUser.name = name; curUser.phone = phone; curUser.org = org; curUser.position = position;
   saveSession();
   document.getElementById('mpName').textContent = name;
   showToast('정보가 저장되었습니다.');
@@ -809,9 +831,11 @@ function renderMembers() {
       <td><strong>${m.name}</strong>${m.memo?` <span style="font-size:10px;color:var(--ink-soft)">📝</span>`:''}</td>
       <td style="font-size:12.5px">${m.email}</td>
       <td style="font-size:12.5px">${m.org||'-'}</td>
+      <td style="font-size:12.5px">${m.position||'-'}</td>
       <td style="font-size:12.5px">${m.phone||'-'}</td>
       <td><span class="status-pill ${roleMap[m.role]||'sp-member'}">${roleLabel[m.role]||m.role}</span></td>
       <td class="tc" style="font-size:11.5px">${date}</td>
+      <td style="font-size:12px;color:var(--ink-soft);max-width:180px;padding:12px 13px;">${m.greeting ? `<span title="${m.greeting}">${m.greeting.length>30?m.greeting.slice(0,30)+'…':m.greeting}</span>` : '-'}</td>
       <td>${acts}</td>
     </tr>`;
   });
