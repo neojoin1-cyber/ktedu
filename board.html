@@ -270,9 +270,9 @@ const SESSION_KEY        = 'ktea_board_admin';     // board 전용 (admin ID/PW)
 const MEMBER_SESSION_KEY = 'ktea_member_session';  // mypage 공유
 const SESSION_TTL        = 24 * 60 * 60 * 1000;   // 24시간
 const PER_PAGE           = 10;
-// ★ 기존 admin/ktedu2604 계정은 그대로 유지 (board.html 단독 사용 시 백업용)
-const ADMIN_ID = 'admin';
-const ADMIN_PW = 'ktedu2604';
+// board.html 전용 관리자 계정 (비밀번호는 해시로만 저장)
+const ADMIN_ID   = 'admin';
+const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c2410'; // SHA-256
 </script>
 
 <div class="mob-nav" id="mobNav">
@@ -1060,16 +1060,19 @@ async function doLogin() {
       return;
     }
 
-    // ② ID/PW 로그인 — board 전용 admin 계정 (폴백)
-    if (input === ADMIN_ID && pw === ADMIN_PW) {
-      isAdmin = true;
-      saveAdminSession();
-      closeModal('loginModal');
-      document.getElementById('lid').value = '';
-      document.getElementById('lpw').value = '';
-      updateAdminUI();
-      showToast('관리자로 로그인되었습니다.');
-      return;
+    // ② ID/PW 로그인 — board 전용 admin 계정 (해시 비교)
+    if (input === ADMIN_ID) {
+      const pwHash = await sha256(pw);
+      if (pwHash === ADMIN_HASH) {
+        isAdmin = true;
+        saveAdminSession();
+        closeModal('loginModal');
+        document.getElementById('lid').value = '';
+        document.getElementById('lpw').value = '';
+        updateAdminUI();
+        showToast('관리자로 로그인되었습니다.');
+        return;
+      }
     }
 
     err.textContent = '아이디·비밀번호가 올바르지 않습니다.';
@@ -1152,25 +1155,26 @@ function openAdminPwModal() {
   openModal('adminPwModal');
 }
 
-function changeAdminPw() {
+async function changeAdminPw() {
   const cur  = document.getElementById('apwCurrent').value;
   const nw   = document.getElementById('apwNew').value;
   const nw2  = document.getElementById('apwNew2').value;
 
   const setE = (id, show) => document.getElementById(id).classList.toggle('show', show);
-  setE('apwCurrentErr', cur !== ADMIN_PW);
+
+  // 현재 비밀번호 해시 비교
+  const curHash = await sha256(cur);
+  setE('apwCurrentErr', curHash !== ADMIN_HASH);
   setE('apwNewErr',     nw.length < 6);
   setE('apwNew2Err',    nw !== nw2);
-  if (cur !== ADMIN_PW || nw.length < 6 || nw !== nw2) return;
+  if (curHash !== ADMIN_HASH || nw.length < 6 || nw !== nw2) return;
 
-  // board.html 파일 내 ADMIN_PW 값을 런타임에 업데이트
-  // (실제 파일 저장은 불가 — 안내 후 클립보드 복사 제공)
-  window.__newAdminPw = nw;
+  const newHash = await sha256(nw);
   closeModal('adminPwModal');
 
-  const msg = `새 비밀번호: ${nw}\n\n이 비밀번호를 적용하려면:\n1. board.html 파일을 메모장으로 열기\n2. Ctrl+F → ktedu2604 검색\n3. ${nw} 으로 교체\n4. 저장 후 GitHub 재업로드\n\n지금 클립보드에 복사하시겠습니까?`;
+  const msg = `비밀번호 변경 방법\n\n1. board.html 을 메모장으로 열기\n2. Ctrl+F → 아래 해시값 검색:\n   4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c2410\n3. 새 해시값으로 교체:\n   ${newHash}\n4. 저장 후 GitHub 재업로드\n\n새 해시값을 클립보드에 복사하시겠습니까?`;
   if (confirm(msg)) {
-    navigator.clipboard.writeText(nw).then(() => showToast('새 비밀번호가 클립보드에 복사되었습니다.'));
+    navigator.clipboard.writeText(newHash).then(() => showToast('새 해시값이 클립보드에 복사되었습니다.'));
   }
 }
 
