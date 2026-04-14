@@ -1500,17 +1500,28 @@
     a.addEventListener('click', closeMobileNav);
   });
 
-  // ★ Supabase + EmailJS 설정 — board.html과 동일한 값 입력
+  // ★ Supabase 설정 — board.html과 동일한 값으로 교체하세요
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
-  const _EJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
-  const _EJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
-  const _EJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+  // ★ EmailJS 설정 (선택) — emailjs.com 가입 후 입력, 없으면 빈 문자열로 두세요
+  const _EJS_PUBLIC_KEY  = '';   // 예) 'abc123xyz'
+  const _EJS_SERVICE_ID  = '';   // 예) 'service_xxxxxx'
+  const _EJS_TEMPLATE_ID = '';   // 예) 'template_xxxxxx'
   const _ADMIN_EMAIL     = 'kbe@daum.net';
+
+  // Supabase 클라이언트 초기화 (페이지 로드 시 1회)
+  let _db = null;
+  function getDB() {
+    if (!_db && window.supabase && _SUPA_URL.includes('supabase.co') && !_SUPA_URL.includes('YOUR_PROJECT')) {
+      _db = window.supabase.createClient(_SUPA_URL, _SUPA_KEY);
+    }
+    return _db;
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const btn  = document.getElementById('btnApply');
+    const btn      = document.getElementById('btnApply');
     const org      = document.getElementById('applyOrg').value.trim();
     const name     = document.getElementById('applyName').value.trim();
     const phone    = document.getElementById('applyPhone').value.trim();
@@ -1523,56 +1534,60 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 
     const now = new Date();
     const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    const postTitle = `[탐방신청] ${org || name} — ${program || '탐방 문의'}`;
+    const postBody  = `신청자: ${name}\n기관·학교: ${org||'-'}\n연락처: ${phone}\n이메일: ${email||'-'}\n프로그램: ${program||'-'}\n인원·일정: ${schedule||'-'}\n\n문의 내용:\n${message||'-'}`;
 
-    try {
-      // ① Supabase applications 테이블에 저장
-      if (_SUPA_URL !== 'https://YOUR_PROJECT_ID.supabase.co') {
-        const { createClient } = window.supabase || {};
-        if (createClient) {
-          const db = createClient(_SUPA_URL, _SUPA_KEY);
-          // applications 테이블에 저장
-          await db.from('applications').insert({ org, name, phone, email, program, schedule, message });
+    const db = getDB();
 
-          // board.html 탐방일정 탭에도 글 자동 등록
-          const postTitle = `[탐방신청] ${org || name} — ${program || '탐방 문의'}`;
-          const postBody  = `신청자: ${name}\n기관·학교: ${org||'-'}\n연락처: ${phone}\n이메일: ${email||'-'}\n프로그램: ${program||'-'}\n인원·일정: ${schedule||'-'}\n\n문의 내용:\n${message||'-'}`;
-          await db.from('posts').insert({
-            board: 'program', cat: 'prog',
-            title: postTitle, body: postBody,
-            extra1: dateStr, extra2: '-',
-            date: dateStr, views: 0,
-            visibility: 'members',
-            author_email: email || '', author_name: name
-          });
-        }
-      }
+    // ① Supabase — applications 테이블 저장
+    if (db) {
+      try {
+        const { error: appErr } = await db.from('applications')
+          .insert({ org, name, phone, email, program, schedule, message });
+        if (appErr) console.warn('applications 저장 오류:', appErr.message);
+      } catch(e) { console.warn('applications 오류:', e); }
 
-      // ② EmailJS로 관리자에게 이메일 발송
-      if (_EJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY' && window.emailjs) {
+      // ② Supabase — board.html 탐방일정 탭 자동 등록
+      try {
+        const { error: postErr } = await db.from('posts').insert({
+          board: 'program', cat: 'prog',
+          title: postTitle, body: postBody,
+          extra1: dateStr, extra2: '-',
+          date: dateStr, views: 0,
+          visibility: 'members',
+          author_email: email || '',
+          author_name: name
+        });
+        if (postErr) console.warn('posts 저장 오류:', postErr.message);
+      } catch(e) { console.warn('posts 오류:', e); }
+    } else {
+      console.warn('Supabase 미연결 — index.html의 _SUPA_URL, _SUPA_KEY를 교체하세요.');
+    }
+
+    // ③ EmailJS 이메일 발송 (설정된 경우만)
+    if (_EJS_PUBLIC_KEY && _EJS_SERVICE_ID && _EJS_TEMPLATE_ID && window.emailjs) {
+      try {
         emailjs.init({ publicKey: _EJS_PUBLIC_KEY });
         await emailjs.send(_EJS_SERVICE_ID, _EJS_TEMPLATE_ID, {
-          to_email : _ADMIN_EMAIL,
-          to_name  : '관리자',
-          from_name: name,
+          to_email  : _ADMIN_EMAIL,
+          to_name   : '관리자',
+          from_name : name,
           from_email: email || '미입력',
-          phone    : phone,
-          org      : org || '미입력',
-          program  : program || '미입력',
-          schedule : schedule || '미입력',
-          message  : message || '없음',
-          site_name: '한국관광교육연구원'
+          phone     : phone,
+          org       : org || '미입력',
+          program   : program || '미입력',
+          schedule  : schedule || '미입력',
+          message   : message || '없음',
+          site_name : '한국관광교육연구원'
         });
+      } catch(mailErr) {
+        console.warn('이메일 발송 실패:', mailErr);
       }
-
-      btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
-      btn.style.background = 'var(--path)';
-      document.getElementById('applyForm').reset();
-    } catch(err) {
-      console.warn('신청 처리 오류:', err);
-      // 오류가 나도 사용자에게는 접수 완료로 표시 (전화 문의 유도)
-      btn.textContent = '✓ 접수되었습니다. 연락드리겠습니다.';
-      btn.style.background = 'var(--path)';
     }
+
+    btn.textContent = '✓ 접수되었습니다. 빠르게 연락드리겠습니다.';
+    btn.style.background = 'var(--path)';
+    document.getElementById('applyForm').reset();
   }
 
   const observer = new IntersectionObserver((entries) => {
