@@ -266,7 +266,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 <script>
 const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
-
 const SESSION_KEY        = 'ktea_board_admin';     // board 전용 (admin ID/PW)
 const MEMBER_SESSION_KEY = 'ktea_member_session';  // mypage 공유
 const SESSION_TTL        = 24 * 60 * 60 * 1000;   // 24시간
@@ -445,7 +444,7 @@ const ADMIN_PW = 'ktedu2604';
     <div class="login-head">
       <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
       <h2>로그인</h2>
-      <p>관리자 또는 승인된 회원으로 로그인합니다.</p>
+      <p>관리자 전용 화면입니다.</p>
     </div>
     <div class="login-body">
       <div class="form-group">
