@@ -900,11 +900,17 @@
     .course-header { flex-direction: column; gap: 16px; }
     .course-cards { grid-template-columns: 1fr; }
 
-    /* history */
-    .history .section-inner > div { grid-template-columns: 1fr !important; gap: 40px; }
+    /* 역사적 배경 2컬럼 → 1컬럼 */
+    .history-bg-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+
+    /* history 섹션 메인 grid → 1컬럼 */
+    .history-main-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
 
     /* news */
     .news-grid { grid-template-columns: 1fr; }
+
+    /* 갤러리 하단 2열 */
+    .gallery-bottom-grid { grid-template-columns: 1fr !important; }
 
     /* contact */
     .contact-grid { grid-template-columns: 1fr; }
@@ -953,13 +959,31 @@
     .hero-stats { display: grid; grid-template-columns: 1fr 1fr; }
     .hero-stat-divider { display: none; }
 
+    /* greeting — 오른쪽 잘림 수정 */
+    .greeting { padding: 64px 4%; }
+    .greeting-inner { padding: 0; }
+    .greeting-content { min-width: 0; overflow: hidden; }
+    .greeting-para { font-size: 13.5px; line-height: 1.9; word-break: keep-all; }
+    .greeting-title { font-size: clamp(1.3rem, 5vw, 1.6rem); }
+    .greeting-sign { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .greeting-sign-text { font-size: 12.5px; }
+
     /* about missions */
     .about-missions { grid-template-columns: 1fr; }
 
-    /* 임원 테이블 스크롤 */
-    .section-inner table { font-size: 11px; }
+    /* 역사적 배경 박스 패딩 축소 */
+    .history-bg-box { padding: 24px 16px !important; margin: 24px 0 !important; }
+    .history-bg-grid { padding: 20px !important; }
+
+    /* 난중일기 기록 박스 */
+    .history-bg-grid > div:last-child { overflow-x: hidden; }
+
+    /* 임원 테이블 — 작은 화면에서 주요경력 숨김 */
     .section-inner table th:nth-child(4),
     .section-inner table td:nth-child(4) { display: none; }
+
+    /* history 성과 카드 */
+    .history-stats-grid { grid-template-columns: 1fr 1fr !important; }
 
     /* 유숙지 카드 */
     .section-inner > div[style*="auto-fit"] { grid-template-columns: 1fr !important; }
@@ -982,15 +1006,12 @@
     .timeline-year { min-width: 60px; font-size: 12px; }
     .timeline-text { font-size: 13px; }
 
-    /* history 성과 카드 */
-    .history .section-inner > div > div:last-child > div { grid-template-columns: 1fr 1fr !important; }
+    /* 갤러리 하단 2열 */
+    .gallery-bottom-grid { grid-template-columns: 1fr !important; }
 
     /* popup / news */
     .pp-head, .pp-body, .np-head, .np-body { padding-left: 16px; padding-right: 16px; }
     .np-stats { grid-template-columns: 1fr; }
-
-    /* 갤러리 하단 2열 */
-    .section-inner > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
   }
 
   /* Mobile nav overlay */
@@ -1315,9 +1336,9 @@
     </div>
 
     <!-- 역사적 배경 박스 -->
-    <div style="background:linear-gradient(135deg,var(--forest),var(--deep));border-radius:8px;padding:36px 40px;margin:40px 0;position:relative;overflow:hidden;">
+    <div class="history-bg-box" style="background:linear-gradient(135deg,var(--forest),var(--deep));border-radius:8px;padding:36px 40px;margin:40px 0;position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;bottom:0;width:40%;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(201,168,76,0.05) 40px,rgba(201,168,76,0.05) 41px);pointer-events:none;"></div>
-      <div style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
+      <div class="history-bg-grid" style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;">
         <div>
           <div style="color:var(--gold);font-size:11px;letter-spacing:0.15em;font-weight:700;margin-bottom:12px;">충무공 백의종군의 역사적 배경</div>
           <h3 style="font-family:'Nanum Myeongjo',serif;color:#fff;font-size:1.35rem;font-weight:800;line-height:1.5;margin-bottom:16px;">왜군의 반간계로 투옥된 장군,<br>죽음 앞에서 다시 전장으로</h3>
@@ -1519,7 +1540,7 @@
 <!-- ── HISTORY ── -->
 <section class="history" id="history">
   <div class="section-inner">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;">
+    <div class="history-main-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;">
       <div>
         <div class="section-eyebrow">
           <div class="section-eyebrow-line"></div>
@@ -1528,7 +1549,7 @@
         <h2 class="section-title">장군의 길을 따라<br>걸어온 15년</h2>
         <p class="section-sub" style="margin-bottom: 24px;">2010년 경상남도지사 허가로 시작된 연구원의 역사. 백의종군로 탐방에 진심이었던 15년의 기록입니다.</p>
         <!-- 주요 성과 박스 -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+        <div class="history-stats-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
           <div style="background:var(--forest);border-radius:6px;padding:18px;text-align:center;">
             <div style="color:var(--gold);font-size:1.8rem;font-weight:800;font-family:'Nanum Myeongjo',serif;">3,272명</div>
             <div style="color:rgba(255,255,255,0.65);font-size:12px;margin-top:4px;">누적 탐방 참여자</div>
@@ -1680,7 +1701,7 @@
     </div>
 
     <!-- 특강·경남연합 2개 -->
-    <div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="gallery-bottom-grid" style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       <div onclick="openNews('lecture')" style="cursor:pointer;border-radius:6px;overflow:hidden;position:relative;transition:transform .2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
         <img src="lecture.jpg" alt="이순신 승리의 비결 특강" style="width:100%;height:220px;object-fit:cover;display:block;">
         <div style="position:absolute;inset:0;background:rgba(21,42,21,0.5);"></div>
