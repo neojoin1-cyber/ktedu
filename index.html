@@ -25,6 +25,7 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   body {
     font-family: 'Noto Sans KR', sans-serif;
@@ -874,22 +875,122 @@
   .delay-3 { animation-delay: 0.45s; }
   .delay-4 { animation-delay: 0.6s; }
 
-  /* ── MOBILE ── */
+  /* ══════════════════════════════════════
+     RESPONSIVE — 태블릿 (max 900px)
+  ══════════════════════════════════════ */
   @media (max-width: 900px) {
     .nav-links, .nav-cta { display: none; }
     .nav-hamburger { display: flex; }
-    .hero-inner { grid-template-columns: 1fr; }
-    .hero-stats { flex-direction: row; flex-wrap: wrap; }
-    .hero-stat { flex: 1 1 140px; }
+
+    section { padding: 64px 5%; }
+
+    /* hero */
+    .hero-inner { grid-template-columns: 1fr; padding: 100px 6% 60px; }
+    .hero-title { font-size: clamp(1.8rem, 6vw, 2.8rem); }
+    .hero-desc { font-size: 14px; }
+    .hero-stats { flex-direction: row; flex-wrap: wrap; gap: 0; }
+    .hero-stat { flex: 1 1 130px; padding: 16px 12px; }
+    .hero-stat-num { font-size: 1.5rem; }
+
+    /* about */
     .about-grid { grid-template-columns: 1fr; gap: 36px; }
+    .about-missions { grid-template-columns: 1fr 1fr; }
+
+    /* course */
+    .course-header { flex-direction: column; gap: 16px; }
     .course-cards { grid-template-columns: 1fr; }
-    .program-grid { grid-template-columns: 1fr; gap: 0; }
+
+    /* history */
+    .history .section-inner > div { grid-template-columns: 1fr !important; gap: 40px; }
+
+    /* news */
     .news-grid { grid-template-columns: 1fr; }
+
+    /* contact */
     .contact-grid { grid-template-columns: 1fr; }
-    .footer-top { grid-template-columns: 1fr; gap: 28px; }
+
+    /* footer */
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+
+    /* route */
     .route-track { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .route-line { width: 1px; height: 40px; min-height: 40px; flex: none; margin-bottom: 0; margin-left: 26px; background: repeating-linear-gradient(180deg, var(--gold) 0, var(--gold) 6px, transparent 6px, transparent 12px); }
+    .route-line { width: 1px; height: 40px; min-height: 40px; flex: none; margin-left: 26px; background: repeating-linear-gradient(180deg, var(--gold) 0, var(--gold) 6px, transparent 6px, transparent 12px); }
     .route-line-label { top: 50%; left: 20px; transform: translateY(-50%); white-space: nowrap; }
+
+    /* greeting */
+    .greeting-inner { grid-template-columns: 1fr; gap: 40px; }
+    .greeting-portrait { aspect-ratio: 4/3; max-width: 360px; margin: 0 auto; }
+
+    /* programs */
+    .program-grid { grid-template-columns: 1fr; gap: 0; }
+
+    /* 임원 테이블 */
+    table { font-size: 12px; }
+    table th, table td { padding: 8px 8px !important; }
+
+    /* 유숙지 카드 그리드 */
+    .section-inner > div[style*="auto-fit"] { grid-template-columns: 1fr 1fr !important; }
+  }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE — 모바일 (max 600px)
+  ══════════════════════════════════════ */
+  @media (max-width: 600px) {
+    section { padding: 48px 4%; }
+
+    /* nav */
+    nav { padding: 0 4%; height: 56px; }
+    .nav-logo-sub { display: none; }
+    .nav-logo-text { font-size: 13px; }
+
+    /* hero */
+    .hero-inner { padding: 80px 4% 48px; }
+    .hero-eyebrow-text { font-size: 10px; }
+    .hero-title { font-size: clamp(1.5rem, 7vw, 2rem); line-height: 1.35; }
+    .hero-desc { font-size: 13px; line-height: 1.7; }
+    .hero-btns { flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 14px 20px; }
+    .hero-stats { display: grid; grid-template-columns: 1fr 1fr; }
+    .hero-stat-divider { display: none; }
+
+    /* about missions */
+    .about-missions { grid-template-columns: 1fr; }
+
+    /* 임원 테이블 스크롤 */
+    .section-inner table { font-size: 11px; }
+    .section-inner table th:nth-child(4),
+    .section-inner table td:nth-child(4) { display: none; }
+
+    /* 유숙지 카드 */
+    .section-inner > div[style*="auto-fit"] { grid-template-columns: 1fr !important; }
+
+    /* contact form */
+    .contact-form input, .contact-form select, .contact-form textarea { font-size: 16px; }
+
+    /* footer */
+    .footer-top { grid-template-columns: 1fr; }
+    .footer-nav { display: none; }
+
+    /* cta */
+    .cta-section { padding: 60px 4%; }
+    .cta-section h2 { font-size: 1.3rem; }
+    .cta-btns { flex-direction: column; align-items: center; gap: 12px; }
+    .cta-btns a { width: 100%; max-width: 280px; text-align: center; }
+
+    /* timeline */
+    .timeline-item { gap: 12px; }
+    .timeline-year { min-width: 60px; font-size: 12px; }
+    .timeline-text { font-size: 13px; }
+
+    /* history 성과 카드 */
+    .history .section-inner > div > div:last-child > div { grid-template-columns: 1fr 1fr !important; }
+
+    /* popup / news */
+    .pp-head, .pp-body, .np-head, .np-body { padding-left: 16px; padding-right: 16px; }
+    .np-stats { grid-template-columns: 1fr; }
+
+    /* 갤러리 하단 2열 */
+    .section-inner > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
   }
 
   /* Mobile nav overlay */

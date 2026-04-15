@@ -18,6 +18,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;min-height:100vh;}
 
 /* NAV */
@@ -169,11 +170,52 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(21,42,21,.97
 .toast.err{background:var(--red);}
 
 /* MOBILE */
+/* ══════════════════════════════════════
+   RESPONSIVE — 태블릿 (max 800px)
+══════════════════════════════════════ */
 @media(max-width:800px){
   .nav-links{display:none;}.nav-hamburger{display:flex;}
   .mypage-grid{grid-template-columns:1fr;}
   .mp-row-2{grid-template-columns:1fr;}
-  .tabs{overflow-x:auto;}
+  .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .auth-grid{grid-template-columns:1fr;}
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — 모바일 (max 600px)
+══════════════════════════════════════ */
+@media(max-width:600px){
+  nav{padding:0 4%;height:56px;}
+  .nav-logo-sub{display:none;}
+  .nav-logo-text{font-size:13px;}
+
+  /* 탭 */
+  .tab-btn{padding:10px 14px;font-size:13px;white-space:nowrap;}
+
+  /* 폼 */
+  .finput,.form-input{font-size:16px;} /* iOS 줌 방지 */
+  .form-card{padding:24px 16px;}
+  .form-card-head{padding:20px 16px 0;}
+  .form-card-body{padding:16px;}
+  .fgroup{margin-bottom:14px;}
+
+  /* 마이페이지 내용 */
+  .mp-section{padding:20px 16px;}
+  .mp-input{font-size:16px;} /* iOS 줌 방지 */
+
+  /* 회원 관리 테이블 스크롤 */
+  .member-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .member-table{min-width:700px;}
+
+  /* 모달 */
+  .modal{margin:12px;width:calc(100% - 24px);}
+
+  /* 버튼 */
+  .btn-primary{padding:14px;font-size:14px;}
+  .btn-save{width:100%;}
+
+  /* 승인대기 안내 */
+  .pending-box{padding:32px 16px;}
 }
 .mob-nav{display:none;position:fixed;inset:0;z-index:500;background:rgba(21,42,21,.98);flex-direction:column;align-items:center;justify-content:center;gap:28px;}
 .mob-nav.open{display:flex;}
@@ -450,7 +492,7 @@ const ADMIN_EMAIL = 'kbe@daum.net';
                   <button class="filter-btn" id="fb-admin" onclick="filterMembers('admin')">관리자</button>
                 </div>
               </div>
-              <div style="overflow-x:auto;">
+              <div class="member-table-wrap" style="overflow-x:auto;">
                 <table class="member-table">
                   <thead><tr>
                     <th class="tc">번호</th>

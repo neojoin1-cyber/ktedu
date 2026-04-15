@@ -22,6 +22,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;overflow-x:hidden;}
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:var(--cream);}
@@ -241,17 +242,74 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:var(--red);}
 
-/* mobile */
+/* ══════════════════════════════════════
+   RESPONSIVE — 태블릿 (max 900px)
+══════════════════════════════════════ */
 @media(max-width:900px){
   .nav-links{display:none;}.nav-hamburger{display:flex;}
   .board-layout{grid-template-columns:1fr;gap:24px;padding-top:32px;}
-  .sidebar{position:static;}
-  .board-tabs{overflow-x:auto;}
+  .sidebar{position:static;top:auto;}
+  .board-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .notice-table th.cv,.notice-table td.cv{display:none;}
   .wr2{grid-template-columns:1fr;}
   .search-box input{width:140px;}
   .file-item{grid-template-columns:44px 1fr;}
-  .file-actions{display:none;}
+  .file-actions{grid-column:1/-1;padding-top:6px;}
+  .write-modal{padding:24px;}
+  .wbody{gap:14px;}
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — 모바일 (max 600px)
+══════════════════════════════════════ */
+@media(max-width:600px){
+  nav{padding:0 4%;height:56px;}
+  .nav-logo-sub{display:none;}
+  .nav-logo-text{font-size:13px;}
+
+  .board-header h1{font-size:1.4rem;}
+  .board-tabs{gap:4px;}
+  .board-tab{padding:8px 12px;font-size:12px;white-space:nowrap;}
+  .sidebar-item{font-size:13px;padding:10px 14px;}
+
+  /* 게시판 테이블 */
+  .notice-table{font-size:12.5px;}
+  .notice-table th,.notice-table td{padding:10px 8px;}
+  .notice-table th:nth-child(4),.notice-table td:nth-child(4){display:none;} /* 날짜 숨김 */
+  .notice-table th:nth-child(5),.notice-table td:nth-child(5){display:none;} /* 조회수 숨김 */
+  .title-link{font-size:13px;}
+
+  /* 툴바 */
+  .board-toolbar{flex-direction:column;align-items:flex-start;gap:10px;}
+  .board-toolbar > div{width:100%;display:flex;justify-content:space-between;}
+  .search-box input{flex:1;width:auto;}
+
+  /* 자료실 카드 */
+  .file-item{grid-template-columns:40px 1fr;gap:10px 8px;}
+  .file-icon-wrap{width:40px;height:40px;font-size:18px;}
+  .file-title{font-size:13px;}
+  .file-actions{grid-column:1/-1;display:flex;gap:8px;padding-top:4px;}
+  .file-dl-btn{font-size:12px;padding:6px 12px;}
+
+  /* 상세 팝업 */
+  .detail-head,.detail-body{padding:20px 16px;}
+  .detail-nav{padding:12px 16px;}
+
+  /* 글쓰기 모달 */
+  .write-modal{padding:16px;}
+  .wbody{gap:12px;}
+  .wselect,.winput,.wtextarea{font-size:16px;} /* iOS 줌 방지 */
+
+  /* 로그인 모달 */
+  .modal{margin:12px;width:calc(100% - 24px);}
+  .form-input{font-size:16px;} /* iOS 줌 방지 */
+
+  /* 페이지네이션 */
+  .pg-btn{min-width:32px;height:32px;font-size:12px;}
+
+  /* 관리자바 */
+  .admin-bar{flex-wrap:wrap;gap:8px;padding:10px 16px;}
+  .admin-info{font-size:12px;}
 }
 .mob-nav{display:none;position:fixed;inset:0;z-index:500;background:rgba(21,42,21,.98);flex-direction:column;align-items:center;justify-content:center;gap:28px;}
 .mob-nav.open{display:flex;}
@@ -342,7 +400,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
       <div class="sidebar-group-title">소식 · 자료</div>
       <a class="sidebar-item active" id="sb-notice" onclick="switchTab('notice',this)">공지사항 <span class="sidebar-count" id="sc-notice">-</span></a>
       <a class="sidebar-item" id="sb-program" onclick="switchTab('program',this)">탐방 일정·신청 <span class="sidebar-count" id="sc-program">-</span></a>
-      <a class="sidebar-item" id="sb-archive" onclick="switchTab('archive',this)">자료실 <span class="sidebar-count" id="sc-archive">-</span></a>
+      <a class="sidebar-item" id="sb-archive" onclick="switchTab('archive',this)">자료실 🔒 <span class="sidebar-count" id="sc-archive">-</span></a>
     </div>
   </div>
 
@@ -350,7 +408,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
     <div class="board-tabs">
       <button class="board-tab active" id="tab-notice" onclick="switchTab('notice',null)">공지사항</button>
       <button class="board-tab" id="tab-program" onclick="switchTab('program',null)">탐방 일정·신청</button>
-      <button class="board-tab" id="tab-archive" onclick="switchTab('archive',null)">자료실</button>
+      <button class="board-tab" id="tab-archive" onclick="switchTab('archive',null)">자료실 🔒</button>
     </div>
 
     <!-- 공지사항 -->
@@ -594,7 +652,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
     <div class="login-head">
       <button class="modal-close" onclick="closeModal('loginRequiredModal')">✕</button>
       <h2>로그인이 필요합니다</h2>
-      <p>글을 작성하려면 로그인 또는 회원가입이 필요합니다.</p>
+      <p>자료실 및 글 작성은 로그인한 회원에게만 제공됩니다.</p>
     </div>
     <div class="login-body" style="display:flex;flex-direction:column;gap:12px;">
       <button class="btn-login" onclick="closeModal('loginRequiredModal');openModal('loginModal')">
@@ -719,6 +777,14 @@ async function loadBoard(board) {
   const fg    = document.getElementById('fg-archive');
   const q     = document.getElementById('q-' + board)?.value.trim() || '';
 
+  // ★ 자료실 — 비로그인 차단
+  if (board === 'archive' && !canWrite()) {
+    if (fg) fg.innerHTML = archiveLoginWall();
+    document.getElementById('cnt-archive').textContent = '-';
+    document.getElementById('pg-archive').innerHTML = '';
+    return;
+  }
+
   if (board !== 'archive') showLoading(tbody, 6);
   else if (fg) fg.innerHTML = loadingHTML();
 
@@ -819,8 +885,41 @@ function renderTable(board, rows, total, page) {
 const ICON_MAP = {pdf:'fi-pdf',hwp:'fi-doc',doc:'fi-doc',docx:'fi-doc',xls:'fi-doc',xlsx:'fi-doc',jpg:'fi-img',jpeg:'fi-img',png:'fi-img',gif:'fi-img'};
 const EMOJI_MAP = {pdf:'📄',hwp:'📋',doc:'📋',docx:'📋',xls:'📊',xlsx:'📊',jpg:'🖼',jpeg:'🖼',png:'🖼',gif:'🖼',zip:'📦'};
 
+/* ═══════════════════════════════════════
+   자료실 비로그인 안내 화면
+═══════════════════════════════════════ */
+function archiveLoginWall() {
+  return `
+  <div style="border-top:2px solid var(--hadon);padding:52px 20px 40px;text-align:center;">
+    <div style="font-size:36px;margin-bottom:16px;">🔒</div>
+    <h3 style="font-family:'Nanum Myeongjo',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">자료실은 회원 전용 공간입니다</h3>
+    <p style="color:var(--ink-soft);font-size:14px;line-height:1.8;margin-bottom:24px;">
+      학습자료, 행사 사진 등 자료실 콘텐츠는<br>
+      로그인한 회원에게만 제공됩니다.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <button onclick="openModal('loginModal')"
+        style="background:var(--hadon);color:white;border:none;padding:11px 28px;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+        🔐 로그인하기
+      </button>
+      <a href="mypage.html"
+        style="display:inline-block;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:11px 28px;border-radius:4px;font-size:14px;font-weight:700;text-decoration:none;">
+        ✏ 회원가입 신청
+      </a>
+    </div>
+  </div>`;
+}
+
 function renderArchive(rows, total, page) {
   const grid = document.getElementById('fg-archive');
+
+  // 비로그인이면 안내 화면 (loadBoard에서도 막지만 이중 방어)
+  if (!canWrite()) {
+    grid.innerHTML = archiveLoginWall();
+    document.getElementById('pg-archive').innerHTML = '';
+    return;
+  }
+
   if (!rows.length) {
     grid.innerHTML = `<div class="empty-state" style="border-top:2px solid var(--hadon);padding-top:40px"><div class="empty-icon">📂</div><p>등록된 자료가 없습니다.</p></div>`;
     document.getElementById('pg-archive').innerHTML='';
@@ -832,6 +931,7 @@ function renderArchive(rows, total, page) {
     const ext  = firstFile ? firstFile.name.split('.').pop().toLowerCase() : '';
     const ic   = ICON_MAP[ext]  || 'fi-etc';
     const em   = EMOJI_MAP[ext] || '📎';
+    // 다운로드 버튼 — 회원만 (이미 canWrite() 통과했으므로 항상 표시)
     const dlBtn = firstFile
       ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
       : '';
@@ -868,6 +968,12 @@ function fmtSize(b) {
 async function openDetail(id) {
   const { data:p } = await db.from('posts').select('*, files(id,name,size,storage_path)').eq('id',id).single();
   if (!p) return;
+
+  // ★ 자료실 — 비로그인 차단
+  if (p.board === 'archive' && !canWrite()) {
+    openModal('loginRequiredModal');
+    return;
+  }
 
   // 관리자는 항상 바로 열기
   if (canAdmin()) { showDetailData(p); return; }
