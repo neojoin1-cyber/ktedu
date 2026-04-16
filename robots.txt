@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /mypage.html
+
+Sitemap: https://www.ktedu.or.kr/sitemap.xml
