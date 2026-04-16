@@ -931,8 +931,9 @@
     .program-grid { grid-template-columns: 1fr; gap: 0; }
 
     /* 임원 테이블 */
-    table { font-size: 12px; }
-    table th, table td { padding: 8px 8px !important; }
+    .officer-table { font-size: 12.5px; }
+    .officer-table th, .officer-table td { padding: 8px 10px !important; }
+    .officer-table .col-pos { white-space: nowrap; }
 
     /* 유숙지 카드 그리드 */
     .section-inner > div[style*="auto-fit"] { grid-template-columns: 1fr 1fr !important; }
@@ -978,9 +979,12 @@
     /* 난중일기 기록 박스 */
     .history-bg-grid > div:last-child { overflow-x: hidden; }
 
-    /* 임원 테이블 — 작은 화면에서 주요경력 숨김 */
-    .section-inner table th:nth-child(4),
-    .section-inner table td:nth-child(4) { display: none; }
+    /* 임원 테이블 — 작은 화면: 가로 스크롤 */
+    .officer-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .officer-table { min-width: 600px; font-size: 12px; table-layout: auto; }
+    .officer-table th, .officer-table td { padding: 8px 10px !important; white-space: nowrap; }
+    .officer-table .col-pos { white-space: nowrap; }
+    .officer-table td:nth-child(4) { white-space: normal; min-width: 200px; word-break: keep-all; }
 
     /* history 성과 카드 */
     .history-stats-grid { grid-template-columns: 1fr 1fr !important; }
@@ -1227,88 +1231,100 @@
       </div>
       <h3 style="font-family:'Nanum Myeongjo',serif;font-size:1.6rem;font-weight:800;color:var(--ink);margin-bottom:8px;">임원 현황 <span style="font-size:1rem;font-weight:400;color:var(--ink-soft);">('26. 4월 기준)</span></h3>
       <p style="color:var(--ink-soft);font-size:14px;margin-bottom:28px;">설립일 2010. 3. 19 · 경상남도지사 허가 제2010-1호</p>
-      <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      <div class="officer-table-wrap" style="overflow-x:auto;">
+        <table class="officer-table" style="width:100%;border-collapse:collapse;font-size:14px;">
           <thead>
             <tr style="background:var(--hadon);color:white;">
               <th style="padding:12px 16px;text-align:center;width:50px;font-weight:700;">번호</th>
-              <th style="padding:12px 16px;text-align:center;width:100px;font-weight:700;">직책</th>
+              <th class="col-pos" style="padding:12px 16px;text-align:center;width:110px;font-weight:700;white-space:nowrap;">직책</th>
               <th style="padding:12px 16px;text-align:center;width:80px;font-weight:700;">성명</th>
-              <th style="padding:12px 16px;text-align:left;font-weight:700;">주요 경력</th>
+              <th class="col-career" style="padding:12px 16px;text-align:left;font-weight:700;">주요 경력</th>
             </tr>
           </thead>
           <tbody>
             <tr style="border-bottom:1px solid var(--border);background:rgba(201,168,76,0.06);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">1</td>
-              <td style="padding:12px 16px;text-align:center;font-weight:700;color:var(--hadon);">원 장</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;font-weight:700;color:var(--hadon);white-space:nowrap;">원 장</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">팽현호</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">한국관광교육연구원 원장</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">한국관광교육연구원 원장</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">2</td>
-              <td style="padding:12px 16px;text-align:center;font-weight:700;color:var(--path);">부원장</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;font-weight:700;color:var(--path);white-space:nowrap;">부원장</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김영희</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교장</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교장</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">3</td>
-              <td style="padding:12px 16px;text-align:center;">이사(이사장)</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이사(이사장)</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">이장환</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">마산대학교 명예교수</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">마산대학교 명예교수</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">4</td>
-              <td style="padding:12px 16px;text-align:center;">이 사</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김옥재</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">동아대학교 관광레저연구소 특별연구원</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">동아대학교 관광레저연구소 특별연구원</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">5</td>
-              <td style="padding:12px 16px;text-align:center;">이 사</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">정정부</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">부산관광고등학교 교장</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">부산관광고등학교 교장</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">6</td>
-              <td style="padding:12px 16px;text-align:center;">이 사</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김태국</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">부산정보관광고등학교 교사</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">부산정보관광고등학교 교사</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">7</td>
-              <td style="padding:12px 16px;text-align:center;">이 사</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">박해욱</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">웰 커뮤니케이션 대표</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">웰 커뮤니케이션 대표</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">8</td>
-              <td style="padding:12px 16px;text-align:center;">이사(사무국장)</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이사(사무국장)</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">서인덕</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교사</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교사</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">9</td>
-              <td style="padding:12px 16px;text-align:center;">이 사</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">박규호</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">삼정고등학교 교장</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">삼정고등학교 교장</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">10</td>
-              <td style="padding:12px 16px;text-align:center;color:var(--gold-lt);background:var(--forest);">고 문</td>
-              <td style="padding:12px 16px;text-align:center;font-weight:700;">임원빈</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">해군사관학교 명예교수 · 이순신리더십연구소장</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
+              <td style="padding:12px 16px;text-align:center;font-weight:700;">남중헌</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">창신대학교 미래융합지식대학장</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">11</td>
-              <td style="padding:12px 16px;text-align:center;color:var(--gold-lt);background:var(--forest);">고 문</td>
-              <td style="padding:12px 16px;text-align:center;font-weight:700;">강영석</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">이순신을 배우는 사람들 회장</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
+              <td style="padding:12px 16px;text-align:center;font-weight:700;">김정수</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">경남정보대학 호텔관광과 겸임교수</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">12</td>
-              <td style="padding:12px 16px;text-align:center;color:var(--gold-lt);background:var(--forest);">고 문</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;color:var(--hadon);font-weight:700;white-space:nowrap;">고 문</td>
+              <td style="padding:12px 16px;text-align:center;font-weight:700;">강영석</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">이순신을 배우는 사람들 회장</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+              <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">13</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;color:var(--hadon);font-weight:700;white-space:nowrap;">자문위원</td>
+              <td style="padding:12px 16px;text-align:center;font-weight:700;">임원빈</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">해군사관학교 명예교수 · 이순신리더십연구소장</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">14</td>
+              <td class="col-pos" style="padding:12px 16px;text-align:center;color:var(--hadon);font-weight:700;white-space:nowrap;">자문위원</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">윤영수</td>
-              <td style="padding:12px 16px;color:var(--ink-mid);">방송작가 (드라마 '불멸의 이순신' 작가)</td>
+              <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">방송작가 (드라마 '불멸의 이순신' 작가)</td>
             </tr>
           </tbody>
         </table>
@@ -1893,8 +1909,8 @@
   });
 
   // ★ Supabase 설정 — board.html과 동일한 값으로 교체하세요
-const SUPA_URL = 'https://qinhvivdlbhmchjeiehn.supabase.co';   // ← Project URL
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmh2aXZkbGJobWNoamVpZWhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwNTY3NzQsImV4cCI6MjA5MTYzMjc3NH0.075vXKA4LYQXHN116jAJkHgHum6wYDIcvU9-iY3yAVA';                  // ← anon public key
+  const SUPA_URL = 'https://YOUR_PROJECT_ID.supabase.co';  // ← 교체 필수
+  const SUPA_KEY = 'YOUR_ANON_PUBLIC_KEY';                 // ← 교체 필수
 
   // Supabase 클라이언트 초기화
   let _db = null;
