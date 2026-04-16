@@ -1,5 +1,17 @@
+# 모든 검색로봇 허용
 User-agent: *
 Allow: /
 Disallow: /mypage.html
 
+# 네이버 검색로봇 명시적 허용
+User-agent: Yeti
+Allow: /
+Disallow: /mypage.html
+
+# 구글 검색로봇
+User-agent: Googlebot
+Allow: /
+Disallow: /mypage.html
+
+# 사이트맵
 Sitemap: https://ktedu.or.kr/sitemap.xml
