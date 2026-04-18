@@ -31,7 +31,7 @@ html{scroll-behavior:smooth;}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;min-height:100vh;}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(13,31,60,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:68px;box-shadow:0 2px 20px rgba(13,31,60,0.06);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(13,31,60,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;box-shadow:0 2px 20px rgba(13,31,60,0.06);}
 .nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .nav-logo-emblem{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .nav-logo-text{color:var(--navy);font-size:14px;font-weight:700;font-weight:500;}
@@ -101,7 +101,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .mypage-grid{display:grid;grid-template-columns:220px 1fr;gap:32px;align-items:start;}
 .mypage-sidebar{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
 .mp-profile{background:var(--hadon);padding:24px 20px;text-align:center;}
-.mp-avatar{width:64px;height:64px;border-radius:50%;background:rgba(201,168,76,.25);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;}
+.mp-avatar{width:64px;height:72px;border-radius:50%;background:rgba(201,168,76,.25);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;}
 .mp-name{color:#fff;font-size:15px;font-weight:700;margin-bottom:4px;}
 .mp-role{display:inline-block;background:var(--amber);color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:2px;letter-spacing:.04em;}
 .mp-menu{padding:8px 0;}
@@ -258,9 +258,9 @@ const ADMIN_EMAIL = 'kbe@daum.net';
 
 <nav>
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-emblem" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <div class="nav-logo-emblem" style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:none;">
       <img src="images/mark.png" alt="한국관광교육연구원 마크"
-           style="width:44px;height:44px;object-fit:contain;display:block;">
+           style="width:56px;height:56px;object-fit:contain;display:block;mix-blend-mode:multiply;">
     </div>
     <div>
       <div class="nav-logo-text">한국관광교육연구원</div>
