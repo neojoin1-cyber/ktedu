@@ -254,6 +254,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--hadon);color:white;padding:12px 24px;border-radius:4px;font-size:13.5px;font-weight:500;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:var(--red);}
+/* 기기별 표시 제어 */
+.mobile-only{display:none!important;}
+.desktop-only{display:inline!important;}
+@media(max-width:900px){
+  .mobile-only{display:inline!important;}
+  .desktop-only{display:none!important;}
+}
 
 /* ══════════════════════════════════════
    RESPONSIVE — 태블릿 (max 900px)
@@ -473,7 +480,20 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
         <tbody id="tb-program"></tbody>
       </table>
       <div class="info-box" style="margin-top:16px;">
-        📋 탐방 신청 : <a href="index.html#contact">홈페이지 신청폼</a> 또는 <a href="tel:010-2786-7822">010-2786-7822</a><br>
+        📋 탐방 신청 :
+        <!-- PC 전용: 홈페이지 신청폼만 -->
+        <span class="desktop-only" style="display:inline;">
+          <a href="index.html#contact">홈페이지 신청폼</a>
+        </span>
+        <!-- 스마트폰·태블릿 전용: 신청폼 + 전화/공유 버튼 -->
+        <span class="mobile-only" style="display:none;">
+          <a href="index.html#contact">홈페이지 신청폼</a> 또는
+          <a href="tel:010-2786-7822">010-2786-7822</a>
+          <button onclick="shareContact()"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--gold);color:var(--forest);border:none;padding:4px 10px;border-radius:3px;font-size:11.5px;font-weight:700;cursor:pointer;vertical-align:middle;margin-left:4px;font-family:'Noto Sans KR',sans-serif;">
+            ↗ 공유
+          </button>
+        </span><br>
         <span style="font-size:12.5px;color:var(--ink-soft);">🔒 신청 내용은 신청 시 입력한 비밀번호로 확인·수정할 수 있습니다.</span>
       </div>
       <div class="pagination" id="pg-program"></div>
@@ -1637,6 +1657,21 @@ function isNewDate(d) {
 }
 function openModal(id)  { document.getElementById(id).classList.add('open');  document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function shareContact() {
+  const data = {
+    title: '한국관광교육연구원 탐방 신청',
+    text: '사단법인 한국관광교육연구원\n탐방·연수 신청: 010-2786-7822\n온라인 신청: https://ktedu.or.kr/#contact',
+    url: 'https://ktedu.or.kr/#contact'
+  };
+  if (navigator.share) {
+    navigator.share(data).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(
+      '한국관광교육연구원 탐방 신청\n☎ 010-2786-7822\n🌐 https://ktedu.or.kr/#contact'
+    ).then(() => alert('연락처가 클립보드에 복사되었습니다.\n카카오톡·문자 등에 붙여넣기 하세요.'))
+     .catch(() => alert('010-2786-7822\nhttps://ktedu.or.kr/#contact'));
+  }
+}
 function showToast(msg,isErr) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.className='toast show'+(isErr?' err':'');
