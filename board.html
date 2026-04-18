@@ -731,6 +731,7 @@ let isAdmin      = false;   // board 전용 관리자(ID/PW)
 let curMember    = null;    // mypage 로그인 회원 객체
 let curTab       = 'notice';
 let curPage      = { notice:1, program:1, archive:1 };
+let pwVerifiedPostId = null; // 비밀번호 인증 완료된 글 ID (탐방일정 비회원 수정용)
 let pendingFiles  = [];
 let existingFiles = [];
 
@@ -763,6 +764,7 @@ function canAdmin()         { return isAdmin || (curMember && curMember.role ===
 function canWrite()         { return canAdmin() || (curMember && curMember.role === 'member'); }
 function canEditPost(post)  {
   if (canAdmin()) return true;
+  if (pwVerifiedPostId === post.id) return true;   // 비밀번호 인증 완료
   if (!curMember) return false;
   return post.author_email === curMember.email;
 }
@@ -1044,6 +1046,7 @@ async function checkPostPw() {
   }
 
   // 비밀번호 일치 → 상세 보기 + 수정 가능
+  pwVerifiedPostId = p.id;   // 비밀번호 인증 완료 기록
   closeModal('postPwModal');
   showDetailData(p, true); // true = 수정 허용
 }
@@ -1301,9 +1304,11 @@ async function changeAdminPw() {
    WRITE / EDIT
 ═══════════════════════════════════════ */
 async function openWrite(board, editId) {
-  if (!canWrite()) { showToast('로그인이 필요합니다.', true); return; }
-  if (editId) {
-    // 수정 권한 확인 — 본인 글 또는 관리자만
+  // 비밀번호 인증된 글 수정은 로그인 불필요
+  const isPwVerified = editId && pwVerifiedPostId === parseInt(editId);
+  if (!canWrite() && !isPwVerified) { showToast('로그인이 필요합니다.', true); return; }
+  if (editId && !isPwVerified) {
+    // 수정 권한 확인 — 본인 글 또는 관리자만 (로그인 사용자)
     const { data:chk } = await db.from('posts').select('author_email').eq('id', editId).single();
     if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
       showToast('본인 글만 수정할 수 있습니다.', true); return;
@@ -1456,6 +1461,7 @@ async function savePost() {
 
     closeModal('writeModal');
     switchTab(board, null);
+    pwVerifiedPostId = null;  // 인증 초기화
     showToast(editId ? '수정되었습니다.' : '등록되었습니다.');
   } catch(e) {
     showToast('저장 중 오류: ' + e.message, true);
@@ -1465,11 +1471,14 @@ async function savePost() {
 }
 
 async function delPost(id) {
-  if (!canWrite()) return;
-  // 본인 글 또는 관리자만 삭제 가능
-  const { data:chk } = await db.from('posts').select('author_email').eq('id', id).single();
-  if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
-    showToast('본인 글만 삭제할 수 있습니다.', true); return;
+  const isPwVerified = pwVerifiedPostId === id;
+  if (!canWrite() && !isPwVerified) return;
+  // 비밀번호 인증된 글이 아닌 경우 — 본인 글 또는 관리자만 삭제
+  if (!isPwVerified) {
+    const { data:chk } = await db.from('posts').select('author_email').eq('id', id).single();
+    if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
+      showToast('본인 글만 삭제할 수 있습니다.', true); return;
+    }
   }
   if (!confirm('이 글을 삭제하시겠습니까?\n첨부 파일도 함께 삭제됩니다.')) return;
   // delete storage files
@@ -1478,6 +1487,7 @@ async function delPost(id) {
     await db.storage.from('attachments').remove(files.map(f=>f.storage_path));
   }
   await db.from('posts').delete().eq('id',id);
+  pwVerifiedPostId = null;  // 인증 초기화
   showToast('삭제되었습니다.');
   loadBoard(curTab);
 }
