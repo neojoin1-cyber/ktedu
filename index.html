@@ -270,13 +270,45 @@
   /* ── BAND ── */
   .band {
     background: var(--hadon);
-    padding: 18px 5%;
-    display: flex; align-items: center; justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
+    border-top: 1px solid rgba(201,168,76,0.25);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    padding: 0;
+    overflow: hidden;
   }
-  .band-item { color: rgba(255,255,255,0.8); font-size: 13px; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; }
-  .band-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .band-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 11px 20px;
+  }
+  .band-inner::-webkit-scrollbar { display: none; }
+  .band-item {
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .band-item + .band-item::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 11px;
+    background: rgba(201,168,76,0.4);
+    margin: 0 16px;
+    flex-shrink: 0;
+  }
+  .band-item strong {
+    color: var(--gold);
+    font-weight: 500;
+  }
 
   /* ── SECTION BASE ── */
   section { padding: 96px 5%; }
@@ -1156,11 +1188,13 @@
 
 <!-- ── BAND ── -->
 <div class="band">
-  <div class="band-item"><div class="band-dot"></div>관광교사 지원 · 역사문화관광 교육 전문 비영리 법인</div>
-  <div class="band-item"><div class="band-dot"></div>전국 관광교사 100명 회원 네트워크</div>
-  <div class="band-item"><div class="band-dot"></div>이순신 백의종군로 탐방 · 교재 개발 · 연수 프로그램</div>
-  <div class="band-item"><div class="band-dot"></div>사단법인 제2010-1호 (경상남도지사 허가)</div>
-  <div class="band-item"><div class="band-dot"></div>대표자 팽현호</div>
+  <div class="band-inner">
+    <div class="band-item"><strong>한국관광교육연구원</strong></div>
+    <div class="band-item">전국 관광교사 지원 · 역사문화관광 교육</div>
+    <div class="band-item">관광교사 회원 100명 네트워크</div>
+    <div class="band-item">이순신 백의종군로 탐방 · 교재 개발 · 교사 연수</div>
+    <div class="band-item">사단법인 제2010-1호 · 대표 팽현호</div>
+  </div>
 </div>
 
 <!-- ── GREETING ── -->
