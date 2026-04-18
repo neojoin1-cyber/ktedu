@@ -627,6 +627,10 @@
     white-space: nowrap;
   }
 
+  /* ── 기기별 표시 제어 ── */
+  .mobile-only  { display: none !important; }   /* PC: 숨김 */
+  .desktop-only { display: flex !important; }   /* PC: 표시 */
+
   .footer-brand { }
   .footer-logo { color: var(--gold); font-family: 'Nanum Myeongjo', serif; font-size: 18px; font-weight: 800; margin-bottom: 14px; }
   .footer-info { color: rgba(255,255,255,0.45); font-size: 12.5px; line-height: 2.0; }
@@ -944,6 +948,10 @@
     .nav-links, .nav-cta { display: none; }
     .nav-hamburger { display: flex; }
 
+    /* 태블릿도 모바일 전화/공유 버튼 표시 */
+    .mobile-only  { display: flex !important; }
+    .desktop-only { display: none !important; }
+
     section { padding: 64px 5%; }
 
     /* hero */
@@ -1006,6 +1014,10 @@
   ══════════════════════════════════════ */
   @media (max-width: 600px) {
     section { padding: 48px 4%; }
+
+    /* 기기별 표시 제어 반전 — 모바일 */
+    .mobile-only  { display: flex !important; }   /* 모바일: 표시 */
+    .desktop-only { display: none !important; }   /* 모바일: 숨김 */
 
     /* nav */
     nav { padding: 0 4%; height: 56px; }
@@ -1832,11 +1844,35 @@
             <div class="contact-item-value">경남 하동군 옥종면 옥종중앙길 132 (옥종관 1층)</div>
           </div>
         </div>
-        <div class="contact-item">
+        <!-- 스마트폰 전용: 전화·공유 버튼 -->
+        <div class="contact-item mobile-only">
           <div class="contact-icon">📞</div>
           <div>
-            <div class="contact-item-label">전화</div>
-            <div class="contact-item-value">010-2786-7822</div>
+            <div class="contact-item-label">전화 / 공유</div>
+            <div class="contact-item-value">
+              <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="tel:010-2786-7822"
+                   style="display:inline-flex;align-items:center;gap:5px;background:var(--hadon);color:white;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;">
+                  📞 010-2786-7822
+                </a>
+                <button onclick="shareContact()"
+                   style="display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:var(--forest);border:none;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+                  ↗ 카카오·문자·메일 공유
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PC 전용: 홈페이지 신청 안내 -->
+        <div class="contact-item desktop-only">
+          <div class="contact-icon">🖥</div>
+          <div>
+            <div class="contact-item-label">온라인 신청</div>
+            <div class="contact-item-value">
+              오른쪽 신청 양식을 이용해 주세요.<br>
+              <span style="font-size:13px;color:var(--ink-soft);">문의는 이메일 phyunhoo@naver.com 으로도 가능합니다.</span>
+            </div>
           </div>
         </div>
         <div class="contact-item">
@@ -1985,6 +2021,24 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
       try { _db = window.supabase.createClient(SUPA_URL, SUPA_KEY); } catch(e){}
     }
     return _db;
+  }
+
+  /* ── 연락처 공유 (Web Share API) ── */
+  function shareContact() {
+    const data = {
+      title: '한국관광교육연구원 탐방 문의',
+      text: '사단법인 한국관광교육연구원\n탐방·연수 문의: 010-2786-7822\n홈페이지 신청: https://ktedu.or.kr/#contact',
+      url: 'https://ktedu.or.kr/#contact'
+    };
+    if (navigator.share) {
+      navigator.share(data).catch(() => {});
+    } else {
+      // Web Share API 미지원 브라우저 — 클립보드 복사
+      navigator.clipboard.writeText(
+        '한국관광교육연구원 탐방 문의\n☎ 010-2786-7822\n🌐 https://ktedu.or.kr/#contact'
+      ).then(() => alert('연락처가 클립보드에 복사되었습니다.\n카카오톡·문자 등에 붙여넣기 하세요.'))
+       .catch(() => alert('010-2786-7822\nhttps://ktedu.or.kr/#contact'));
+    }
   }
 
   async function handleSubmit(e) {
