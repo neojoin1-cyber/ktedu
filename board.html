@@ -990,7 +990,7 @@ function renderArchive(rows, total, page) {
     const inlineExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
     const dlBtn = firstFile
       ? ext === 'pdf'
-        ? `<a class="file-dl-btn" href="javascript:void(0)" onclick="openPDF('${getFileUrl(firstFile.storage_path)}','${(firstFile.name||'').replace(/'/g,"\\'")}')">📂 PDF 열기</a>`
+        ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" rel="noopener">📂 PDF 열기</a>`
         : inlineExts.includes(ext)
         ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank">📂 열기</a>`
         : `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
@@ -1021,26 +1021,23 @@ function getInlineUrl(path) {
   return `${SUPA_URL}/storage/v1/object/public/attachments/${path}`;
 }
 
-/* PDF를 Blob으로 받아 브라우저에서 강제 인라인 열기
-   — Supabase Content-Disposition 헤더 우회 */
+/* PDF 열기 — 직접 새탭 + Blob 폴백 */
 async function openPDF(url, name) {
+  // 1차: 새 탭 직접 열기 (가장 단순하고 확실)
+  const win = window.open(url, '_blank');
+  if (win) return;
+
+  // 2차: 팝업 차단된 경우 → Blob으로 현재 탭에서 열기
   try {
-    const res  = await fetch(url);
-    const blob = await res.blob();
-    const blobUrl = URL.createObjectURL(
-      new Blob([blob], { type: 'application/pdf' })
-    );
-    const a = document.createElement('a');
-    a.href   = blobUrl;
-    a.target = '_blank';
-    a.rel    = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const res     = await fetch(url);
+    const blob    = await res.blob();
+    const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+    window.location.href = blobUrl;
     setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
   } catch(e) {
-    // fetch 실패 시 그냥 새 탭으로 열기
-    window.open(url, '_blank');
+    // 3차: 모든 방법 실패 시 다운로드로 대체
+    const a = document.createElement('a');
+    a.href = url; a.download = name; a.click();
   }
 }
 
@@ -1065,11 +1062,11 @@ function renderFileItem(f) {
       </div>`;
   }
 
-  // PDF — Blob 방식으로 브라우저 인라인 열기
+  // PDF — 직접 링크로 새 탭 열기 (스마트폰 팝업차단 우회)
   if (ext === 'pdf') {
     return `
       <div class="attach-file-wrap">
-        <a class="attach-file" href="javascript:void(0)" onclick="openPDF('${url}','${name.replace(/'/g,"\\'")}')">
+        <a class="attach-file" href="${url}" target="_blank" rel="noopener">
           📄 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
           <span class="attach-badge attach-view">PDF 열기</span>
         </a>
