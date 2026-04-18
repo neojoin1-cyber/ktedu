@@ -241,6 +241,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(21,42,21,0.9
 .attach-title{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em;margin-bottom:10px;}
 .attach-file{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:13px;color:var(--hadon);margin-bottom:6px;text-decoration:none;transition:background .15s;}
 .attach-file:hover{background:#d8eddd;}
+.attach-file-wrap{margin-bottom:10px;}
+.attach-hint{font-size:12px;color:var(--ink-soft);margin-top:2px;padding:4px 4px 0;line-height:1.8;}
+.attach-badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:700;margin-left:auto;flex-shrink:0;}
+.attach-view{background:#e1f5ee;color:#0f6e56;}
+.attach-dl{background:#e6f1fb;color:#185fa5;}
 .detail-nav{border-top:1px solid var(--border);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;}
 .detail-nav a{font-size:13px;color:var(--hadon);text-decoration:none;cursor:pointer;}
 .detail-nav-back{font-size:13px;color:var(--ink-soft);background:var(--cream);padding:6px 16px;border-radius:2px;cursor:pointer;border:1px solid var(--border);font-family:'Noto Sans KR',sans-serif;}
@@ -972,6 +977,126 @@ function renderArchive(rows, total, page) {
 function getFileUrl(path) {
   return `${SUPA_URL}/storage/v1/object/public/attachments/${path}`;
 }
+
+/* ── 파일 종류별 렌더링 ── */
+function renderFileItem(f) {
+  const url  = getFileUrl(f.storage_path);
+  const name = f.name || '';
+  const ext  = name.split('.').pop().toLowerCase();
+  const size = fmtSize(f.size);
+
+  // 이미지 — 바로 미리보기
+  if (['jpg','jpeg','png','gif','webp','bmp','svg'].includes(ext)) {
+    return `
+      <div class="attach-file-wrap">
+        <img src="${url}" alt="${name}"
+          style="max-width:100%;max-height:320px;border-radius:4px;display:block;margin-bottom:6px;cursor:pointer;"
+          onclick="window.open('${url}','_blank')" title="클릭하면 원본 크기로 열립니다">
+        <a class="attach-file" href="${url}" target="_blank" download="${name}">
+          🖼 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-view">미리보기</span>
+        </a>
+      </div>`;
+  }
+
+  // PDF — 브라우저 뷰어로 열기
+  if (ext === 'pdf') {
+    return `
+      <div class="attach-file-wrap">
+        <a class="attach-file" href="${url}" target="_blank">
+          📄 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-view">바로 열기</span>
+        </a>
+        <div class="attach-hint">PDF 뷰어로 바로 열립니다.</div>
+      </div>`;
+  }
+
+  // HWP — 한컴 앱 안내
+  if (ext === 'hwp' || ext === 'hwpx') {
+    return `
+      <div class="attach-file-wrap">
+        <a class="attach-file" href="${url}" download="${name}">
+          📝 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-dl">다운로드</span>
+        </a>
+        <div class="attach-hint">
+          한글(.hwp) 파일입니다.
+          <a href="https://play.google.com/store/apps/details?id=com.hancom.office.editor.hidden" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
+          <a href="https://apps.apple.com/kr/app/한컴오피스-한글-뷰어/id431450291" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        </div>
+      </div>`;
+  }
+
+  // DOCX / DOC — MS Word 또는 한컴 앱 안내
+  if (['doc','docx'].includes(ext)) {
+    return `
+      <div class="attach-file-wrap">
+        <a class="attach-file" href="${url}" download="${name}">
+          📝 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-dl">다운로드</span>
+        </a>
+        <div class="attach-hint">
+          Word 파일입니다.
+          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.word" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
+          <a href="https://apps.apple.com/kr/app/microsoft-word/id586447913" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        </div>
+      </div>`;
+  }
+
+  // XLSX / XLS — MS Excel 앱 안내
+  if (['xls','xlsx'].includes(ext)) {
+    return `
+      <div class="attach-file-wrap">
+        <a class="attach-file" href="${url}" download="${name}">
+          📊 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-dl">다운로드</span>
+        </a>
+        <div class="attach-hint">
+          Excel 파일입니다.
+          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.excel" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
+          <a href="https://apps.apple.com/kr/app/microsoft-excel/id586683407" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        </div>
+      </div>`;
+  }
+
+  // PPT / PPTX
+  if (['ppt','pptx'].includes(ext)) {
+    return `
+      <div class="attach-file-wrap">
+        <a class="attach-file" href="${url}" download="${name}">
+          📊 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+          <span class="attach-badge attach-dl">다운로드</span>
+        </a>
+        <div class="attach-hint">
+          PowerPoint 파일입니다.
+          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.powerpoint" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
+          <a href="https://apps.apple.com/kr/app/microsoft-powerpoint/id586449534" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        </div>
+      </div>`;
+  }
+
+  // 동영상 — 브라우저 인라인 재생
+  if (['mp4','webm','mov','avi'].includes(ext)) {
+    return `
+      <div class="attach-file-wrap">
+        <video controls style="max-width:100%;border-radius:4px;margin-bottom:6px;">
+          <source src="${url}" type="video/${ext === 'mov' ? 'mp4' : ext}">
+        </video>
+        <a class="attach-file" href="${url}" download="${name}">
+          🎬 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+        </a>
+      </div>`;
+  }
+
+  // 기타 — 일반 다운로드
+  return `
+    <div class="attach-file-wrap">
+      <a class="attach-file" href="${url}" target="_blank" download="${name}">
+        📎 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
+        <span class="attach-badge attach-dl">다운로드</span>
+      </a>
+    </div>`;
+}
 function fmtSize(b) {
   if (!b) return '';
   return b>1048576 ? (b/1048576).toFixed(1)+'MB' : (b/1024).toFixed(0)+'KB';
@@ -1064,11 +1189,7 @@ function showDetailData(p, canEdit) {
   const listEl   = document.getElementById('dAttachList');
   if (p.files && p.files.length) {
     attachEl.style.display='block';
-    listEl.innerHTML = p.files.map(f=>
-      `<a class="attach-file" href="${getFileUrl(f.storage_path)}" target="_blank" download="${f.name}">
-        📎 ${f.name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${fmtSize(f.size)}</span>
-       </a>`
-    ).join('');
+    listEl.innerHTML = p.files.map(f => renderFileItem(f)).join('');
   } else { attachEl.style.display='none'; }
 
   // 수정/삭제 버튼 — 관리자이거나 비밀번호 인증한 경우
