@@ -425,7 +425,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
       <div class="sidebar-group-title">소식 · 자료</div>
       <a class="sidebar-item active" id="sb-notice" onclick="switchTab('notice',this)">공지사항 <span class="sidebar-count" id="sc-notice">-</span></a>
       <a class="sidebar-item" id="sb-program" onclick="switchTab('program',this)">탐방 일정·신청 <span class="sidebar-count" id="sc-program">-</span></a>
-      <a class="sidebar-item" id="sb-archive" onclick="switchTab('archive',this)">자료실 🔒 <span class="sidebar-count" id="sc-archive">-</span></a>
+      <a class="sidebar-item" id="sb-archive" onclick="switchTab('archive',this)">자료실 <span class="sidebar-count" id="sc-archive">-</span></a>
     </div>
   </div>
 
@@ -433,7 +433,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
     <div class="board-tabs">
       <button class="board-tab active" id="tab-notice" onclick="switchTab('notice',null)">공지사항</button>
       <button class="board-tab" id="tab-program" onclick="switchTab('program',null)">탐방 일정·신청</button>
-      <button class="board-tab" id="tab-archive" onclick="switchTab('archive',null)">자료실 🔒</button>
+      <button class="board-tab" id="tab-archive" onclick="switchTab('archive',null)">자료실</button>
     </div>
 
     <!-- 공지사항 -->
@@ -705,7 +705,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
     <div class="login-head">
       <button class="modal-close" onclick="closeModal('loginRequiredModal')">✕</button>
       <h2>로그인이 필요합니다</h2>
-      <p>자료실 및 글 작성은 로그인한 회원에게만 제공됩니다.</p>
+      <p>글 내용 확인 및 첨부파일 열람은 로그인한 회원에게만 제공됩니다.</p>
     </div>
     <div class="login-body" style="display:flex;flex-direction:column;gap:12px;">
       <button class="btn-login" onclick="closeModal('loginRequiredModal');openModal('loginModal')">
@@ -739,6 +739,13 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
         <div class="form-error" id="ppErr">비밀번호가 올바르지 않습니다.</div>
       </div>
       <button class="btn-login" onclick="checkPostPw()">확인</button>
+      <div style="text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <span style="font-size:12.5px;color:var(--ink-soft);">회원이시면 로그인으로 바로 확인하세요</span><br>
+        <button onclick="closeModal('postPwModal');openModal('loginModal')"
+          style="margin-top:8px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:8px 20px;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+          🔐 로그인하기
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -832,25 +839,16 @@ async function loadBoard(board) {
   const fg    = document.getElementById('fg-archive');
   const q     = document.getElementById('q-' + board)?.value.trim() || '';
 
-  // ★ 자료실 — 비로그인 차단
-  if (board === 'archive' && !canWrite()) {
-    if (fg) fg.innerHTML = archiveLoginWall();
-    document.getElementById('cnt-archive').textContent = '-';
-    document.getElementById('pg-archive').innerHTML = '';
-    return;
-  }
-
+  // 전체 공개 — 목록은 누구나 열람 가능
   if (board !== 'archive') showLoading(tbody, 6);
   else if (fg) fg.innerHTML = loadingHTML();
 
-  // program 게시판은 항상 전체 공개
-  // 나머지는 비로그인 시 public 글만
-  const isMember     = canWrite();
-  const showAll      = isMember || board === 'program';
+  // 회원 전용(members) 글은 로그인한 회원에게만 표시
+  const isMember = canWrite();
 
   // count
   let cntQ = db.from('posts').select('id', { count:'exact', head:true }).eq('board', board);
-  if (!showAll) cntQ = cntQ.eq('visibility', 'public');
+  if (!isMember) cntQ = cntQ.eq('visibility', 'public');
   if (q) cntQ = cntQ.ilike('title', `%${q}%`);
   const { count } = await cntQ;
   document.getElementById('cnt-' + board).textContent = count || 0;
@@ -866,7 +864,7 @@ async function loadBoard(board) {
     .order('pin', { ascending:false })
     .order('created_at', { ascending:false })
     .range(from, to);
-  if (!showAll) dataQ = dataQ.eq('visibility', 'public');
+  if (!isMember) dataQ = dataQ.eq('visibility', 'public');
   if (q) dataQ = dataQ.ilike('title', `%${q}%`);
 
   const { data, error } = await dataQ;
@@ -967,13 +965,6 @@ function archiveLoginWall() {
 
 function renderArchive(rows, total, page) {
   const grid = document.getElementById('fg-archive');
-
-  // 비로그인이면 안내 화면 (loadBoard에서도 막지만 이중 방어)
-  if (!canWrite()) {
-    grid.innerHTML = archiveLoginWall();
-    document.getElementById('pg-archive').innerHTML = '';
-    return;
-  }
 
   if (!rows.length) {
     grid.innerHTML = `<div class="empty-state" style="border-top:2px solid var(--hadon);padding-top:40px"><div class="empty-icon">📂</div><p>등록된 자료가 없습니다.</p></div>`;
@@ -1220,46 +1211,50 @@ async function openDetail(id) {
   const { data:p } = await db.from('posts').select('*, files(id,name,size,storage_path)').eq('id',id).single();
   if (!p) return;
 
-  // ★ 자료실 — 비로그인 차단
-  if (p.board === 'archive' && !canWrite()) {
-    openModal('loginRequiredModal');
+  // ── 관리자: 모든 게시판 전체 허용 ──
+  if (canAdmin()) {
+    showDetailData(p, true);
     return;
   }
 
-  // 관리자는 항상 바로 열기
-  if (canAdmin()) { showDetailData(p); return; }
+  // ── 공지사항 / 자료실: 회원만 내용 열람 가능 ──
+  if (p.board === 'notice' || p.board === 'archive') {
+    if (!canWrite()) {
+      // 비로그인 → 로그인 유도
+      openModal('loginRequiredModal');
+      return;
+    }
+    // 회원: 내용 열람 가능, 수정/삭제는 본인 글만
+    showDetailData(p, canEditPost(p));
+    return;
+  }
 
-  // 탐방일정(program) 게시판 — 비밀번호로 본인 확인 필수
+  // ── 탐방일정(program): 비밀번호 또는 회원 로그인 ──
   if (p.board === 'program') {
+    // 회원 로그인 상태 → 내용 확인만 (수정/삭제 불가, 관리자 제외)
+    if (canWrite()) {
+      showDetailData(p, false);  // 내용만, 수정/삭제 버튼 없음
+      return;
+    }
+    // 비로그인 → 비밀번호 확인 팝업
     if (!p.post_password) {
-      // 비밀번호가 없는 오래된 글(이전 데이터)은 관리자만 열람 가능
+      // 비밀번호 없는 구 데이터
       showToast('이 글은 관리자만 열람할 수 있습니다.', true);
       return;
     }
     document.getElementById('ppPostId').value = id;
     document.getElementById('ppInput').value  = '';
     document.getElementById('ppErr').classList.remove('show');
-    document.getElementById('ppModalTitle').textContent   = '신청 내용 확인';
-    document.getElementById('ppModalSubtitle').textContent = '신청 시 입력한 비밀번호를 입력하세요.\n비밀번호가 맞으면 내용 확인 및 수정이 가능합니다.';
+    document.getElementById('ppModalTitle').textContent    = '신청 내용 확인';
+    document.getElementById('ppModalSubtitle').textContent =
+      '신청 시 입력한 비밀번호를 입력하세요.\n비밀번호가 맞으면 내용 확인 및 수정·삭제가 가능합니다.';
     openModal('postPwModal');
     setTimeout(()=>document.getElementById('ppInput').focus(), 100);
     return;
   }
 
-  // 그 외 게시판 — post_password 있는 글만 비밀번호 확인
-  if (p.post_password) {
-    document.getElementById('ppPostId').value = id;
-    document.getElementById('ppInput').value  = '';
-    document.getElementById('ppErr').classList.remove('show');
-    document.getElementById('ppModalTitle').textContent   = '비밀번호 확인';
-    document.getElementById('ppModalSubtitle').textContent = '이 글은 비밀번호로 보호되어 있습니다.';
-    openModal('postPwModal');
-    setTimeout(()=>document.getElementById('ppInput').focus(), 100);
-    return;
-  }
-
-  // 비밀번호 없는 일반 글 → 바로 열기
-  showDetailData(p);
+  // ── 그 외 (예비) ──
+  showDetailData(p, canEditPost(p));
 }
 
 async function checkPostPw() {
@@ -1296,12 +1291,26 @@ function showDetailData(p, canEdit) {
   document.getElementById('dMeta').textContent  = `등록일 ${p.date||''}` + (p.board!=='archive' ? ` · 조회 ${p.views||0}` : '');
   document.getElementById('dBody').textContent  = p.body;
 
+  // 첨부파일: 공지·자료실은 회원+관리자만 / 탐방일정은 비밀번호 인증 or 회원
   const attachEl = document.getElementById('dAttach');
   const listEl   = document.getElementById('dAttachList');
-  if (p.files && p.files.length) {
+  const canSeeFiles = canAdmin() || canWrite() || (p.board === 'program' && pwVerifiedPostId === p.id);
+  if (p.files && p.files.length && canSeeFiles) {
     attachEl.style.display='block';
     listEl.innerHTML = p.files.map(f => renderFileItem(f)).join('');
-  } else { attachEl.style.display='none'; }
+  } else if (p.files && p.files.length && !canSeeFiles) {
+    // 비로그인: 파일 있음 안내만 표시
+    attachEl.style.display='block';
+    listEl.innerHTML = `<div style="padding:12px 0;color:var(--ink-soft);font-size:13.5px;">
+      🔒 첨부파일은 로그인 회원만 내려받을 수 있습니다.
+      <button onclick="closeDetail();openModal('loginRequiredModal')"
+        style="margin-left:12px;background:var(--hadon);color:#fff;border:none;padding:5px 14px;border-radius:3px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+        🔐 로그인
+      </button>
+    </div>`;
+  } else {
+    attachEl.style.display='none';
+  }
 
   // 수정/삭제 버튼 — 관리자이거나 비밀번호 인증한 경우
   const detailNav = document.getElementById('detailNav');
@@ -1536,15 +1545,16 @@ async function changeAdminPw() {
    WRITE / EDIT
 ═══════════════════════════════════════ */
 async function openWrite(board, editId) {
-  // 비밀번호 인증된 글 수정은 로그인 불필요
   const isPwVerified = editId && pwVerifiedPostId === parseInt(editId);
-  if (!canWrite() && !isPwVerified) { showToast('로그인이 필요합니다.', true); return; }
-  if (editId && !isPwVerified) {
-    // 수정 권한 확인 — 본인 글 또는 관리자만 (로그인 사용자)
+  if (editId) {
+    // 수정: 본인 글 or 관리자 or 비밀번호 인증
     const { data:chk } = await db.from('posts').select('author_email').eq('id', editId).single();
-    if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
+    if (chk && !canAdmin() && !isPwVerified && chk.author_email !== currentUserEmail()) {
       showToast('본인 글만 수정할 수 있습니다.', true); return;
     }
+  } else {
+    // 새 글 작성: 로그인 필요
+    if (!canWrite()) { openModal('loginRequiredModal'); return; }
   }
   pendingFiles  = [];
   existingFiles = [];
@@ -1758,13 +1768,10 @@ async function savePost() {
 
 async function delPost(id) {
   const isPwVerified = pwVerifiedPostId === id;
-  if (!canWrite() && !isPwVerified) return;
-  // 비밀번호 인증된 글이 아닌 경우 — 본인 글 또는 관리자만 삭제
-  if (!isPwVerified) {
-    const { data:chk } = await db.from('posts').select('author_email').eq('id', id).single();
-    if (chk && !canAdmin() && chk.author_email !== currentUserEmail()) {
-      showToast('본인 글만 삭제할 수 있습니다.', true); return;
-    }
+  // 본인 글 or 관리자 or 비밀번호 인증 확인
+  const { data:chk } = await db.from('posts').select('author_email').eq('id', id).single();
+  if (!isPwVerified && !canAdmin() && chk?.author_email !== currentUserEmail()) {
+    showToast('본인 글만 삭제할 수 있습니다.', true); return;
   }
   if (!confirm('이 글을 삭제하시겠습니까?\n첨부 파일도 함께 삭제됩니다.')) return;
   // delete storage files
