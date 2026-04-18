@@ -990,7 +990,7 @@ function renderArchive(rows, total, page) {
     const inlineExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
     const dlBtn = firstFile
       ? ext === 'pdf'
-        ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" rel="noopener">📂 PDF 열기</a>`
+        ? `<a class="file-dl-btn" href="https://docs.google.com/viewer?url=${encodeURIComponent(getFileUrl(firstFile.storage_path))}&embedded=false" target="_blank" rel="noopener">📂 PDF 열기</a>`
         : inlineExts.includes(ext)
         ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank">📂 열기</a>`
         : `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
@@ -1062,15 +1062,25 @@ function renderFileItem(f) {
       </div>`;
   }
 
-  // PDF — 직접 링크로 새 탭 열기 (스마트폰 팝업차단 우회)
+  // PDF — Google Docs 뷰어로 열기 (스마트폰 포함 모든 기기에서 확실하게 작동)
   if (ext === 'pdf') {
+    const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
     return `
       <div class="attach-file-wrap">
-        <a class="attach-file" href="${url}" target="_blank" rel="noopener">
+        <a class="attach-file" href="${googleViewerUrl}" target="_blank" rel="noopener">
           📄 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
           <span class="attach-badge attach-view">PDF 열기</span>
         </a>
-        <div class="attach-hint">클릭하면 PDF가 브라우저에서 바로 열립니다.</div>
+        <div class="attach-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <a href="${googleViewerUrl}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:4px;background:#4285f4;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            🌐 브라우저에서 바로 보기
+          </a>
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
+        </div>
       </div>`;
   }
 
@@ -1095,48 +1105,66 @@ function renderFileItem(f) {
 
   // DOCX / DOC — MS Word 또는 한컴 앱 안내
   if (['doc','docx'].includes(ext)) {
+    const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
     return `
       <div class="attach-file-wrap">
-        <a class="attach-file" href="${url}" download="${name}">
+        <a class="attach-file" href="${gv}" target="_blank" rel="noopener">
           📝 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
-          <span class="attach-badge attach-dl">다운로드</span>
+          <span class="attach-badge attach-view">바로 보기</span>
         </a>
-        <div class="attach-hint">
-          Word 파일입니다.
-          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.word" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
-          <a href="https://apps.apple.com/kr/app/microsoft-word/id586447913" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        <div class="attach-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <a href="${gv}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:4px;background:#4285f4;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            🌐 브라우저에서 바로 보기
+          </a>
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
         </div>
       </div>`;
   }
 
-  // XLSX / XLS — MS Excel 앱 안내
+  // XLSX / XLS — Google Docs 뷰어
   if (['xls','xlsx'].includes(ext)) {
+    const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
     return `
       <div class="attach-file-wrap">
-        <a class="attach-file" href="${url}" download="${name}">
+        <a class="attach-file" href="${gv}" target="_blank" rel="noopener">
           📊 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
-          <span class="attach-badge attach-dl">다운로드</span>
+          <span class="attach-badge attach-view">바로 보기</span>
         </a>
-        <div class="attach-hint">
-          Excel 파일입니다.
-          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.excel" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
-          <a href="https://apps.apple.com/kr/app/microsoft-excel/id586683407" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        <div class="attach-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <a href="${gv}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:4px;background:#4285f4;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            🌐 브라우저에서 바로 보기
+          </a>
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
         </div>
       </div>`;
   }
 
-  // PPT / PPTX
+  // PPT / PPTX — Google Docs 뷰어
   if (['ppt','pptx'].includes(ext)) {
+    const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=false`;
     return `
       <div class="attach-file-wrap">
-        <a class="attach-file" href="${url}" download="${name}">
+        <a class="attach-file" href="${gv}" target="_blank" rel="noopener">
           📊 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
-          <span class="attach-badge attach-dl">다운로드</span>
+          <span class="attach-badge attach-view">바로 보기</span>
         </a>
-        <div class="attach-hint">
-          PowerPoint 파일입니다.
-          <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.powerpoint" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
-          <a href="https://apps.apple.com/kr/app/microsoft-powerpoint/id586449534" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+        <div class="attach-hint" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <a href="${gv}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:4px;background:#4285f4;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            🌐 브라우저에서 바로 보기
+          </a>
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
         </div>
       </div>`;
   }
