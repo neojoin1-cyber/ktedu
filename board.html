@@ -680,7 +680,7 @@ const ADMIN_HASH = '4b94e8bfcf2385d2fb23d757d463fecc7aa0d474bb73105abf10acdc590c
         <label class="wlabel">파일 첨부 (선택 · 각 20MB 이하)</label>
         <div class="file-zone" onclick="document.getElementById('fileInput').click()">
           <p>📎 클릭하여 파일 선택</p>
-          <small>PDF, HWP, DOC, XLS, 이미지 등 — Supabase Storage에 실제 저장됩니다</small>
+          <small id="fileHint">PDF, 이미지, Word, Excel, PPT (각 20MB 이하)</small>
         </div>
         <input type="file" id="fileInput" multiple onchange="handleFiles(this.files)">
         <div class="file-chips" id="fileChips"></div>
@@ -997,10 +997,10 @@ function renderArchive(rows, total, page) {
         dlBtn = `<a class="file-dl-btn" href="${gv}" target="_blank" rel="noopener">📂 바로 보기</a>`;
       } else if (inlineExts.includes(ext)) {
         dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank">📂 열기</a>`;
-      } else if (ext === 'hwp' || ext === 'hwpx') {
+      } else if (ARCHIVE_ONLY_EXTS.includes(ext)) {
         const safeName = (firstFile.name||'file').replace(/'/g,"\\'");
-        dlBtn = `<button class="file-dl-btn" onclick="hwpPreview('${fileUrl}','${safeName}')" style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">👁 미리보기</button>` +
-                `<a class="file-dl-btn" href="${fileUrl}" download="${firstFile.name}">⬇ 다운로드</a>`;
+        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" download="${firstFile.name}">⬇ 내려받기</a>` +
+                `<button class="file-dl-btn" onclick="copyFileUrl('${fileUrl}','${safeName}')" style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 URL복사</button>`;
       } else {
         dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`;
       }
@@ -1095,7 +1095,8 @@ function renderFileItem(f) {
   }
 
   // HWP / HWPX — 미리보기(폴라리스 연결) + URL 복사 + 다운로드
-  if (ext === 'hwp' || ext === 'hwpx') {
+  // HWP / HWPX — 자료실 전용: 내려받기 + URL 복사
+  if (ARCHIVE_ONLY_EXTS.includes(ext)) {
     const safeName = name.replace(/'/g,"\\'");
     return `
       <div class="attach-file-wrap">
@@ -1104,24 +1105,17 @@ function renderFileItem(f) {
           <span class="attach-badge attach-dl">한글 파일</span>
         </a>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-          <!-- 미리보기: 폴라리스 오피스 웹으로 이동 + URL 자동 복사 -->
-          <button onclick="hwpPreview('${url}','${safeName}')"
-            style="display:inline-flex;align-items:center;gap:5px;background:#1a73e8;color:#fff;border:none;padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
-            👁 미리보기
-          </button>
-          <!-- URL 복사 -->
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:5px;background:var(--hadon);color:#fff;padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;text-decoration:none;">
+            ⬇ 내려받기
+          </a>
           <button onclick="copyFileUrl('${url}','${safeName}')"
             style="display:inline-flex;align-items:center;gap:5px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
             📋 URL 복사
           </button>
-          <!-- 다운로드 -->
-          <a href="${url}" download="${name}"
-            style="display:inline-flex;align-items:center;gap:5px;background:var(--hadon);color:#fff;padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;text-decoration:none;">
-            ⬇ 다운로드
-          </a>
         </div>
         <div class="attach-hint" style="margin-top:6px;font-size:11.5px;color:var(--ink-soft);">
-          미리보기: 파일 URL이 복사된 후 폴라리스 오피스 웹이 열립니다. 붙여넣기하여 업로드하세요.
+          한글(.hwp) 파일은 한컴오피스, 폴라리스 오피스 등 설치된 프로그램으로 열어주세요.
         </div>
       </div>`;
   }
@@ -1621,6 +1615,13 @@ function onBoardChange() {
   if (b==='program') { l1.textContent='신청 마감일'; l2.textContent='정원'; }
   else if (b==='archive') { l1.textContent='자료 구분'; l2.textContent='날짜·버전'; }
   else { l1.textContent='부제 (선택)'; l2.textContent='조회수 초기값'; }
+  // 파일 힌트 업데이트
+  const hint = document.getElementById('fileHint');
+  if (hint) {
+    hint.textContent = b === 'archive'
+      ? 'PDF, 이미지, Word, Excel, PPT, HWP, HWPX 등 모든 형식 (각 20MB 이하)'
+      : 'PDF, 이미지, Word, Excel, PPT만 첨부 가능 (각 20MB 이하) — HWP는 자료실에 올려주세요';
+  }
 }
 
 // 라디오 ↔ hidden select 동기화
@@ -1635,9 +1636,22 @@ function setVisibility(val) {
   document.getElementById('wVisibility').value = val || 'public';
 }
 
+// 바로보기 가능 형식 (공지사항·탐방일정용)
+const VIEWABLE_EXTS = ['pdf','jpg','jpeg','png','gif','webp','bmp','svg',
+                       'mp4','webm','mov',
+                       'doc','docx','xls','xlsx','ppt','pptx'];
+// 자료실은 모든 형식 허용
+const ARCHIVE_ONLY_EXTS = ['hwp','hwpx','hwt','hml'];
+
 function handleFiles(files) {
+  const board = document.getElementById('wBoard').value;
   Array.from(files).forEach(f => {
     if (f.size > 20*1024*1024) { showToast('20MB 이하 파일만 첨부 가능합니다.', true); return; }
+    const ext = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
+    if (board !== 'archive' && ARCHIVE_ONLY_EXTS.includes(ext)) {
+      showToast('❌ HWP 형식은 자료실에만 올릴 수 있습니다.\n공지사항에는 PDF, 이미지, Word, Excel, PPT 파일만 첨부 가능합니다.', true);
+      return;
+    }
     pendingFiles.push(f);
     renderAllChips();
   });
