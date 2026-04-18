@@ -96,13 +96,8 @@
 
   .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
   .nav-logo-emblem {
-    width: 42px; height: 42px;
-    background: var(--navy);
-    color: var(--amber-lt);
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; border-radius: 4px;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600; letter-spacing: -0.02em;
     flex-shrink: 0;
   }
   .nav-logo-text { color: var(--navy); font-size: 14px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
@@ -459,12 +454,42 @@
      ABOUT — 미션 카드
   ══════════════════════════════════ */
   .about { background: var(--ivory); }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
   .about-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: start;
     margin-bottom: 64px;
   }
+  .about-text p {
+    color: var(--text-mid);
+    font-size: 15px;
+    line-height: 2.0;
+    margin-bottom: 18px;
+  }
+  .about-text strong { color: var(--navy); font-weight: 700; }
+  .about-missions { display: flex; flex-direction: column; gap: 0; }
+  .mission-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line-lt);
+  }
+  .mission-item:first-child { padding-top: 0; }
+  .mission-item:last-child { border-bottom: none; }
+  .mission-item h4 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1rem; font-weight: 800;
+    color: var(--navy); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mission-item h4::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--amber);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mission-item p { color: var(--text-mid); font-size: 14px; line-height: 1.85; }
   .about-card {
     background: var(--white);
     border: 1px solid var(--line);
@@ -668,6 +693,63 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
   }
+  /* 새 수평형 프로그램 카드 */
+  .program-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .program-item {
+    display: flex; align-items: flex-start; gap: 20px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: all 0.22s;
+    position: relative;
+    overflow: hidden;
+  }
+  .program-item::after {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--amber);
+    transform: scaleY(0); transform-origin: bottom;
+    transition: transform 0.25s;
+  }
+  .program-item:hover {
+    box-shadow: 0 8px 32px rgba(13,31,60,0.1);
+    transform: translateY(-3px);
+    border-color: transparent;
+  }
+  .program-item:hover::after { transform: scaleY(1); }
+  .program-icon {
+    width: 52px; height: 52px;
+    background: var(--navy);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .program-item:hover .program-icon { transform: scale(1.08); }
+  .program-content { flex: 1; min-width: 0; }
+  .program-content h3 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.02rem; font-weight: 800;
+    color: var(--navy); margin-bottom: 8px;
+    line-height: 1.35;
+  }
+  .program-content p {
+    color: var(--text-soft); font-size: 13px; line-height: 1.75;
+    margin-bottom: 10px;
+  }
+  .program-arrow {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--amber); font-size: 12.5px; font-weight: 700;
+    transition: gap 0.2s;
+  }
+  .program-item:hover .program-arrow { gap: 8px; }
   .prog-card {
     background: var(--white);
     border: 1px solid var(--line);
@@ -1018,10 +1100,10 @@
   }
   .popup-close:hover { background: var(--line); color: var(--navy); }
   .pp-head {
-    padding: 36px 36px 0;
+    padding: 48px 36px 28px;
     border-bottom: 1px solid var(--line);
-    padding-bottom: 28px;
     margin-bottom: 28px;
+    position: relative;
   }
   .pp-head-icon { font-size: 52px; display: block; margin-bottom: 16px; width: 80px; height: 80px; background: var(--navy); border-radius: 16px; display: flex; align-items: center; justify-content: center; }
   .pp-head-tag {
@@ -1103,6 +1185,13 @@
   }
   .pp-btn-outline:hover { border-color: var(--navy); color: var(--navy); }
 
+
+  .np-head {
+    padding: 48px 36px 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 0;
+    position: relative;
+  }
   /* 뉴스 팝업 */
   .np-badge {
     display: inline-block;
@@ -1116,11 +1205,13 @@
   }
   .np-title {
     font-family: 'Nanum Myeongjo', serif;
-    font-size: 1.4rem;
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
     font-weight: 800;
     color: var(--navy);
-    line-height: 1.35;
+    line-height: 1.4;
     margin-bottom: 8px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   .np-meta { color: var(--text-soft); font-size: 12.5px; margin-bottom: 0; }
   .np-img-area { padding: 0 36px 24px; }
@@ -1148,15 +1239,16 @@
     background: var(--ivory);
     border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 18px 16px;
+    padding: 20px 16px;
     text-align: center;
   }
   .np-stat-num {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 600;
     color: var(--navy);
     display: block;
+    line-height: 1.1;
   }
   .np-stat-label { color: var(--text-soft); font-size: 11.5px; margin-top: 4px; }
   .np-highlight {
@@ -1206,12 +1298,13 @@
     .hero-stat-card { flex: 1 1 45%; }
     .greeting-grid { grid-template-columns: 1fr; gap: 40px; }
     .greeting-aside { position: static; }
-    .about-grid { grid-template-columns: 1fr 1fr; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
     .course-intro-grid { grid-template-columns: 1fr; gap: 40px; }
     .history-bg-grid { grid-template-columns: 1fr; }
     .history-stats-grid { grid-template-columns: 1fr 1fr; }
     .history-main-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
     .programs-grid { grid-template-columns: 1fr 1fr; }
+    .program-grid { grid-template-columns: 1fr; }
     .news-grid { grid-template-columns: 1fr 1fr; }
     .contact-grid { grid-template-columns: 1fr; gap: 40px; }
     .footer-top { grid-template-columns: 1fr 1fr; }
@@ -1228,6 +1321,7 @@
     .hero-stat-card { flex: 1 1 100%; }
     .about-grid { grid-template-columns: 1fr; }
     .programs-grid { grid-template-columns: 1fr; }
+    .program-grid { grid-template-columns: 1fr; }
     .news-grid { grid-template-columns: 1fr; }
     .history-stats-grid { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr; gap: 32px; }
@@ -1817,7 +1911,15 @@
 <!-- ── NAV ── -->
 <nav>
   <a href="#" class="nav-logo">
-    <div class="nav-logo-emblem">韓</div>
+    <div class="nav-logo-emblem">
+      <svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="21" r="20" fill="#1a6b2e"/>
+        <circle cx="21" cy="21" r="18" fill="none" stroke="white" stroke-width="1.2" stroke-dasharray="2.5 1.8"/>
+        <text x="21" y="16" text-anchor="middle" fill="white" font-size="7" font-family="'Noto Sans KR',sans-serif" font-weight="700" letter-spacing="0.3">KOREA TOURISM</text>
+        <text x="21" y="23" text-anchor="middle" fill="white" font-size="8.5" font-family="'Nanum Myeongjo',serif" font-weight="800">관광교육</text>
+        <text x="21" y="30" text-anchor="middle" fill="white" font-size="6.5" font-family="'Noto Sans KR',sans-serif" font-weight="600" letter-spacing="0.3">INSTITUTE 2010</text>
+      </svg>
+    </div>
     <div>
       <div class="nav-logo-text">한국관광교육연구원</div>
       <div class="nav-logo-sub">Korea Tourism Education Research Association</div>
@@ -2308,39 +2410,51 @@
     <div class="program-grid">
       <div class="program-item" onclick="openProgram('trail')" style="cursor:pointer;">
         <div class="program-icon">🎒</div>
-        <h3>백의종군로 탐방 체험학습</h3>
-        <p>학생 눈높이에 맞는 구간별 스토리텔링과 함께하는 현장 체험학습. 농어촌인성학교 연계 수료식 운영.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>백의종군로 탐방 체험학습</h3>
+          <p>학생 눈높이에 맞는 구간별 스토리텔링과 함께하는 현장 체험학습. 농어촌인성학교 연계 수료식 운영.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
       <div class="program-item" onclick="openProgram('academy')" style="cursor:pointer;">
         <div class="program-icon">⚔</div>
-        <h3>임진왜란 아카데미</h3>
-        <p>정기룡 장군 유숙지 체험, 하동군 역사문화 현장 탐방, 임진왜란 승첩지 연계 교육 프로그램.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>임진왜란 아카데미</h3>
+          <p>정기룡 장군 유숙지 체험, 하동군 역사문화 현장 탐방, 임진왜란 승첩지 연계 교육 프로그램.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
       <div class="program-item" onclick="openProgram('leadership')" style="cursor:pointer;">
         <div class="program-icon">🏅</div>
-        <h3>이순신 리더십 교육</h3>
-        <p>이순신파워공무원아카데미(경상남도), 이순신 팸투어 등 리더십 중심의 기업·공공기관 프로그램.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>이순신 리더십 교육</h3>
+          <p>이순신파워공무원아카데미(경상남도), 이순신 팸투어 등 리더십 중심의 기업·공공기관 프로그램.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
       <div class="program-item" onclick="openProgram('school')" style="cursor:pointer;">
         <div class="program-icon">🏫</div>
-        <h3>학교 연계 프로그램</h3>
-        <p>관광교육 네트워크를 통한 학교별 맞춤 탐방 연계. 6박 7일 전구간 완주 특별 프로그램 포함.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>학교 연계 프로그램</h3>
+          <p>관광교육 네트워크를 통한 학교별 맞춤 탐방 연계. 6박 7일 전구간 완주 특별 프로그램 포함.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
       <div class="program-item" onclick="openProgram('publish')" style="cursor:pointer;">
         <div class="program-icon">📖</div>
-        <h3>교재 및 콘텐츠 발간</h3>
-        <p>재밌는 스토리텔링 기법과 체험 활동 중심의 역사문화관광 교양지 및 교재 발간 사업.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>교재 및 콘텐츠 발간</h3>
+          <p>재밌는 스토리텔링 기법과 체험 활동 중심의 역사문화관광 교양지 및 교재 발간 사업.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
       <div class="program-item" onclick="openProgram('consign')" style="cursor:pointer;">
         <div class="program-icon">🤝</div>
-        <h3>지자체 위탁·대행 사업</h3>
-        <p>하동군 문화체육과 협력 백의종군로 활성화 사업. 자치단체 위탁 및 위임 사업 수행.</p>
-        <span class="program-arrow">→</span>
+        <div class="program-content">
+          <h3>지자체 위탁·대행 사업</h3>
+          <p>하동군 문화체육과 협력 백의종군로 활성화 사업. 자치단체 위탁 및 위임 사업 수행.</p>
+          <span class="program-arrow">자세히 보기 →</span>
+        </div>
       </div>
     </div>
   </div>
