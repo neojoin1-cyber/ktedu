@@ -1074,8 +1074,10 @@ function renderFileItem(f) {
       </div>`;
   }
 
-  // HWP — 한컴 앱 안내
+  // HWP — 한컴 앱 연결 (앱 있으면 바로 열기, 없으면 설치 유도)
   if (ext === 'hwp' || ext === 'hwpx') {
+    // Android: intent URL로 앱 있으면 바로 열기, 없으면 Play Store로
+    const intentUrl = `intent://view?url=${encodeURIComponent(url)}#Intent;scheme=hancom;package=com.tf.thinkdroid.viewer;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.tf.thinkdroid.viewer')};end`;
     return `
       <div class="attach-file-wrap">
         <a class="attach-file" href="${url}" download="${name}">
@@ -1083,9 +1085,10 @@ function renderFileItem(f) {
           <span class="attach-badge attach-dl">다운로드</span>
         </a>
         <div class="attach-hint">
-          한글(.hwp) 파일입니다.
-          <a href="https://play.google.com/store/apps/details?id=com.hancom.office.editor.hidden" target="_blank" style="color:var(--hadon);font-weight:500;">안드로이드 앱</a> ·
-          <a href="https://apps.apple.com/kr/app/한컴오피스-한글-뷰어/id431450291" target="_blank" style="color:var(--hadon);font-weight:500;">아이폰 앱</a>
+          한글 파일 뷰어 앱으로 열기 :
+          <a href="${intentUrl}" style="color:var(--hadon);font-weight:500;">📱 안드로이드 뷰어 앱으로 열기</a>
+          &nbsp;·&nbsp;
+          <a href="https://apps.apple.com/kr/app/hancom-office-viewer/id742836820" target="_blank" style="color:var(--hadon);font-weight:500;">🍎 아이폰 뷰어 앱으로 열기</a>
         </div>
       </div>`;
   }
@@ -1640,7 +1643,7 @@ async function savePost() {
       const ext  = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
       const safeName = `${postId}/${Date.now()}.${ext || 'bin'}`;
 
-      // contentType 정확히 지정 (PDF·이미지·Office 파일)
+      // contentType 정확히 지정
       const mimeMap = {
         pdf:'application/pdf', jpg:'image/jpeg', jpeg:'image/jpeg',
         png:'image/png', gif:'image/gif', webp:'image/webp',
@@ -1655,9 +1658,15 @@ async function savePost() {
       };
       const contentType = mimeMap[ext] || f.type || 'application/octet-stream';
 
+      // PDF·이미지·동영상은 inline (브라우저 직접 열기)
+      // 나머지 문서류는 attachment (다운로드)
+      const inlineTypes = ['pdf','jpg','jpeg','png','gif','webp','bmp','svg','mp4','mov','webm'];
+      const contentDisposition = inlineTypes.includes(ext) ? 'inline' : 'attachment';
+
       const { error: upErr } = await db.storage.from('attachments').upload(safeName, f, {
         upsert: true,
-        contentType
+        contentType,
+        contentDisposition
       });
       if (upErr) {
         console.error('파일 업로드 실패:', f.name, upErr);
