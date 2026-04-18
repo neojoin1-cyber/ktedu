@@ -988,13 +988,24 @@ function renderArchive(rows, total, page) {
     const em   = EMOJI_MAP[ext] || '📎';
     // PDF·이미지 → 브라우저 인라인 열기 / 나머지 → 다운로드
     const inlineExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
-    const dlBtn = firstFile
-      ? ext === 'pdf'
-        ? `<a class="file-dl-btn" href="https://docs.google.com/viewer?url=${encodeURIComponent(getFileUrl(firstFile.storage_path))}&embedded=false" target="_blank" rel="noopener">📂 PDF 열기</a>`
-        : inlineExts.includes(ext)
-        ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank">📂 열기</a>`
-        : `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
-      : '';
+    const googleExts = ['pdf','doc','docx','xls','xlsx','ppt','pptx'];
+    const fileUrl    = getFileUrl(firstFile.storage_path);
+    let dlBtn = '';
+    if (firstFile) {
+      if (googleExts.includes(ext)) {
+        const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=false`;
+        dlBtn = `<a class="file-dl-btn" href="${gv}" target="_blank" rel="noopener">📂 바로 보기</a>`;
+      } else if (inlineExts.includes(ext)) {
+        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank">📂 열기</a>`;
+      } else if (ext === 'hwp' || ext === 'hwpx') {
+        const intentUrl = `intent://view?url=${encodeURIComponent(fileUrl)}#Intent;scheme=hancom;package=com.tf.thinkdroid.viewer;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.tf.thinkdroid.viewer')};end`;
+        // PC: 다운로드 / 모바일: 앱 열기
+        dlBtn = `<a class="file-dl-btn desktop-only" href="${fileUrl}" download="${firstFile.name}">⬇ 다운로드</a>` +
+                `<a class="file-dl-btn mobile-only" href="${intentUrl}">📱 앱으로 열기</a>`;
+      } else {
+        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`;
+      }
+    }
     const canEdit = canEditPost(p);
     const acts = canEdit
       ? `<button class="btn-edit" onclick="openWrite('archive',${p.id})">수정</button>
@@ -1084,9 +1095,8 @@ function renderFileItem(f) {
       </div>`;
   }
 
-  // HWP — 한컴 앱 연결 (앱 있으면 바로 열기, 없으면 설치 유도)
+  // HWP — PC: 다운로드 / 스마트폰: 한컴 앱 연결
   if (ext === 'hwp' || ext === 'hwpx') {
-    // Android: intent URL로 앱 있으면 바로 열기, 없으면 Play Store로
     const intentUrl = `intent://view?url=${encodeURIComponent(url)}#Intent;scheme=hancom;package=com.tf.thinkdroid.viewer;S.browser_fallback_url=${encodeURIComponent('https://play.google.com/store/apps/details?id=com.tf.thinkdroid.viewer')};end`;
     return `
       <div class="attach-file-wrap">
@@ -1094,11 +1104,24 @@ function renderFileItem(f) {
           📝 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
           <span class="attach-badge attach-dl">다운로드</span>
         </a>
-        <div class="attach-hint">
-          한글 파일 뷰어 앱으로 열기 :
-          <a href="${intentUrl}" style="color:var(--hadon);font-weight:500;">📱 안드로이드 뷰어 앱으로 열기</a>
-          &nbsp;·&nbsp;
-          <a href="https://apps.apple.com/kr/app/hancom-office-viewer/id742836820" target="_blank" style="color:var(--hadon);font-weight:500;">🍎 아이폰 뷰어 앱으로 열기</a>
+        <!-- PC: 다운로드 안내만 -->
+        <div class="attach-hint desktop-only">
+          한글(.hwp) 파일입니다. 다운로드 후 한컴오피스로 열어주세요.
+        </div>
+        <!-- 스마트폰·태블릿: 앱 연결 안내 -->
+        <div class="attach-hint mobile-only" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <a href="${intentUrl}"
+            style="display:inline-flex;align-items:center;gap:4px;background:#00b050;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            📱 안드로이드 앱으로 열기
+          </a>
+          <a href="https://apps.apple.com/kr/app/hancom-office-viewer/id742836820" target="_blank"
+            style="display:inline-flex;align-items:center;gap:4px;background:#555;color:#fff;padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            🍎 아이폰 앱으로 열기
+          </a>
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:4px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:5px 12px;border-radius:3px;font-size:12px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
         </div>
       </div>`;
   }
