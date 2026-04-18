@@ -115,6 +115,12 @@
     letter-spacing: -0.01em;
   }
   .nav-links a:hover { color: var(--navy); background: var(--line-lt); }
+  .nav-links a.active-section {
+    color: #fff !important;
+    background: var(--navy) !important;
+    border-radius: 6px;
+    font-weight: 600;
+  }
 
   .nav-cta {
     background: var(--navy);
@@ -353,8 +359,8 @@
     font-size: 15.5px;
     line-height: 1.8;
     font-weight: 300;
-    max-width: 600px;
-    margin-bottom: 60px;
+    max-width: 680px;
+    margin-bottom: 40px;
   }
 
   /* ══════════════════════════════════
@@ -1890,6 +1896,97 @@
     .hero-trust-num { font-size:1.3rem; }
     .hero-trust-label { font-size:10px; }
   }
+  /* ── About 사진 스트립 ── */
+  .about-photo-strip {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 12px;
+    margin-bottom: 56px;
+    height: 220px;
+  }
+  .aps-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(13,31,60,0.12);
+  }
+  .aps-item img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.4s;
+  }
+  .aps-item:hover img { transform: scale(1.04); }
+  .aps-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(13,31,60,0.75));
+    color: rgba(255,255,255,0.9);
+    font-size: 12px; font-weight: 500;
+    padding: 20px 14px 10px;
+  }
+
+  /* ── History 사진+명언 ── */
+  .history-photo-quote {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+  .hpq-img {
+    border-radius: 10px;
+    overflow: hidden;
+    height: 180px;
+  }
+  .hpq-img img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    filter: brightness(0.85);
+    transition: filter 0.3s;
+  }
+  .hpq-img:hover img { filter: brightness(1); }
+  .hpq-quote {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 20px 22px;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .hpq-quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+  .hpq-quote p {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.75;
+    margin-bottom: 12px;
+  }
+  .hpq-source {
+    color: rgba(184,134,11,0.8);
+    font-size: 11.5px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── About, History 반응형 ── */
+  @media (max-width: 900px) {
+    .about-photo-strip { height: 160px; }
+    .history-photo-quote { grid-template-columns: 1fr; }
+    .hpq-img { height: 140px; }
+  }
+  @media (max-width: 600px) {
+    .about-photo-strip { grid-template-columns: 1fr 1fr; height: 130px; }
+    .about-photo-strip .aps-item:last-child { display: none; }
+    .history-photo-quote { display: none; } /* 모바일에선 생략 */
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -1933,7 +2030,6 @@
     <a href="#history">연혁</a>
     <a href="board.html">공지·자료</a>
     <a href="mypage.html">가입 신청</a>
-    <a href="#contact">문의·신청</a>
   </div>
   <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">탐방 신청</button>
   <div class="nav-hamburger" onclick="openMobileNav()">
@@ -2092,6 +2188,22 @@
     <p class="section-sub">
       사단법인 한국관광교육연구원은 전국 관광교사를 지원하고<br>역사문화관광 콘텐츠를 개발·운영하는 비영리 교육 전문 법인입니다.
     </p>
+    <!-- 사진 스트립 -->
+    <div class="about-photo-strip">
+      <div class="aps-item">
+        <img src="images/2014_gyeongnam.jpg" alt="경남연합중학생 백의종군로 탐방">
+        <div class="aps-caption">경남연합중학생 탐방</div>
+      </div>
+      <div class="aps-item aps-tall">
+        <img src="images/2019_workshop.jpg" alt="전국관광교사 워크숍 단체사진">
+        <div class="aps-caption">전국관광교사 워크숍</div>
+      </div>
+      <div class="aps-item">
+        <img src="images/2024_workshop.jpg" alt="2024 영호남 관광교사 워크숍">
+        <div class="aps-caption">영호남 관광교사 워크숍 2024</div>
+      </div>
+    </div>
+
     <div class="about-grid">
       <div class="about-text">
         <p>우리 연구원은 2010년 경상남도지사의 허가로 설립된 이래, <strong>전국 관광교사들이 더 좋은 교육을 할 수 있도록</strong> 탐방 프로그램 개발, 교재 발간, 현장 연수, 업무협약 구축 등 체계적인 지원을 이어오고 있습니다.</p>
@@ -2129,7 +2241,7 @@
       <div class="officer-table-wrap" style="overflow-x:auto;">
         <table class="officer-table" style="width:100%;border-collapse:collapse;font-size:14px;">
           <thead>
-            <tr style="background:var(--hadon);color:white;">
+            <tr style="background:var(--navy);color:white;">
               <th style="padding:12px 16px;text-align:center;width:50px;font-weight:700;">번호</th>
               <th class="col-pos" style="padding:12px 16px;text-align:center;width:110px;font-weight:700;white-space:nowrap;">직책</th>
               <th style="padding:12px 16px;text-align:center;width:80px;font-weight:700;">성명</th>
@@ -2149,7 +2261,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김영희</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교장</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">3</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이사(이사장)</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">이장환</td>
@@ -2161,7 +2273,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김옥재</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">동아대학교 관광레저연구소 특별연구원</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">5</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">정정부</td>
@@ -2173,7 +2285,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김태국</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">부산정보관광고등학교 교사</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">7</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">박해욱</td>
@@ -2185,7 +2297,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">서인덕</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">경주정보고등학교 교사</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">9</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">박규호</td>
@@ -2197,7 +2309,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">남중헌</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">창신대학교 미래융합지식대학장</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">11</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">이 사</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">김정수</td>
@@ -2209,7 +2321,7 @@
               <td style="padding:12px 16px;text-align:center;font-weight:700;">강영석</td>
               <td class="col-career" style="padding:12px 16px;color:var(--ink-mid);">이순신을 배우는 사람들 회장</td>
             </tr>
-            <tr style="border-bottom:1px solid var(--border);background:var(--cream);">
+            <tr style="border-bottom:1px solid var(--border);background:var(--ivory);">
               <td style="padding:12px 16px;text-align:center;color:var(--ink-soft);">13</td>
               <td class="col-pos" style="padding:12px 16px;text-align:center;white-space:nowrap;">자문위원</td>
               <td style="padding:12px 16px;text-align:center;font-weight:700;">임원빈</td>
@@ -2224,7 +2336,7 @@
           </tbody>
         </table>
       </div>
-      <div style="margin-top:16px;padding:14px 20px;background:var(--cream);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;font-size:13.5px;color:var(--text-mid);line-height:1.8;">
+      <div style="margin-top:16px;padding:14px 20px;background:var(--ivory);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;font-size:13.5px;color:var(--text-mid);line-height:1.8;">
         ▶ 목적 : 역사문화자원을 활용한 관광상품화사업과 임진왜란 승첩지, 가야문화, 전통주산업 등 역사문화콘텐츠를 통한 관광상품을 개발·연구하여 관광산업을 발전시키는 데 그 목적이 있음.
       </div>
     </div>
@@ -2489,6 +2601,19 @@
             <div class="history-stat-label">하동군 업무협약 운영</div>
           </div>
         </div>
+
+        <!-- 탐방 현장 사진 + 이순신 명언 -->
+        <div class="history-photo-quote">
+          <div class="hpq-img">
+            <img src="images/2015_haeundae.jpg" alt="해운대여중 백의종군로 탐방 행진"
+                 onerror="this.style.background='rgba(255,255,255,0.1)';this.src=''">
+          </div>
+          <div class="hpq-quote">
+            <div class="hpq-quote-mark">"</div>
+            <p>신에게는 아직 열두 척의 배가 있습니다.<br>죽을 힘을 다하면 능히 이길 수 있습니다.</p>
+            <div class="hpq-source">— 이충무공 난중일기, 1597년</div>
+          </div>
+        </div>
       </div>
       <div class="history-timeline">
         <div class="timeline-item">
@@ -2673,7 +2798,7 @@
             <div class="contact-item-value">
               <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
                 <a href="tel:010-2786-7822"
-                   style="display:inline-flex;align-items:center;gap:5px;background:var(--hadon);color:white;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;">
+                   style="display:inline-flex;align-items:center;gap:5px;background:var(--navy);color:white;padding:10px 18px;border-radius:4px;font-size:13px;font-weight:500;text-decoration:none;">
                   📞 010-2786-7822
                 </a>
                 <button onclick="shareContact()"
@@ -2956,7 +3081,13 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const id = entry.target.getAttribute('id');
-        navLinks.forEach(a => { a.style.color = a.href.includes(id) ? 'var(--gold-lt)' : ''; });
+        navLinks.forEach(a => {
+          const isActive = a.getAttribute('href') && a.getAttribute('href').includes('#'+id);
+          a.style.color = isActive ? '#fff' : '';
+          a.style.background = isActive ? 'var(--navy)' : '';
+          a.style.borderRadius = isActive ? '6px' : '';
+          a.style.fontWeight = isActive ? '600' : '';
+        });
       }
     });
   }, { rootMargin: '-40% 0px -50% 0px' });
