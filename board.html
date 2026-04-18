@@ -1451,18 +1451,32 @@ async function savePost() {
 
     // 새 파일 업로드
     const filesToUpload = pendingFiles.filter(f => f !== null);
+    let uploadFailed = [];
     for (const f of filesToUpload) {
-      const path = `${postId}/${Date.now()}_${f.name}`;
-      const { error: upErr } = await db.storage.from('attachments').upload(path, f, { upsert: true });
-      if (!upErr) {
+      // 경로는 영문+숫자+확장자만 사용 (한글 파일명은 DB에 원본 보존)
+      const ext  = f.name.includes('.') ? '.' + f.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') : '';
+      const path = `${postId}/${Date.now()}${ext}`;
+      const { error: upErr } = await db.storage.from('attachments').upload(path, f, {
+        upsert: true,
+        contentType: f.type || 'application/octet-stream'
+      });
+      if (upErr) {
+        console.error('파일 업로드 실패:', f.name, upErr);
+        uploadFailed.push(f.name + ' (' + upErr.message + ')');
+      } else {
+        // name에는 원본 한글 파일명 저장, storage_path는 영문 경로
         await db.from('files').insert({ post_id: postId, name: f.name, size: f.size, storage_path: path });
       }
     }
 
     closeModal('writeModal');
     switchTab(board, null);
-    pwVerifiedPostId = null;  // 인증 초기화
-    showToast(editId ? '수정되었습니다.' : '등록되었습니다.');
+    pwVerifiedPostId = null;
+    if (uploadFailed.length) {
+      showToast('글은 저장됐으나 파일 업로드 실패: ' + uploadFailed.join(', '), true);
+    } else {
+      showToast(editId ? '수정되었습니다.' : '등록되었습니다.');
+    }
   } catch(e) {
     showToast('저장 중 오류: ' + e.message, true);
   } finally {
