@@ -839,16 +839,14 @@ async function loadBoard(board) {
   const fg    = document.getElementById('fg-archive');
   const q     = document.getElementById('q-' + board)?.value.trim() || '';
 
-  // 전체 공개 — 목록은 누구나 열람 가능
   if (board !== 'archive') showLoading(tbody, 6);
   else if (fg) fg.innerHTML = loadingHTML();
 
-  // 회원 전용(members) 글은 로그인한 회원에게만 표시
-  const isMember = canWrite();
+  // 목록은 전체 공개 — visibility 필터 없이 전체 조회
+  // (내용 열람 권한은 openDetail에서 별도 체크)
 
   // count
   let cntQ = db.from('posts').select('id', { count:'exact', head:true }).eq('board', board);
-  if (!isMember) cntQ = cntQ.eq('visibility', 'public');
   if (q) cntQ = cntQ.ilike('title', `%${q}%`);
   const { count } = await cntQ;
   document.getElementById('cnt-' + board).textContent = count || 0;
@@ -864,7 +862,6 @@ async function loadBoard(board) {
     .order('pin', { ascending:false })
     .order('created_at', { ascending:false })
     .range(from, to);
-  if (!isMember) dataQ = dataQ.eq('visibility', 'public');
   if (q) dataQ = dataQ.ilike('title', `%${q}%`);
 
   const { data, error } = await dataQ;
