@@ -974,23 +974,32 @@ function renderArchive(rows, total, page) {
     const ext  = firstFile ? firstFile.name.split('.').pop().toLowerCase() : '';
     const ic   = ICON_MAP[ext]  || 'fi-etc';
     const em   = EMOJI_MAP[ext] || '📎';
-    // PDF·이미지 → 브라우저 인라인 열기 / 나머지 → 다운로드
-    const inlineExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
-    const googleExts = ['pdf','doc','docx','xls','xlsx','ppt','pptx'];
-    const fileUrl    = getFileUrl(firstFile.storage_path);
+
     let dlBtn = '';
     if (firstFile) {
-      if (googleExts.includes(ext)) {
-        const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=false`;
-        dlBtn = `<a class="file-dl-btn" href="${gv}" target="_blank" rel="noopener">📂 바로 보기</a>`;
-      } else if (inlineExts.includes(ext)) {
-        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank">📂 열기</a>`;
-      } else if (ARCHIVE_ONLY_EXTS.includes(ext)) {
-        const safeName = (firstFile.name||'file').replace(/'/g,"\\'");
-        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" download="${firstFile.name}">⬇ 내려받기</a>` +
-                `<button class="file-dl-btn" onclick="copyFileUrl('${fileUrl}','${safeName}')" style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 URL복사</button>`;
+      if (!canWrite()) {
+        // 비로그인 — 파일 버튼 대신 로그인 유도
+        dlBtn = `<button class="file-dl-btn" onclick="openModal('loginRequiredModal')"
+                   style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);">
+                   🔒 로그인 후 열람
+                 </button>`;
       } else {
-        dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`;
+        // 회원·관리자 — 파일 형식별 버튼 표시
+        const inlineExts = ['jpg','jpeg','png','gif','webp','bmp','svg'];
+        const googleExts = ['pdf','doc','docx','xls','xlsx','ppt','pptx'];
+        const fileUrl    = getFileUrl(firstFile.storage_path);
+        if (googleExts.includes(ext)) {
+          const gv = `https://docs.google.com/viewer?url=${encodeURIComponent(fileUrl)}&embedded=false`;
+          dlBtn = `<a class="file-dl-btn" href="${gv}" target="_blank" rel="noopener">📂 바로 보기</a>`;
+        } else if (inlineExts.includes(ext)) {
+          dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank">📂 열기</a>`;
+        } else if (ARCHIVE_ONLY_EXTS.includes(ext)) {
+          const safeName = (firstFile.name||'file').replace(/'/g,"\\'");
+          dlBtn = `<a class="file-dl-btn" href="${fileUrl}" download="${firstFile.name}">⬇ 내려받기</a>` +
+                  `<button class="file-dl-btn" onclick="copyFileUrl('${fileUrl}','${safeName}')" style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 URL복사</button>`;
+        } else {
+          dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`;
+        }
       }
     }
     const canEdit = canEditPost(p);
