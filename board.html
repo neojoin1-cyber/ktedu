@@ -986,9 +986,12 @@ function renderArchive(rows, total, page) {
     const ext  = firstFile ? firstFile.name.split('.').pop().toLowerCase() : '';
     const ic   = ICON_MAP[ext]  || 'fi-etc';
     const em   = EMOJI_MAP[ext] || '📎';
-    // 다운로드 버튼 — 회원만 (이미 canWrite() 통과했으므로 항상 표시)
+    // PDF·이미지 → 브라우저 인라인 열기 / 나머지 → 다운로드
+    const inlineExts = ['pdf','jpg','jpeg','png','gif','webp','bmp','svg'];
     const dlBtn = firstFile
-      ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
+      ? inlineExts.includes(ext)
+        ? `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank">📂 열기</a>`
+        : `<a class="file-dl-btn" href="${getFileUrl(firstFile.storage_path)}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`
       : '';
     const canEdit = canEditPost(p);
     const acts = canEdit
@@ -1012,6 +1015,10 @@ function renderArchive(rows, total, page) {
 function getFileUrl(path) {
   return `${SUPA_URL}/storage/v1/object/public/attachments/${path}`;
 }
+// 인라인 표시용 — download 파라미터 없이 그냥 공개 URL 사용
+function getInlineUrl(path) {
+  return `${SUPA_URL}/storage/v1/object/public/attachments/${path}`;
+}
 
 /* ── 파일 종류별 렌더링 ── */
 function renderFileItem(f) {
@@ -1027,9 +1034,9 @@ function renderFileItem(f) {
         <img src="${url}" alt="${name}"
           style="max-width:100%;max-height:320px;border-radius:4px;display:block;margin-bottom:6px;cursor:pointer;"
           onclick="window.open('${url}','_blank')" title="클릭하면 원본 크기로 열립니다">
-        <a class="attach-file" href="${url}" target="_blank" download="${name}">
+        <a class="attach-file" href="${url}" target="_blank">
           🖼 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
-          <span class="attach-badge attach-view">미리보기</span>
+          <span class="attach-badge attach-view">원본 보기</span>
         </a>
       </div>`;
   }
@@ -1609,19 +1616,33 @@ async function savePost() {
     const filesToUpload = pendingFiles.filter(f => f !== null);
     let uploadFailed = [];
     for (const f of filesToUpload) {
-      // 경로는 영문+숫자+확장자만 사용 (한글 파일명은 DB에 원본 보존)
-      const ext  = f.name.includes('.') ? '.' + f.name.split('.').pop().replace(/[^a-zA-Z0-9]/g, '') : '';
-      const path = `${postId}/${Date.now()}${ext}`;
-      const { error: upErr } = await db.storage.from('attachments').upload(path, f, {
+      const ext  = f.name.includes('.') ? f.name.split('.').pop().toLowerCase() : '';
+      const safeName = `${postId}/${Date.now()}.${ext || 'bin'}`;
+
+      // contentType 정확히 지정 (PDF·이미지·Office 파일)
+      const mimeMap = {
+        pdf:'application/pdf', jpg:'image/jpeg', jpeg:'image/jpeg',
+        png:'image/png', gif:'image/gif', webp:'image/webp',
+        hwp:'application/x-hwp', hwpx:'application/x-hwpx',
+        doc:'application/msword',
+        docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        xls:'application/vnd.ms-excel',
+        xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ppt:'application/vnd.ms-powerpoint',
+        pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        mp4:'video/mp4', mov:'video/mp4', webm:'video/webm',
+      };
+      const contentType = mimeMap[ext] || f.type || 'application/octet-stream';
+
+      const { error: upErr } = await db.storage.from('attachments').upload(safeName, f, {
         upsert: true,
-        contentType: f.type || 'application/octet-stream'
+        contentType
       });
       if (upErr) {
         console.error('파일 업로드 실패:', f.name, upErr);
         uploadFailed.push(f.name + ' (' + upErr.message + ')');
       } else {
-        // name에는 원본 한글 파일명 저장, storage_path는 영문 경로
-        await db.from('files').insert({ post_id: postId, name: f.name, size: f.size, storage_path: path });
+        await db.from('files').insert({ post_id: postId, name: f.name, size: f.size, storage_path: safeName });
       }
     }
 
