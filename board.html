@@ -998,11 +998,9 @@ function renderArchive(rows, total, page) {
       } else if (inlineExts.includes(ext)) {
         dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank">📂 열기</a>`;
       } else if (ext === 'hwp' || ext === 'hwpx') {
-        const hwpMime = ext === 'hwpx' ? 'application/x-hwpx' : 'application/x-hwp';
         const safeName = (firstFile.name||'file').replace(/'/g,"\\'");
-        // PC: 다운로드 / 모바일: Blob으로 설치 앱 선택기
-        dlBtn = `<a class="file-dl-btn desktop-only" href="${fileUrl}" download="${firstFile.name}">⬇ 다운로드</a>` +
-                `<button class="file-dl-btn mobile-only" onclick="openWithAnyApp('${fileUrl}','${safeName}','${hwpMime}')">📱 앱으로 열기</button>`;
+        dlBtn = `<button class="file-dl-btn" onclick="hwpPreview('${fileUrl}','${safeName}')" style="border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">👁 미리보기</button>` +
+                `<a class="file-dl-btn" href="${fileUrl}" download="${firstFile.name}">⬇ 다운로드</a>`;
       } else {
         dlBtn = `<a class="file-dl-btn" href="${fileUrl}" target="_blank" download="${firstFile.name}">⬇ 다운로드</a>`;
       }
@@ -1096,25 +1094,35 @@ function renderFileItem(f) {
       </div>`;
   }
 
-  // HWP / HWPX — Blob 방식으로 설치된 모든 HWP 앱과 연결
+  // HWP / HWPX — 미리보기(폴라리스 연결) + URL 복사 + 다운로드
   if (ext === 'hwp' || ext === 'hwpx') {
-    const mime = ext === 'hwpx' ? 'application/x-hwpx' : 'application/x-hwp';
+    const safeName = name.replace(/'/g,"\\'");
     return `
       <div class="attach-file-wrap">
         <a class="attach-file" href="${url}" download="${name}">
           📝 ${name} <span style="color:var(--ink-soft);font-size:12px;margin-left:8px;">${size}</span>
-          <span class="attach-badge attach-dl">다운로드</span>
+          <span class="attach-badge attach-dl">한글 파일</span>
         </a>
-        <!-- 스마트폰: Blob으로 설치 앱 연결 시도 -->
-        <div class="attach-hint mobile-only" style="margin-top:6px;">
-          <button onclick="openWithAnyApp('${url}','${name.replace(/'/g,"\\'")}','${mime}')"
-            style="display:inline-flex;align-items:center;gap:6px;background:#00b050;color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
-            📱 설치된 앱으로 열기
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <!-- 미리보기: 폴라리스 오피스 웹으로 이동 + URL 자동 복사 -->
+          <button onclick="hwpPreview('${url}','${safeName}')"
+            style="display:inline-flex;align-items:center;gap:5px;background:#1a73e8;color:#fff;border:none;padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+            👁 미리보기
           </button>
-          <span style="font-size:11px;color:var(--ink-soft);margin-left:8px;">앱이 없으면 자동으로 다운로드됩니다</span>
+          <!-- URL 복사 -->
+          <button onclick="copyFileUrl('${url}','${safeName}')"
+            style="display:inline-flex;align-items:center;gap:5px;background:var(--cream);color:var(--hadon);border:1px solid var(--hadon);padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
+            📋 URL 복사
+          </button>
+          <!-- 다운로드 -->
+          <a href="${url}" download="${name}"
+            style="display:inline-flex;align-items:center;gap:5px;background:var(--hadon);color:#fff;padding:7px 14px;border-radius:4px;font-size:12.5px;font-weight:500;text-decoration:none;">
+            ⬇ 다운로드
+          </a>
         </div>
-        <!-- PC: 다운로드 안내 -->
-        <div class="attach-hint desktop-only">한글(.hwp) 파일 — 다운로드 후 한컴오피스로 열어주세요.</div>
+        <div class="attach-hint" style="margin-top:6px;font-size:11.5px;color:var(--ink-soft);">
+          미리보기: 파일 URL이 복사된 후 폴라리스 오피스 웹이 열립니다. 붙여넣기하여 업로드하세요.
+        </div>
       </div>`;
   }
 
@@ -1766,9 +1774,30 @@ function isNewDate(d) {
 }
 function openModal(id)  { document.getElementById(id).classList.add('open');  document.body.style.overflow='hidden'; }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
-/* HWP 등 — Blob으로 다운로드 후 OS 앱 선택기 트리거
-   안드로이드: 설치된 모든 HWP 앱 목록 표시
-   앱 없으면: 그냥 파일 다운로드 */
+/* HWP 미리보기 — URL 복사 후 폴라리스 오피스 웹 열기 */
+async function hwpPreview(url, name) {
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('파일 URL이 복사되었습니다!');
+  } catch(e) {
+    // clipboard 실패 시 prompt로 수동 복사 안내
+    prompt('아래 URL을 복사하세요 (Ctrl+C / 길게 누르기):', url);
+  }
+  // 약간의 딜레이 후 폴라리스 오피스 웹 열기
+  setTimeout(() => window.open('https://hwp.polarisoffice.com/', '_blank'), 500);
+}
+
+/* 첨부파일 URL 복사 */
+async function copyFileUrl(url, name) {
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast('📋 파일 URL이 복사되었습니다!');
+  } catch(e) {
+    prompt('아래 URL을 복사하세요:', url);
+  }
+}
+
+/* HWP 등 — Blob으로 다운로드 후 OS 앱 선택기 트리거 */
 async function openWithAnyApp(url, name, mime) {
   try {
     showToast('파일 불러오는 중...');
