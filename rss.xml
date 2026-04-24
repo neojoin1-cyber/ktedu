@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>사단법인 한국관광교육연구원</title>
+    <link>https://ktedu.or.kr</link>
+    <description>전국 관광교사 지원·이순신 백의종군로 탐방 전문 비영리 법인. 교사 연수·교재 개발·역사 체험학습 프로그램 운영.</description>
+    <language>ko</language>
+    <copyright>Copyright 2010 사단법인 한국관광교육연구원</copyright>
+    <managingEditor>ktedu@ktedu.or.kr (사단법인 한국관광교육연구원)</managingEditor>
+    <webMaster>ktedu@ktedu.or.kr (사단법인 한국관광교육연구원)</webMaster>
+    <lastBuildDate>Fri, 24 Apr 2026 09:00:00 +0900</lastBuildDate>
+    <atom:link href="https://ktedu.or.kr/rss.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>https://ktedu.or.kr/images/mark.png</url>
+      <title>사단법인 한국관광교육연구원</title>
+      <link>https://ktedu.or.kr</link>
+    </image>
+
+    <item>
+      <title>사단법인 한국관광교육연구원 홈페이지 개설 안내</title>
+      <link>https://ktedu.or.kr/</link>
+      <description>사단법인 한국관광교육연구원 공식 홈페이지가 개설되었습니다. 관광교사 지원, 이순신 백의종군로 탐방 프로그램, 역사문화관광 교육 등 다양한 정보를 제공합니다.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/</guid>
+    </item>
+
+    <item>
+      <title>이순신 백의종군로 탐방 프로그램 안내</title>
+      <link>https://ktedu.or.kr/#about</link>
+      <description>경남 하동 일대 82km 이순신 백의종군로 역사 탐방 프로그램을 운영합니다. 학교 단체, 기업 연수, 관광교사 교육 등 맞춤형 역사체험 프로그램을 제공합니다.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/#about</guid>
+    </item>
+
+    <item>
+      <title>관광교사 지원 및 교육 프로그램</title>
+      <link>https://ktedu.or.kr/#programs</link>
+      <description>전국 관광교사를 대상으로 전문 연수, 교재 개발, 역사문화관광 교육 프로그램을 운영합니다. 한국관광교육연구원의 전문 교육 과정을 확인하세요.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/#programs</guid>
+    </item>
+
+    <item>
+      <title>공지사항 및 탐방일정</title>
+      <link>https://ktedu.or.kr/board.html</link>
+      <description>한국관광교육연구원의 최신 공지사항, 탐방 일정 및 신청 안내, 회원 전용 자료실을 확인하실 수 있습니다.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/board.html</guid>
+    </item>
+
+    <item>
+      <title>원장 인사말 — 팽현호 원장</title>
+      <link>https://ktedu.or.kr/#greeting</link>
+      <description>사단법인 한국관광교육연구원 팽현호 원장(경영학 박사)의 인사말. 관광교육 활성화와 이순신 백의종군로 탐방 연구·지원에 대한 비전을 소개합니다.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/#greeting</guid>
+    </item>
+
+    <item>
+      <title>연구원 연혁 및 주요 활동</title>
+      <link>https://ktedu.or.kr/#history</link>
+      <description>2010년 창립 이래 이순신 백의종군로 탐방, 관광교사 연수, 해운대·마산·진주 등 전국 역사문화관광 교육 활동 연혁을 소개합니다.</description>
+      <pubDate>Fri, 18 Apr 2026 09:00:00 +0900</pubDate>
+      <guid isPermaLink="true">https://ktedu.or.kr/#history</guid>
+    </item>
+
+  </channel>
+</rss>
