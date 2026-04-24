@@ -30,18 +30,15 @@
   --red:#b83232;--red-lt:#fff0f0;
   --text:#1a1a1a;--muted:#6b7a8a;
   --border:#e4e8ed;--bg:#f6f4f1;
-  --sidebar:250px;
   --nav-h:68px;
 }
 html{scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
 * {-webkit-tap-highlight-color:rgba(0,0,0,0.05)}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;display:flex;min-height:100vh}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
 button,a,.nav-item,.sub-item,.quick-card,.lnk,.scard,.gallery img{touch-action:manipulation}
 [style*="overflow-x:auto"]::-webkit-scrollbar{display:none}
 
 /* ── SIDEBAR ── */
-.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--navy);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;overflow-y:auto;z-index:100;transition:transform .3s}
-.sidebar-logo{padding:22px 18px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
 .logo-name{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:600;color:#fff;display:block;margin-bottom:3px;cursor:pointer;text-decoration:none}
 .logo-name:hover{color:#7ec8e3}
 .logo-sub{font-size:11px;color:rgba(255,255,255,.4);line-height:1.5}
@@ -51,16 +48,14 @@ button,a,.nav-item,.sub-item,.quick-card,.lnk,.scard,.gallery img{touch-action:m
 .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
 .nav-item.active{background:rgba(126,200,227,.12);color:#7ec8e3;border-left-color:#7ec8e3;font-weight:500}
 .nav-icon{font-size:14px;width:17px;text-align:center;flex-shrink:0}
-.sidebar-footer{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.08)}
-.sidebar-quote{font-family:'Noto Serif KR',serif;font-size:11px;color:rgba(255,255,255,.3);line-height:1.7;font-style:italic}
 
 /* ── MAIN ── */
-.main{margin-left:0;flex:1;min-height:100vh;display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding-top:var(--nav-h)}
-.page{display:none;flex:1;flex-direction:column}
-.page.active{display:flex;flex-direction:column;overflow-x:hidden;width:100%}
+.main{width:100%;min-height:100vh;overflow-x:hidden;padding-top:var(--nav-h)}
+.page{display:none;width:100%}
+.page.active{display:block;width:100%;overflow-x:hidden}
 
 /* ── HOME ── */
-.home-hero{background:linear-gradient(135deg,#152333 0%,#1e3a50 55%,#16303f 100%);color:#fff;padding:52px 36px 60px;position:relative;overflow:hidden;flex-shrink:0}
+.home-hero{background:linear-gradient(135deg,#152333 0%,#1e3a50 55%,#16303f 100%);color:#fff;padding:52px 36px 60px;position:relative;overflow:hidden;width:100%;box-sizing:border-box}
 .home-hero::before{content:'';position:absolute;top:-80px;right:-60px;width:380px;height:380px;background:rgba(126,200,227,.04);border-radius:50%}
 .home-inner{max-width:680px;position:relative;z-index:1;display:grid;grid-template-columns:1fr 180px;gap:32px;align-items:center}
 .hero-badge{display:inline-flex;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:4px 13px;font-size:11px;letter-spacing:.08em;margin-bottom:13px;color:#a8cce0}
@@ -96,10 +91,10 @@ button,a,.nav-item,.sub-item,.quick-card,.lnk,.scard,.gallery img{touch-action:m
 .closing-author{font-size:11px;color:rgba(255,255,255,.28)}
 
 /* ── CONTENT PAGE ── */
-.page-header{background:#fff;border-bottom:1px solid var(--border);padding:20px 36px 16px;flex-shrink:0;position:sticky;top:0;z-index:10;width:100%}
+.page-header{background:#fff;border-bottom:1px solid var(--border);padding:20px 36px 16px;position:sticky;top:var(--nav-h);z-index:10;width:100%;box-sizing:border-box}
 .page-label{font-size:10px;letter-spacing:.1em;color:var(--teal);font-weight:700;text-transform:uppercase;margin-bottom:3px}
 .page-title{font-family:'Noto Serif KR',serif;font-size:clamp(17px,2.5vw,23px);font-weight:600;color:var(--navy)}
-.page-body{padding:24px 28px;max-width:860px;flex:1;width:100%;align-self:flex-start}
+.page-body{padding:24px 28px;max-width:860px;width:100%;box-sizing:border-box}
 
 /* ── 공통 컴포넌트 ── */
 .bar{width:30px;height:3px;background:var(--teal);border-radius:2px;margin:10px 0 20px}
