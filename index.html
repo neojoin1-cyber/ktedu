@@ -94,15 +94,15 @@
   }
   nav.scrolled { box-shadow: 0 2px 24px rgba(13,31,60,0.08); }
 
-  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; flex-shrink: 0; }
   .nav-logo-emblem {
     width: 56px; height: 56px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     background: none;
   }
-  .nav-logo-text { color: var(--navy); font-size: 14px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
-  .nav-logo-sub { color: var(--text-soft); font-size: 9.5px; letter-spacing: 0.04em; margin-top: 1px; }
+  .nav-logo-text { color: var(--navy); font-size: 14px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; white-space: nowrap; }
+  .nav-logo-sub { color: var(--text-soft); font-size: 9.5px; letter-spacing: 0.04em; margin-top: 1px; white-space: nowrap; }
 
   .nav-links { display: flex; gap: 4px; align-items: center; }
   .nav-links a {
@@ -114,6 +114,7 @@
     border-radius: 6px;
     transition: all 0.18s;
     letter-spacing: -0.01em;
+    white-space: nowrap;
   }
   .nav-links a:hover { color: var(--navy); background: var(--line-lt); }
   .nav-links a.active-section {
@@ -136,6 +137,8 @@
     letter-spacing: -0.01em;
     transition: all 0.2s;
     margin-left: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .nav-cta:hover { background: var(--navy-mid); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(13,31,60,0.2); }
 
@@ -1294,11 +1297,17 @@
   .desktop-only { display: flex !important; }
 
   /* ══════════════════════════════════
+     반응형 — 1300px 메뉴 줄바꿈 방지
+  ══════════════════════════════════ */
+  @media (max-width: 1300px) {
+    .nav-links, .nav-cta { display: none; }
+    .nav-hamburger { display: flex; }
+  }
+
+  /* ══════════════════════════════════
      반응형 — 900px 태블릿
   ══════════════════════════════════ */
   @media (max-width: 900px) {
-    .nav-links, .nav-cta { display: none; }
-    .nav-hamburger { display: flex; }
     .mobile-only  { display: flex !important; }
     .desktop-only { display: none !important; }
     section { padding: 64px 5%; }

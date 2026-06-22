@@ -32,14 +32,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--paper);color:var(--i
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(13,31,60,0.12);display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:72px;box-shadow:0 2px 20px rgba(13,31,60,0.06);}
-.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;flex-shrink:0;}
 .nav-logo-emblem{width:56px;height:56px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:none;border:none;}
-.nav-logo-text{color:var(--navy);font-size:14px;font-weight:700;font-weight:500;}
-.nav-logo-sub{color:var(--text-soft);font-size:9.5px;letter-spacing:.06em;}
+.nav-logo-text{color:var(--navy);font-size:14px;font-weight:700;font-weight:500;white-space:nowrap;}
+.nav-logo-sub{color:var(--text-soft);font-size:9.5px;letter-spacing:.06em;white-space:nowrap;}
 .nav-links{display:flex;gap:18px;}
 .nav-links a{color:var(--text-mid);text-decoration:none;font-size:13px;transition:color .2s;white-space:nowrap;}
 .nav-links a:hover,.nav-links a.active{color:var(--navy);}
-.nav-back{color:var(--sage);border:1px solid rgba(168,197,160,.4);padding:7px 16px;border-radius:2px;font-size:12.5px;text-decoration:none;}
+.nav-back{color:var(--sage);border:1px solid rgba(168,197,160,.4);padding:7px 16px;border-radius:2px;font-size:12.5px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
 .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;}
 .nav-hamburger span{width:22px;height:1.5px;background:var(--navy);display:block;}
 
@@ -179,11 +179,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,
 .toast.err{background:var(--red);}
 
 /* MOBILE */
+@media(max-width:1300px){
+  .nav-links{display:none;}.nav-hamburger{display:flex;}
+}
+
 /* ══════════════════════════════════════
    RESPONSIVE — 태블릿 (max 800px)
 ══════════════════════════════════════ */
 @media(max-width:800px){
-  .nav-links{display:none;}.nav-hamburger{display:flex;}
   .mypage-grid{grid-template-columns:1fr;}
   .mp-row-2{grid-template-columns:1fr;}
   .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;}
