@@ -700,7 +700,7 @@ footer { background: var(--navy); padding: 64px 6% 28px; }
     <a href="board.html">공지·자료</a>
     <a href="mypage.html">가입 신청</a>
   </div>
-  <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">탐방 신청</button>
+  <button class="nav-cta" onclick="document.getElementById('greeting').scrollIntoView({behavior:'smooth'})">원장 인사말</button>
   <div class="nav-hamburger" onclick="openMobileNav()">
     <span></span><span></span><span></span>
   </div>
@@ -714,31 +714,32 @@ footer { background: var(--navy); padding: 64px 6% 28px; }
     <div class="hero-content">
       <div class="hero-kicker fade-up">
         <div class="hero-kicker-bar"></div>
-        <div class="hero-kicker-text">관광교육 연구 · 역사문화 탐방 · 전국 관광교사 지원</div>
+        <div class="hero-kicker-text">전국 관광교사 지원 · 관광교육 연구 · 역사문화 콘텐츠 개발</div>
       </div>
       <h1 class="hero-title fade-up delay-1">
-        장군의 발자취를 따라<br>
-        <em>미래 인재를 키웁니다</em>
+        관광교사와 함께<br>
+        <em>교육의 미래를 엽니다</em>
       </h1>
       <p class="hero-desc fade-up delay-2">
-        이순신 백의종군로 82km — 극기·도전·인내의 역사 현장.<br>
-        전국 관광교사·학생·기업이 함께 걷고 배우는<br>
-        한국관광교육연구원이 15년째 이어가는 살아있는 교육입니다.
+        전국 관광교사를 위한 연구와 교재 개발, 연수 지원에서 시작해<br>
+        이순신 백의종군로 같은 역사현장 학습모델까지 —<br>
+        한국관광교육연구원이 15년째 만들어가는<br>
+        관광교육의 다음 단계입니다.
       </p>
       <div class="hero-btns fade-up delay-3">
-        <a href="#contact" class="btn-primary">탐방 신청하기 →</a>
+        <a href="#greeting" class="btn-primary">원장 인사말 보기 →</a>
         <a href="#course" class="btn-outline">백의종군로 안내</a>
       </div>
       <!-- 신뢰 지표 -->
       <div class="hero-trust fade-up delay-4">
         <div class="hero-trust-item">
-          <span class="hero-trust-num">3,272<small>명</small></span>
-          <span class="hero-trust-label">누적 탐방</span>
+          <span class="hero-trust-num">전국</span>
+          <span class="hero-trust-label">관광교사 네트워크</span>
         </div>
         <div class="hero-trust-div"></div>
         <div class="hero-trust-item">
-          <span class="hero-trust-num">82<small>km</small></span>
-          <span class="hero-trust-label">탐방 코스</span>
+          <span class="hero-trust-num">14<small>인</small></span>
+          <span class="hero-trust-label">임원·자문위원</span>
         </div>
         <div class="hero-trust-div"></div>
         <div class="hero-trust-item">
@@ -755,21 +756,21 @@ footer { background: var(--navy); padding: 64px 6% 28px; }
 
     <!-- 오른쪽: 실제 사진 콜라주 -->
     <div class="hero-photo-collage fade-up delay-2">
-      <!-- 메인 큰 사진 -->
+      <!-- 메인 큰 사진: 관광교사 워크숍 (연구·지원 정체성을 먼저 보여줌) -->
       <div class="hpc-main">
-        <img src="images/2015_haeundae.jpg" alt="학생들이 태극기를 들고 백의종군로를 행진하는 모습"
+        <img src="images/2025_workshop.jpg" alt="2025 전국관광교사·교수 워크숍 단체 사진"
              onerror="this.style.background='var(--navy-mid)';this.src=''">
         <div class="hpc-main-caption">
-          <span class="hpc-caption-tag">백의종군로 탐방</span>
-          <span class="hpc-caption-text">함께 걷는 역사의 길 (해운대여중)</span>
+          <span class="hpc-caption-tag">워크숍·연수</span>
+          <span class="hpc-caption-text">전국 관광교사·교수와 함께 (2025 워크숍)</span>
         </div>
       </div>
       <!-- 작은 사진 2개 -->
       <div class="hpc-side">
         <div class="hpc-small">
-          <img src="images/2025_workshop.jpg" alt="2025 영호남 관광교사 워크숍 단체 사진"
+          <img src="images/2015_haeundae.jpg" alt="학생들이 태극기를 들고 백의종군로를 행진하는 모습"
                onerror="this.style.background='var(--navy-lt)';this.src=''">
-          <div class="hpc-small-caption"><span class="hpc-small-tag">워크숍·연수</span> 2025 전국관광교사·교수 워크숍</div>
+          <div class="hpc-small-caption"><span class="hpc-small-tag">백의종군로 탐방</span> 함께 걷는 역사의 길</div>
         </div>
         <div class="hpc-small">
           <img src="images/lecture.jpg" alt="드라마 불멸의 이순신 윤영수 작가 특강"
@@ -1431,12 +1432,12 @@ footer { background: var(--navy); padding: 64px 6% 28px; }
 <!-- ── CTA ── -->
 <section class="cta-band">
   <div class="cta-band-inner">
-    <span class="cta-band-label">함께하는 역사교육</span>
-    <h2>관광교사·학교·기업 모두를 위한<br>역사문화 탐방 프로그램</h2>
-    <p>이순신 백의종군로 82km — 경남 하동에서 시작하는 살아있는 역사교육.<br>단체 탐방부터 교사 연수, 기업 연수까지 함께합니다.</p>
+    <span class="cta-band-label">관광교사와 함께</span>
+    <h2>전국 관광교사의 연구와 교육을<br>한국관광교육연구원이 지원합니다</h2>
+    <p>교재 개발, 현장 연수, 역사문화 콘텐츠 연구부터 이순신 백의종군로 같은 학습모델까지.<br>관광교육의 다음 단계를 함께 만들어갈 관광교사·기관을 기다립니다.</p>
     <div class="cta-band-btns">
-      <a href="#contact" class="cta-btn-a">탐방 신청하기</a>
-      <a href="board.html" class="cta-btn-b">공지·자료 보기</a>
+      <a href="#about" class="cta-btn-a">연구원 소개 보기</a>
+      <a href="#course" class="cta-btn-b">백의종군로 안내</a>
     </div>
   </div>
 </section>
