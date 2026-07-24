@@ -1,0 +1,157 @@
+/* 형광펜·메모 위젯 스타일 — highlight-widget.js와 함께 사용 */
+
+mark.gw-hl {
+  position: relative;
+  cursor: pointer;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+mark.gw-hl.c-y { background: #fff59d; }
+mark.gw-hl.c-g { background: #a5d6a7; }
+mark.gw-hl.c-p { background: #f48fb1; }
+mark.gw-hl.c-b { background: #90caf9; }
+mark.gw-hl:hover { outline: 2px solid rgba(0, 0, 0, 0.35); }
+
+/* 형광펜 우측 상단의 작은 분류 라벨(중요/암기/헷갈림/질문, 메모 있으면 📝 추가) */
+mark.gw-hl::after {
+  content: attr(data-label);
+  position: absolute;
+  top: -9px;
+  right: -3px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1px;
+  color: #444;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0 3px;
+  border-radius: 3px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 메모 호버 툴팁(엑셀 코멘트 방식) */
+mark.gw-hl .gw-tip {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 6px;
+  min-width: 120px;
+  max-width: 240px;
+  background: #2b2f38;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  white-space: pre-wrap;
+  z-index: 50;
+  user-select: none;
+  -webkit-user-select: none;
+}
+mark.gw-hl.hasmemo:hover .gw-tip { display: block; }
+
+mark.gw-hl.gw-flash { animation: gwflash 1.5s ease; }
+@keyframes gwflash {
+  0%, 100% { outline: 0 solid rgba(239, 75, 60, 0); }
+  20%, 60% { outline: 3px solid rgba(239, 75, 60, 0.9); }
+}
+
+/* 콘텐츠 안에 "필수/빈출/중요" 같은 태그 배지가 있다면(class="b b-XX" 등),
+   드래그로 형광펜 칠할 때 그 배지 텍스트까지 같이 선택되지 않도록 제외.
+   그 사이트의 배지 클래스명에 맞춰 셀렉터를 조정할 것. */
+.b, .b-gi, .b-bin, .b-law, .b-new, .b-tip {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 색상 선택 툴바(드래그 직후 뜨는 팝오버) */
+.gw-floatbar {
+  position: fixed;
+  display: flex;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #d4d8e0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: 0 6px 20px rgba(16, 28, 47, 0.22);
+  z-index: 200;
+}
+.gw-swatchbtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  min-width: 44px;
+}
+.gw-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.13);
+  display: block;
+}
+.gw-memoicon {
+  background: #fff;
+  border: 1px solid #c7ccd4;
+  color: #101c2f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.gw-swatchlabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #444;
+}
+.gw-sep {
+  width: 1px;
+  align-self: stretch;
+  background: #e2e6ec;
+  margin: 2px 2px;
+}
+.gw-closebtn { min-width: 32px; }
+
+/* 메모·색상 편집 팝업(기존 형광펜 클릭 시) */
+.gw-popupbox {
+  position: fixed;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+  color: #111;
+}
+.gw-popup-colors {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.gw-starbtn {
+  font-size: 18px;
+  background: none;
+  border: none;
+  margin-left: 4px;
+  cursor: pointer;
+}
+.gw-memo-textarea {
+  width: 220px;
+  height: 60px;
+}
+.gw-popup-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+}
