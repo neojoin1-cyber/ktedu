@@ -565,6 +565,9 @@ const ADMIN_EMAIL = 'kbe@daum.net';
 ══════════════════════════════════ */
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
+const DEVICE_KEY = 'ktea_study_device_id';
+function getStudyDeviceId() { let id = localStorage.getItem(DEVICE_KEY); if (!id) { id = crypto.randomUUID(); localStorage.setItem(DEVICE_KEY, id); } return id; }
+function getStudyDeviceType() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ? 'mobile' : 'pc'; }
 
 /* ══════════════════════════════════
    STATE
@@ -649,7 +652,7 @@ async function doLogin() {
 
   try {
     const pwHash = await sha256(pw);
-    const { data: memberSession } = await db.rpc('login_member_with_study_session', { p_email: email, p_pw_hash: pwHash });
+    const { data: memberSession } = await db.rpc('login_member_with_device_session', { p_email: email, p_pw_hash: pwHash, p_device_id: getStudyDeviceId(), p_device_type: getStudyDeviceType(), p_device_name: navigator.userAgent.slice(0, 200) });
     if (!memberSession) { err.classList.add('show'); document.getElementById('loginPw').value = ''; return; }
     curUser = memberSession;
     err.classList.remove('show');
