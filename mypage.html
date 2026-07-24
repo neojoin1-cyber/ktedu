@@ -834,13 +834,13 @@ function renderMembers() {
       acts = `<div class="act-btns">
         <button class="btn-approve" onclick="approveMember(${m.id})">승인</button>
         <button class="btn-reject"  onclick="rejectMember(${m.id})">거절·삭제</button>
-        <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+        <button class="btn-memo"    onclick="resetStudyDevices(${m.id},'${(m.name||'회원').replace(/'/g,"\\'")}')">학습기기 초기화</button><button class="btn-memo" onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
       </div>`;
     } else if (m.role === 'member') {
       acts = `<div class="act-btns">
         <button class="btn-approve" onclick="setAdminRole(${m.id},'admin')" title="관리자로 승급">관리자 승급</button>
         <button class="btn-reject"  onclick="rejectMember(${m.id})">삭제</button>
-        <button class="btn-memo"    onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
+        <button class="btn-memo"    onclick="resetStudyDevices(${m.id},'${(m.name||'회원').replace(/'/g,"\\'")}')">학습기기 초기화</button><button class="btn-memo" onclick="openMemo(${m.id},'${(m.memo||'').replace(/'/g,"\\'")}')">메모</button>
       </div>`;
     } else if (m.role === 'admin') {
       acts = `<div class="act-btns">
@@ -881,6 +881,14 @@ async function approveMember(id) {
   if (error) { showToast('오류: '+error.message, true); return; }
   showToast('승인되었습니다.');
   loadMembers();
+}
+
+async function resetStudyDevices(id, name) {
+  if (!confirm(`${name} 회원의 등록된 PC·모바일 학습기기를 모두 초기화할까요?`)) return;
+  if (!curUser?.study_token) { showToast('관리자 계정에서 로그아웃 후 다시 로그인해 주세요.', true); return; }
+  const { error } = await db.rpc('reset_member_study_devices', { p_token: curUser.study_token, p_member_id: id });
+  if (error) { showToast('초기화 오류: ' + error.message, true); return; }
+  showToast('학습 기기가 초기화되었습니다.');
 }
 
 async function rejectMember(id) {
